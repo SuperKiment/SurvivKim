@@ -1,5 +1,6 @@
 package com.superkiment.client;
 
+import com.superkiment.common.entities.Player;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
@@ -7,6 +8,7 @@ import org.lwjgl.system.MemoryStack;
 
 import java.nio.IntBuffer;
 
+import static com.superkiment.client.Setup.setupInputs;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -20,12 +22,7 @@ public class Main {
     private long window;
     private InputManager input;
 
-    private float playerX = 400;
-    private float playerY = 300;
-    private float playerSpeed = 200f; // pixels par seconde
-    private int jumpCount = 0;
-    private long lastFrameTime;
-    private float deltaTime;
+    private Player player;
 
     public void run() {
         System.out.println("Hello LWJGL " + org.lwjgl.Version.getVersion() + "!");
@@ -98,7 +95,10 @@ public class Main {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        setupInputs();
+        player = new Player();
+
+        input = InputManager.getInstance();
+        setupInputs(window, input, player);
     }
 
     private void loop() {
@@ -110,21 +110,21 @@ public class Main {
 
 
             // Dessiner le joueur (carré rouge)
-            new Shape(playerX, playerY)
+            new Shape((float) player.pos.x, (float) player.pos.y)
                     .setColor(1.0f, 0.3f, 0.3f)
                     .drawRect(40, 40);
 
             // Indicateur de sprint (cercle vert si shift pressé)
             if (input.isActionActive("sprint")) {
-                new Shape(playerX, playerY)
+                new Shape((float) player.pos.x, (float) player.pos.y)
                         .setColor(0.3f, 1.0f, 0.3f)
                         .drawCircle(25, 16);
             }
 
             // Alternative : utiliser directement les touches
             if (input.isKeyJustPressed(GLFW_KEY_R)) {
-                playerX = 400;
-                playerY = 300;
+                player.pos.x = 400d;
+                player.pos.y = 300d;
                 System.out.println("Position réinitialisée !");
             }
 
@@ -187,7 +187,7 @@ public class Main {
 
             glfwSwapBuffers(window);
             glfwPollEvents();
-            updateDeltaTime();
+            Time.updateDeltaTime();
         }
     }
 
@@ -195,67 +195,7 @@ public class Main {
         new Main().run();
     }
 
-    private void setupInputs() {
-        input = InputManager.getInstance();
-        input.init(window);
 
-        // Lier les touches aux actions
-        input.bindAction("avancer", GLFW_KEY_W, GLFW_KEY_UP);
-        input.bindAction("reculer", GLFW_KEY_S, GLFW_KEY_DOWN);
-        input.bindAction("gauche", GLFW_KEY_A, GLFW_KEY_LEFT);
-        input.bindAction("droite", GLFW_KEY_D, GLFW_KEY_RIGHT);
-        input.bindAction("sauter", GLFW_KEY_SPACE);
-        input.bindAction("quitter", GLFW_KEY_ESCAPE);
-        input.bindAction("sprint", GLFW_KEY_LEFT_SHIFT);
 
-        // Action continue (appelée tant que la touche est enfoncée)
-        input.onAction("avancer", (v) -> {
-            float dt = getDeltaTime();
-            float speed = input.isActionActive("sprint") ? playerSpeed * 2 : playerSpeed;
-            playerY -= speed * dt;
-        });
-
-        input.onAction("reculer", (v) -> {
-            float dt = getDeltaTime();
-            float speed = input.isActionActive("sprint") ? playerSpeed * 2 : playerSpeed;
-            playerY += speed * dt;
-        });
-
-        input.onAction("gauche", (v) -> {
-            float dt = getDeltaTime();
-            float speed = input.isActionActive("sprint") ? playerSpeed * 2 : playerSpeed;
-            float soustraction = speed * dt;
-            playerX -= soustraction;
-        });
-
-        input.onAction("droite", (v) -> {
-            float dt = getDeltaTime();
-            float speed = input.isActionActive("sprint") ? playerSpeed * 2 : playerSpeed;
-            playerX += speed * dt;
-        });
-
-        // Action au moment du press (une seule fois)
-        input.onActionPress("sauter", () -> {
-            jumpCount++;
-            System.out.println("Saut ! Total: " + jumpCount);
-        });
-
-        input.onActionPress("quitter", () -> {
-            glfwSetWindowShouldClose(window, true);
-        });
-
-        // Afficher les bindings
-        input.printBindings();
-    }
-
-    private void updateDeltaTime() {
-        long currentTime = System.nanoTime();
-        deltaTime = (currentTime - lastFrameTime)/1_000_000_000f;
-        lastFrameTime = currentTime;
-    }
-
-    private float getDeltaTime() {
-        return deltaTime;
-    }
 
 }
