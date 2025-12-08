@@ -29,7 +29,7 @@ public class Network {
 
         try {
             monitor.logTCPReceived(packet);
-        } catch (IOException e) {
+        } catch (IOException ignored) {
         }
 
         switch (packet.getType()) {
@@ -54,6 +54,8 @@ public class Network {
      * Gérer les packets UDP reçus
      */
     public static void handleUDPPacket(PacketEntityPosition packet, InetAddress address, int port, UDPServer udpServer) {
+        monitor.logUDPReceived(packet);
+
         ClientConnection client = clients.get(packet.entityId);
         if (client != null) {
             if (client.getUdpPort() == 0) {
@@ -77,10 +79,9 @@ public class Network {
 
         entities.put(entity.id, entity);
 
-        System.out.println("Entité créée: " + entity.id + " (" + entity.name + ")");
-
         // Broadcaster à tous les clients
         broadcastTCP(packet, client);
+        monitor.log("INFO", "Entité créée: " + entity.id + " (" + entity.name + ")");
     }
 
     public static void handleDeleteEntity(PacketDeleteEntity packet) {
@@ -89,6 +90,7 @@ public class Network {
 
         // Broadcaster à tous les clients
         broadcastTCP(packet, null);
+        monitor.log("INFO", "Entité supprimée: " + packet.entityId);
     }
 
     public static void handlePlayerJoin(PacketPlayerJoin packet, ClientConnection client) {
@@ -108,12 +110,18 @@ public class Network {
 
         // Broadcaster le nouveau joueur aux autres
         broadcastTCP(packet, client);
+        monitor.log("INFO", "Joueur a rejoint : " + client.playerId + " (" + client.playerName + ")");
     }
 
     /**
      * Envoyer un packet TCP à tous les clients sauf l'expéditeur
      */
     public static void broadcastTCP(Packet packet, ClientConnection except) {
+        try {
+            monitor.logTCPSent(packet);
+        } catch (IOException ignored) {
+        }
+
         for (ClientConnection client : clients.values()) {
             if (client != except) {
                 client.sendTCP(packet);
@@ -125,6 +133,8 @@ public class Network {
      * Envoyer une position UDP à tous les clients sauf l'expéditeur
      */
     public static void broadcastPositionUDP(PacketEntityPosition packet, InetAddress exceptAddress, int exceptPort, UDPServer udpServer) {
+        monitor.logUDPSent(packet);
+
         for (ClientConnection client : clients.values()) {
             int udpPort = client.getUdpPort();
             if (udpPort == 0) {

@@ -3,6 +3,7 @@ package com.superkiment.server.monitor;
 import com.superkiment.common.packets.Packet;
 import com.superkiment.common.packets.PacketEntityPosition;
 import com.superkiment.common.packets.PacketSerializer;
+import com.superkiment.server.GameServer;
 
 import java.io.IOException;
 import java.util.*;
@@ -102,7 +103,7 @@ public class ServerMonitor {
         udpPacketsPerSecond++;
         totalBytesReceived += bytes;
         bytesPerSecond += bytes;
-        log("UDP_IN", "← Position " + entityId.substring(0, 8) + "... (" + bytes + " bytes)");
+        //log("UDP_IN", "← Position " + entityId.substring(0, 8) + "... (" + bytes + " bytes)");
     }
 
     /**
@@ -117,7 +118,7 @@ public class ServerMonitor {
         udpPacketsPerSecond++;
         totalBytesSent += bytes;
         bytesPerSecond += bytes;
-        log("UDP_OUT", "→ Position " + entityId.substring(0, 8) + "... (" + bytes + " bytes)");
+        //log("UDP_OUT", "→ Position " + entityId.substring(0, 8) + "... (" + bytes + " bytes)");
     }
 
     /**
@@ -172,6 +173,25 @@ public class ServerMonitor {
 
         json.append("]}");
         return json.toString();
+    }
+
+    public void statsUpdateLoop(GameServer gameServer) {
+        while (gameServer.running) {
+            try {
+                Thread.sleep(1000); // Toutes les secondes
+
+                // Mettre à jour les stats
+                setConnectedClients(GameServer.entitiesManager.getClients().size());
+                setTotalEntities(GameServer.entitiesManager.getEntities().size());
+                resetPerSecondStats();
+
+                // Broadcaster aux dashboards
+                MonitorWebServer.broadcast(getStatsJSON());
+
+            } catch (InterruptedException e) {
+                break;
+            }
+        }
     }
 
     /**

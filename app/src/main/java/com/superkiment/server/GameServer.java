@@ -18,7 +18,7 @@ public class GameServer {
 
     public static EntitiesManager entitiesManager;
 
-    private boolean running = false;
+    public boolean running = false;
 
     public static void main(String[] args) {
         GameServer server = new GameServer();
@@ -48,7 +48,7 @@ public class GameServer {
         new Thread(udpServer::start).start();
 
         //Mise à jour des stats
-        new Thread(this::statsUpdateLoop).start();
+        new Thread(()->monitor.statsUpdateLoop(this)).start();
 
         // Boucle principale du serveur
         gameLoop();
@@ -80,39 +80,6 @@ public class GameServer {
     private void tick() {
         // Logique du serveur (update entités, etc.)
         // Pour l'instant, rien à faire ici
-    }
-
-    public void removeClient(ClientConnection client) {
-        if (client.playerId != null) {
-            entitiesManager.getClients().remove(client.playerId);
-            System.out.println("Client déconnecté: " + client.playerName);
-
-            // Supprimer l'entité du joueur
-            if (entitiesManager.getEntities().containsKey(client.playerId)) {
-                PacketDeleteEntity packet = new PacketDeleteEntity(client.playerId);
-                Network.broadcastTCP(packet, null);
-                entitiesManager.getEntities().remove(client.playerId);
-            }
-        }
-    }
-
-    private void statsUpdateLoop() {
-        while (running) {
-            try {
-                Thread.sleep(1000); // Toutes les secondes
-
-                // Mettre à jour les stats
-                monitor.setConnectedClients(entitiesManager.getClients().size());
-                monitor.setTotalEntities(entitiesManager.getEntities().size());
-                monitor.resetPerSecondStats();
-
-                // Broadcaster aux dashboards
-                MonitorWebServer.broadcast(monitor.getStatsJSON());
-
-            } catch (InterruptedException e) {
-                break;
-            }
-        }
     }
 
     public void stop() {

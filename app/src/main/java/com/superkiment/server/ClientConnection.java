@@ -68,7 +68,7 @@ public class ClientConnection implements Runnable {
     private void disconnect() {
         try {
             socket.close();
-            gameServer.removeClient(this);
+            GameServer.entitiesManager.removeClient(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
