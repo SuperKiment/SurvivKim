@@ -1,11 +1,14 @@
 package com.superkiment.client.network;
 
 import com.superkiment.common.Entity;
+import com.superkiment.common.entities.Player;
 import com.superkiment.common.packets.*;
 import org.joml.Vector2d;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static org.lwjgl.glfw.GLFW.glfwSetWindowTitle;
 
 public class GameClient {
 
@@ -24,7 +27,7 @@ public class GameClient {
     private UDPClient udpClient;
 
     private final Map<String, Entity> entities = new ConcurrentHashMap<>();
-    private Entity localPlayer;
+    private Player localPlayer;
     private String playerId;
 
     private boolean connected = false;
@@ -52,7 +55,7 @@ public class GameClient {
             udpClient.connect();
 
             // Créer l'entité du joueur local
-            localPlayer = new Entity(new Vector2d(400, 300));
+            localPlayer = new Player(new Vector2d(400, 300));
             localPlayer.id = playerId;
             localPlayer.name = playerName;
 
@@ -77,6 +80,23 @@ public class GameClient {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public static GameClient tryConnectToServer(long window) {
+        System.out.println("Tentative de connexion au serveur...");
+        GameClient gameClient = new GameClient(SERVER_ADDRESS, TCP_PORT, UDP_PORT);
+
+        boolean success = gameClient.connect("Player_" + System.currentTimeMillis() % 1000);
+
+        if (success) {
+            System.out.println("✓ Connecté au serveur !");
+            glfwSetWindowTitle(window, "Mon Jeu Multijoueur - Connecté");
+            return gameClient;
+        }
+
+        System.out.println("✗ Échec de connexion au serveur");
+        glfwSetWindowTitle(window, "Mon Jeu Multijoueur - Déconnecté");
+        return null;
     }
 
     /**
@@ -195,7 +215,7 @@ public class GameClient {
     }
 
     // Getters
-    public Entity getLocalPlayer() {
+    public Player getLocalPlayer() {
         return localPlayer;
     }
 
