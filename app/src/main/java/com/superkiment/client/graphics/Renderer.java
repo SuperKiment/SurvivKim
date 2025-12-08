@@ -24,8 +24,8 @@ public class Renderer {
             boolean isLocal = entity.id.equals(localPlayer.id);
 
             glPushMatrix();
-            glTranslated(entity.pos.x, entity.pos.y, 0);
-            double angleInRad = entity.dirLook.angle(new Vector2d(1, 0)) * 57.2957795131d;
+            glTranslated(entity.posLerp.x, entity.posLerp.y, 0);
+            double angleInRad = entity.dirLookLerp.angle(new Vector2d(1, 0)) * 57.2957795131d;
             glRotated(angleInRad, 0, 0, -1);
             entity.shapeModel.renderModel();
 

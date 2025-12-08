@@ -5,8 +5,12 @@ import com.superkiment.client.graphics.Shape;
 import com.superkiment.client.graphics.ShapeModel;
 import org.joml.Vector2d;
 
+import static com.superkiment.common.utils.Vector.Lerp;
+import static com.superkiment.common.utils.Vector.LerpRotation;
+
 public class Entity {
-    public Vector2d pos, dirLook, dirDepl;
+    public Vector2d pos, posLerp,
+            dirLookTarget, dirLookLerp, dirDepl;
     public float speed = 200f;
     public String id;
     public String name = "NoName";
@@ -20,7 +24,9 @@ public class Entity {
 
     public Entity(Vector2d pos) {
         this.pos = new Vector2d(pos.x, pos.y);
-        this.dirLook = new Vector2d(0, 1);
+        this.posLerp = new Vector2d(pos.x, pos.y);
+        this.dirLookTarget = new Vector2d(0, 1);
+        this.dirLookLerp = new Vector2d(0, 1);
         this.dirDepl = new Vector2d(0, 0);
 
         shapeModel = new ShapeModel();
@@ -30,16 +36,17 @@ public class Entity {
 
     public void update() {
         updateMovement();
+        updateLerp();
     }
 
     public void turnToDirection(Vector2d dir) {
-        this.dirLook.set(dir);
+        this.dirLookTarget.set(dir);
     }
 
     private void updateMovement() {
         if (!moveFromInput) return;
 
-        dirLook.set(dirDepl.x, dirDepl.y);
+        dirLookTarget.set(dirDepl.x, dirDepl.y);
 
         Vector2d mvt = new Vector2d(dirDepl.x, dirDepl.y);
         mvt
@@ -49,6 +56,11 @@ public class Entity {
         pos.add(mvt);
 
         moveFromInput = false;
+    }
+
+    private void updateLerp() {
+        dirLookLerp = LerpRotation(dirLookLerp, dirLookTarget, 0.2);
+        posLerp = Lerp(posLerp, pos, 0.3);
     }
 
     public void moveToPosition(Vector2d pos) {
