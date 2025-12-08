@@ -1,5 +1,8 @@
 package com.superkiment.client;
 
+import com.superkiment.client.graphics.Renderer;
+import com.superkiment.client.network.GameClient;
+import com.superkiment.common.Entity;
 import com.superkiment.common.entities.Player;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
@@ -21,6 +24,8 @@ public class Main {
 
     private long window;
     private InputManager input;
+    private GameClient gameClient;
+    private Renderer renderer;
 
     private Player player;
 
@@ -30,10 +35,13 @@ public class Main {
         init();
         loop();
 
+        if (gameClient != null) {
+            gameClient.disconnect();
+        }
+
         // Libérer les ressources
         glfwFreeCallbacks(window);
         glfwDestroyWindow(window);
-
         glfwTerminate();
         glfwSetErrorCallback(null).free();
     }
@@ -95,99 +103,91 @@ public class Main {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+        renderer = new Renderer();
+
         player = new Player();
 
         input = InputManager.getInstance();
         setupInputs(window, input, player);
+
+        input.onActionPress("connecter", () -> {
+            if (gameClient == null || !gameClient.isConnected()) {
+                connectToServer();
+            }
+        });
+        input.bindAction("connecter", GLFW_KEY_C);
+
+        connectToServer();
     }
 
     private void loop() {
-        glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
+        glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
 
         while (!glfwWindowShouldClose(window)) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             input.update();
 
+            float dt = Time.getDeltaTime();
 
-            // Dessiner le joueur (carré rouge)
-            new Shape((float) player.pos.x, (float) player.pos.y)
-                    .setColor(1.0f, 0.3f, 0.3f)
-                    .drawRect(40, 40);
+            // ========== GESTION DU RÉSEAU ==========
+            if (gameClient != null && gameClient.isConnected()) {
+                Entity localPlayer = gameClient.getLocalPlayer();
 
-            // Indicateur de sprint (cercle vert si shift pressé)
-            if (input.isActionActive("sprint")) {
-                new Shape((float) player.pos.x, (float) player.pos.y)
-                        .setColor(0.3f, 1.0f, 0.3f)
-                        .drawCircle(25, 16);
+                // Déplacer le joueur local
+                float speed = localPlayer.speed * dt;
+
+                if (input.isActionActive("avancer")) {
+                    localPlayer.pos.y -= speed;
+                }
+                if (input.isActionActive("reculer")) {
+                    localPlayer.pos.y += speed;
+                }
+                if (input.isActionActive("gauche")) {
+                    localPlayer.pos.x -= speed;
+                }
+                if (input.isActionActive("droite")) {
+                    localPlayer.pos.x += speed;
+                }
+
+                // Envoyer la position au serveur (UDP) régulièrement
+                GameClient.positionSendTimer += dt;
+                if (GameClient.positionSendTimer >= GameClient.POSITION_SEND_RATE) {
+                    gameClient.sendPosition();
+                    GameClient.positionSendTimer = 0;
+                }
+
+                renderer.renderEntities(gameClient.getEntities(), localPlayer);
+
+            } else {
+                // Message de déconnexion
+                new Shape(400, 300)
+                        .setColor(1.0f, 0.5f, 0.2f)
+                        .drawRect(200, 50);
             }
 
-            // Alternative : utiliser directement les touches
-            if (input.isKeyJustPressed(GLFW_KEY_R)) {
-                player.pos.x = 400d;
-                player.pos.y = 300d;
-                System.out.println("Position réinitialisée !");
+            // Quitter avec ESC
+            if (input.isActionJustPressed("quitter")) {
+                glfwSetWindowShouldClose(window, true);
             }
-
-            // Utiliser la souris
-            if (input.isMouseButtonJustPressed(GLFW_MOUSE_BUTTON_LEFT)) {
-                var mousePos = input.getMousePosition();
-                System.out.println("Clic à: " + mousePos.x + ", " + mousePos.y);
-
-                // Dessiner un cercle bleu à la position du clic
-                new Shape(mousePos.x, mousePos.y)
-                        .setColor(0.3f, 0.5f, 1.0f)
-                        .drawCircle(10, 16);
-            }
-
-            // Afficher la position de la souris en temps réel
-            var mousePos = input.getMousePosition();
-            new Shape(mousePos.x, mousePos.y)
-                    .setColor(1.0f, 1.0f, 0.3f)
-                    .drawCircle(5, 8);
-
-            // Utiliser le scroll
-            float scroll = input.getScrollDelta();
-            if (scroll != 0) {
-                System.out.println("Scroll: " + scroll);
-            }
-
-            // EXEMPLE D'UTILISATION DES FORMES
-
-            // Rectangle rouge
-            new Shape(200, 150)
-                    .setColor(1.0f, 0.2f, 0.2f)
-                    .drawRect(100, 80);
-
-            // Cercle bleu
-            new Shape(400, 150)
-                    .setColor(0.2f, 0.5f, 1.0f)
-                    .drawCircle(50, 32);
-
-            // Triangle vert avec rotation
-            new Shape(600, 150)
-                    .setColor(0.2f, 1.0f, 0.3f)
-                    .setRotation(45)
-                    .drawTriangle(80);
-
-            // Rectangle avec contour
-            new Shape(200, 350)
-                    .setColor(1.0f, 0.8f, 0.2f)
-                    .drawRectOutline(120, 60, 3);
-
-            // Cercle avec contour
-            new Shape(400, 350)
-                    .setColor(0.8f, 0.2f, 1.0f)
-                    .drawCircleOutline(40, 32, 2);
-
-            // Triangle avec contour et rotation animée
-            new Shape(600, 350)
-                    .setColor(1.0f, 0.5f, 0.2f)
-                    .setRotation((float) (glfwGetTime() * 50)) // Rotation animée
-                    .drawTriangleOutline(70, 2);
 
             glfwSwapBuffers(window);
             glfwPollEvents();
             Time.updateDeltaTime();
+        }
+    }
+
+    private void connectToServer() {
+        System.out.println("Tentative de connexion au serveur...");
+        gameClient = new GameClient(GameClient.SERVER_ADDRESS, GameClient.TCP_PORT, GameClient.UDP_PORT);
+
+        boolean success = gameClient.connect("Player_" + System.currentTimeMillis() % 1000);
+
+        if (success) {
+            System.out.println("✓ Connecté au serveur !");
+            glfwSetWindowTitle(window, "Mon Jeu Multijoueur - Connecté");
+        } else {
+            System.out.println("✗ Échec de connexion au serveur");
+            glfwSetWindowTitle(window, "Mon Jeu Multijoueur - Déconnecté");
         }
     }
 

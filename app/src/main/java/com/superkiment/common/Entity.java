@@ -6,6 +6,8 @@ import org.joml.Vector2d;
 public class Entity {
     public Vector2d pos, dir;
     public float speed = 200f;
+    public String id;
+    public String name = "NoName";
 
     public Entity() {
         this(new Vector2d(200f, 200f));
@@ -27,5 +29,10 @@ public class Entity {
                 .mul(speed)
                 .mul(Time.getDeltaTime());
         pos.add(mvt);
+    }
+
+    public void moveToPosition(Vector2d pos) {
+        this.pos.x = pos.x;
+        this.pos.y = pos.y;
     }
 }
