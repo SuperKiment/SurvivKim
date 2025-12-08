@@ -1,4 +1,4 @@
-package com.superkiment.common;
+package com.superkiment.common.entities;
 
 import com.superkiment.client.Time;
 import org.joml.Vector2d;

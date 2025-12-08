@@ -30,7 +30,7 @@ public class ClientConnection implements Runnable {
             while (!socket.isClosed()) {
                 try {
                     Packet packet = (Packet) in.readObject();
-                    gameServer.handleTCPPacket(packet, this);
+                    Network.handleTCPPacket(packet, this);
                 } catch (EOFException | SocketException e) {
                     break;
                 } catch (ClassNotFoundException e) {

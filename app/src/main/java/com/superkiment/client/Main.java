@@ -2,8 +2,7 @@ package com.superkiment.client;
 
 import com.superkiment.client.graphics.Renderer;
 import com.superkiment.client.network.GameClient;
-import com.superkiment.common.Entity;
-import com.superkiment.common.entities.Player;
+import com.superkiment.common.entities.Entity;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;

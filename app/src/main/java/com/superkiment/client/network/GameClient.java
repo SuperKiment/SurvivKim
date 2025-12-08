@@ -1,6 +1,6 @@
 package com.superkiment.client.network;
 
-import com.superkiment.common.Entity;
+import com.superkiment.common.entities.Entity;
 import com.superkiment.common.entities.Player;
 import com.superkiment.common.packets.*;
 import org.joml.Vector2d;

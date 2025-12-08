@@ -1,13 +1,9 @@
 package com.superkiment.server;
 
-import com.superkiment.common.Entity;
+import com.superkiment.common.entities.EntitiesManager;
 import com.superkiment.common.packets.*;
-import org.joml.Vector2d;
-
-import java.io.IOException;
-import java.net.*;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import com.superkiment.server.monitor.MonitorWebServer;
+import com.superkiment.server.monitor.ServerMonitor;
 
 public class GameServer {
 
@@ -17,9 +13,10 @@ public class GameServer {
 
     private TCPServer tcpServer;
     private UDPServer udpServer;
+    private MonitorWebServer monitorServer;
+    private ServerMonitor monitor;
 
-    private final Map<String, Entity> entities = new ConcurrentHashMap<>();
-    private final Map<String, ClientConnection> clients = new ConcurrentHashMap<>();
+    public static EntitiesManager entitiesManager;
 
     private boolean running = false;
 
@@ -33,15 +30,25 @@ public class GameServer {
         System.out.println("TCP Port: " + TCP_PORT);
         System.out.println("UDP Port: " + UDP_PORT);
 
+        monitor = ServerMonitor.getInstance();
+        monitorServer = new MonitorWebServer();
+        monitorServer.start();
+
+        entitiesManager = new EntitiesManager();
+
+        Network.setupNetwork(entitiesManager.getEntities(), entitiesManager.getClients());
+
         running = true;
 
-        // Démarrer le serveur TCP
+        // Démarrer les serveurs TCP et UDP
         tcpServer = new TCPServer(TCP_PORT, this);
         new Thread(tcpServer::start).start();
 
-        // Démarrer le serveur UDP
-        udpServer = new UDPServer(UDP_PORT, this);
+        udpServer = new UDPServer(UDP_PORT);
         new Thread(udpServer::start).start();
+
+        //Mise à jour des stats
+        new Thread(this::statsUpdateLoop).start();
 
         // Boucle principale du serveur
         gameLoop();
@@ -75,128 +82,35 @@ public class GameServer {
         // Pour l'instant, rien à faire ici
     }
 
-    /**
-     * Gérer les packets TCP reçus
-     */
-    public void handleTCPPacket(Packet packet, ClientConnection client) {
-        System.out.println("TCP reçu: " + packet);
-
-        switch (packet.getType()) {
-            case CREATE_ENTITY:
-                handleCreateEntity((PacketCreateEntity) packet, client);
-                break;
-
-            case DELETE_ENTITY:
-                handleDeleteEntity((PacketDeleteEntity) packet);
-                break;
-
-            case PLAYER_JOIN:
-                handlePlayerJoin((PacketPlayerJoin) packet, client);
-                break;
-
-            default:
-                System.out.println("Type de packet TCP non géré: " + packet.getType());
-        }
-    }
-
-    /**
-     * Gérer les packets UDP reçus
-     */
-    public void handleUDPPacket(PacketEntityPosition packet, InetAddress address, int port) {
-        ClientConnection client = clients.get(packet.entityId);
-        if (client != null) {
-            if (client.getUdpPort() == 0) {
-                client.setUdpPort(port);
-            }
-        }
-
-        Entity entity = entities.get(packet.entityId);
-        if (entity != null) {
-            entity.pos.set(packet.posX, packet.posY);
-            entity.dir.set(packet.dirX, packet.dirY);
-
-            broadcastPositionUDP(packet, address, port);
-        }
-    }
-
-    private void handleCreateEntity(PacketCreateEntity packet, ClientConnection client) {
-        Entity entity = new Entity(new Vector2d(packet.posX, packet.posY));
-        entity.id = packet.entityId;
-        entity.name = packet.entityName;
-
-        entities.put(entity.id, entity);
-
-        System.out.println("Entité créée: " + entity.id + " (" + entity.name + ")");
-
-        // Broadcaster à tous les clients
-        broadcastTCP(packet, client);
-    }
-
-    private void handleDeleteEntity(PacketDeleteEntity packet) {
-        entities.remove(packet.entityId);
-        System.out.println("Entité supprimée: " + packet.entityId);
-
-        // Broadcaster à tous les clients
-        broadcastTCP(packet, null);
-    }
-
-    private void handlePlayerJoin(PacketPlayerJoin packet, ClientConnection client) {
-        client.playerId = packet.playerId;
-        client.playerName = packet.playerName;
-        clients.put(packet.playerId, client);
-
-        System.out.println("Joueur connecté: " + packet.playerName + " (" + packet.playerId + ")");
-
-        // Envoyer toutes les entités existantes au nouveau joueur
-        for (Entity entity : entities.values()) {
-            PacketCreateEntity createPacket = new PacketCreateEntity(
-                    entity.id, entity.name, entity.pos
-            );
-            client.sendTCP(createPacket);
-        }
-
-        // Broadcaster le nouveau joueur aux autres
-        broadcastTCP(packet, client);
-    }
-
-    /**
-     * Envoyer un packet TCP à tous les clients sauf l'expéditeur
-     */
-    private void broadcastTCP(Packet packet, ClientConnection except) {
-        for (ClientConnection client : clients.values()) {
-            if (client != except) {
-                client.sendTCP(packet);
-            }
-        }
-    }
-
-    /**
-     * Envoyer une position UDP à tous les clients sauf l'expéditeur
-     */
-    private void broadcastPositionUDP(PacketEntityPosition packet, InetAddress exceptAddress, int exceptPort) {
-        for (ClientConnection client : clients.values()) {
-            int udpPort = client.getUdpPort();
-            if (udpPort == 0) {
-                continue;
-            }
-            if (client.getAddress().equals(exceptAddress) && udpPort == exceptPort) {
-                continue;
-            }
-            udpServer.sendPosition(packet, client.getAddress(), udpPort);
-        }
-    }
-
-
     public void removeClient(ClientConnection client) {
         if (client.playerId != null) {
-            clients.remove(client.playerId);
+            entitiesManager.getClients().remove(client.playerId);
             System.out.println("Client déconnecté: " + client.playerName);
 
             // Supprimer l'entité du joueur
-            if (entities.containsKey(client.playerId)) {
+            if (entitiesManager.getEntities().containsKey(client.playerId)) {
                 PacketDeleteEntity packet = new PacketDeleteEntity(client.playerId);
-                broadcastTCP(packet, null);
-                entities.remove(client.playerId);
+                Network.broadcastTCP(packet, null);
+                entitiesManager.getEntities().remove(client.playerId);
+            }
+        }
+    }
+
+    private void statsUpdateLoop() {
+        while (running) {
+            try {
+                Thread.sleep(1000); // Toutes les secondes
+
+                // Mettre à jour les stats
+                monitor.setConnectedClients(entitiesManager.getClients().size());
+                monitor.setTotalEntities(entitiesManager.getEntities().size());
+                monitor.resetPerSecondStats();
+
+                // Broadcaster aux dashboards
+                MonitorWebServer.broadcast(monitor.getStatsJSON());
+
+            } catch (InterruptedException e) {
+                break;
             }
         }
     }

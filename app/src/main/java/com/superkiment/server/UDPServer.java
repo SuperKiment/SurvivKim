@@ -7,13 +7,11 @@ import java.net.*;
 public class UDPServer {
 
     private final int port;
-    private final GameServer gameServer;
     private DatagramSocket socket;
     private boolean running = false;
 
-    public UDPServer(int port, GameServer gameServer) {
+    public UDPServer(int port) {
         this.port = port;
-        this.gameServer = gameServer;
     }
 
     public void start() {
@@ -30,7 +28,9 @@ public class UDPServer {
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
                     socket.receive(packet);
-                    System.out.println("From client: " + packet.getAddress() + ":" + packet.getPort());
+
+                    // A remettre quand on aura du real time monitoring
+                    // System.out.println("From client: " + packet.getAddress() + ":" + packet.getPort());
 
                     // Désérialiser le packet
                     PacketEntityPosition posPacket = PacketSerializer.deserializePositionUDP(
@@ -38,7 +38,7 @@ public class UDPServer {
                     );
 
                     // Traiter le packet
-                    gameServer.handleUDPPacket(posPacket, packet.getAddress(), packet.getPort());
+                    Network.handleUDPPacket(posPacket, packet.getAddress(), packet.getPort(), this);
 
                 } catch (IOException e) {
                     if (running) {

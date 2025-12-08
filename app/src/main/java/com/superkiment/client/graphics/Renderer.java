@@ -1,6 +1,6 @@
 package com.superkiment.client.graphics;
 
-import com.superkiment.common.Entity;
+import com.superkiment.common.entities.Entity;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
