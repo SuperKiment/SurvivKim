@@ -8,7 +8,7 @@ import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
-import com.superkiment.client.graphics.Shape;
+import com.superkiment.client.graphics.ReusableShape;
 
 public class Main {
 
@@ -65,10 +65,10 @@ public class Main {
 
             // ========== GESTION DU RÉSEAU ==========
             if (gameClient != null && gameClient.isConnected()) {
-                gameLoop(dt);
+                gameTick(dt);
             } else {
                 // Message de déconnexion
-                new Shape(400, 300)
+                new ReusableShape(400, 300)
                         .setColor(1.0f, 0.5f, 0.2f)
                         .drawRect(200, 50);
             }
@@ -84,23 +84,11 @@ public class Main {
         }
     }
 
-    private void gameLoop(float deltaTime) {
+    private void gameTick(float deltaTime) {
         Entity localPlayer = gameClient.getLocalPlayer();
 
-        // Déplacer le joueur local
-        float speed = localPlayer.speed * deltaTime;
-
-        if (input.isActionActive("avancer")) {
-            localPlayer.pos.y -= speed;
-        }
-        if (input.isActionActive("reculer")) {
-            localPlayer.pos.y += speed;
-        }
-        if (input.isActionActive("gauche")) {
-            localPlayer.pos.x -= speed;
-        }
-        if (input.isActionActive("droite")) {
-            localPlayer.pos.x += speed;
+        for (Entity entity : gameClient.getEntities().values()) {
+            entity.update();
         }
 
         // Envoyer la position au serveur (UDP) régulièrement

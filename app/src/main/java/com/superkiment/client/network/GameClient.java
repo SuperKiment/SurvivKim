@@ -109,8 +109,8 @@ public class GameClient {
                 localPlayer.id,
                 localPlayer.pos.x,
                 localPlayer.pos.y,
-                localPlayer.dir.x,
-                localPlayer.dir.y
+                localPlayer.dirLook.x,
+                localPlayer.dirLook.y
         );
 
         udpClient.sendPosition(packet);
@@ -167,7 +167,7 @@ public class GameClient {
         Entity entity = entities.get(packet.entityId);
         if (entity != null) {
             entity.pos.set(packet.posX, packet.posY);
-            entity.dir.set(packet.dirX, packet.dirY);
+            entity.dirLook.set(packet.dirX, packet.dirY);
         }
     }
 

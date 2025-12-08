@@ -1,7 +1,6 @@
 package com.superkiment.client;
 
 import com.superkiment.common.entities.Player;
-import org.joml.Vector2d;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 
@@ -50,7 +49,8 @@ public class InputManager {
     private final Map<String, Runnable> actionOnPress = new HashMap<>();
     private final Map<String, Runnable> actionOnRelease = new HashMap<>();
 
-    private InputManager() {}
+    private InputManager() {
+    }
 
     public static InputManager getInstance() {
         if (instance == null) {
@@ -73,24 +73,29 @@ public class InputManager {
 
         // Action continue (appelée tant que la touche est enfoncée)
         input.onAction("avancer", (v) -> {
-            player.turnToDirection(new Vector2d(0, -1));
-            player.moveInDirection();
+            player.dirDepl.y = -1d;
+            player.moveFromInput = true;
         });
 
         input.onAction("reculer", (v) -> {
-            player.turnToDirection(new Vector2d(0, 1));
-            player.moveInDirection();
+            player.dirDepl.y = 1d;
+            player.moveFromInput = true;
         });
 
         input.onAction("gauche", (v) -> {
-            player.turnToDirection(new Vector2d(-1, 0));
-            player.moveInDirection();
+            player.dirDepl.x = -1d;
+            player.moveFromInput = true;
         });
 
         input.onAction("droite", (v) -> {
-            player.turnToDirection(new Vector2d(1, 0));
-            player.moveInDirection();
+            player.dirDepl.x = 1d;
+            player.moveFromInput = true;
         });
+
+        input.onActionRelease("avancer", () -> player.dirDepl.y = 0);
+        input.onActionRelease("reculer", () -> player.dirDepl.y = 0);
+        input.onActionRelease("gauche", () -> player.dirDepl.x = 0);
+        input.onActionRelease("droite", () -> player.dirDepl.x = 0);
 
         // Action au moment du press (une seule fois)
         //input.onActionPress("sauter", () -> {

@@ -66,7 +66,7 @@ public class Network {
         Entity entity = entities.get(packet.entityId);
         if (entity != null) {
             entity.pos.set(packet.posX, packet.posY);
-            entity.dir.set(packet.dirX, packet.dirY);
+            entity.dirLook.set(packet.dirX, packet.dirY);
 
             broadcastPositionUDP(packet, address, port, udpServer);
         }
