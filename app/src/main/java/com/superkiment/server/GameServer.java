@@ -2,9 +2,11 @@ package com.superkiment.server;
 
 import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.entities.EntitiesManager;
-import com.superkiment.common.packets.*;
 import com.superkiment.server.monitor.MonitorWebServer;
 import com.superkiment.server.monitor.ServerMonitor;
+import com.superkiment.server.network.Network;
+import com.superkiment.server.network.TCPServer;
+import com.superkiment.server.network.UDPServer;
 
 public class GameServer {
 
@@ -14,7 +16,6 @@ public class GameServer {
 
     private TCPServer tcpServer;
     private UDPServer udpServer;
-    private MonitorWebServer monitorServer;
     private ServerMonitor monitor;
 
     public static EntitiesManager entitiesManager;
@@ -33,13 +34,13 @@ public class GameServer {
         System.out.println("UDP Port: " + UDP_PORT);
 
         monitor = ServerMonitor.getInstance();
-        monitorServer = new MonitorWebServer();
+        MonitorWebServer monitorServer = new MonitorWebServer();
         monitorServer.start();
 
         entitiesManager = new EntitiesManager();
         blocksManager = new BlocksManager();
 
-        Network.setupNetwork(entitiesManager.getEntities(), entitiesManager.getClients(), blocksManager);
+        Network.setupNetwork(entitiesManager);
 
         running = true;
 

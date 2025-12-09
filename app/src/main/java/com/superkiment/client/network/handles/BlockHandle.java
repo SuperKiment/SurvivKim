@@ -1,10 +1,9 @@
-package com.superkiment.client.network;
+package com.superkiment.client.network.handles;
 
 import com.superkiment.client.Main;
+import com.superkiment.client.network.TCPClient;
 import com.superkiment.common.packets.PacketCreateBlock;
 import org.joml.Vector2d;
-
-import java.util.UUID;
 
 import static com.superkiment.client.Main.blocksManager;
 

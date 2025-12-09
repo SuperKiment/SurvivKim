@@ -1,6 +1,9 @@
 package com.superkiment.client.network;
 
 import com.superkiment.client.Main;
+import com.superkiment.client.network.handles.BlockHandle;
+import com.superkiment.client.network.handles.EntityHandle;
+import com.superkiment.client.network.handles.PlayerHandle;
 import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.entities.EntitiesManager;
 import com.superkiment.common.entities.Entity;

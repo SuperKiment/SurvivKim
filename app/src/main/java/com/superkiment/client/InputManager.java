@@ -1,7 +1,6 @@
 package com.superkiment.client;
 
-import com.superkiment.client.network.BlockHandle;
-import com.superkiment.client.network.GameClient;
+import com.superkiment.client.network.handles.BlockHandle;
 import com.superkiment.common.entities.Player;
 import org.joml.Vector2d;
 import org.joml.Vector2f;
@@ -10,7 +9,6 @@ import org.lwjgl.glfw.GLFW;
 import java.util.*;
 import java.util.function.Consumer;
 
-import static java.lang.Math.floor;
 import static java.lang.Math.round;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;

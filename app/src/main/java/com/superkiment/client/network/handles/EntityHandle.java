@@ -1,6 +1,7 @@
-package com.superkiment.client.network;
+package com.superkiment.client.network.handles;
 
 import com.superkiment.client.Main;
+import com.superkiment.client.network.TCPClient;
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.packets.PacketCreateEntity;
 import com.superkiment.common.packets.PacketDeleteEntity;

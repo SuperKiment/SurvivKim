@@ -1,8 +1,8 @@
 package com.superkiment.common.entities;
 
 import com.superkiment.common.packets.PacketDeleteEntity;
-import com.superkiment.server.ClientConnection;
-import com.superkiment.server.Network;
+import com.superkiment.server.network.ClientConnection;
+import com.superkiment.server.network.Network;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

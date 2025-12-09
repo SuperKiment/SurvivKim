@@ -1,6 +1,7 @@
-package com.superkiment.client.network;
+package com.superkiment.client.network.handles;
 
 import com.superkiment.client.Main;
+import com.superkiment.client.network.UDPClient;
 import com.superkiment.common.entities.Player;
 import com.superkiment.common.packets.PacketEntityPosition;
 import com.superkiment.common.packets.PacketPlayerJoin;

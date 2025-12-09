@@ -1,6 +1,8 @@
-package com.superkiment.server;
+package com.superkiment.server.network;
 
 import com.superkiment.common.packets.*;
+import com.superkiment.server.GameServer;
+
 import java.io.*;
 import java.net.*;
 

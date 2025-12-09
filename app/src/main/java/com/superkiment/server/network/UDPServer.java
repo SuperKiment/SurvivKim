@@ -1,4 +1,4 @@
-package com.superkiment.server;
+package com.superkiment.server.network;
 
 import com.superkiment.common.packets.*;
 import java.io.IOException;
