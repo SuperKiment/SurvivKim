@@ -1,6 +1,8 @@
 package com.superkiment.client;
 
+import com.superkiment.client.network.GameClient;
 import com.superkiment.common.entities.Player;
+import org.joml.Vector2d;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 
@@ -59,7 +61,7 @@ public class InputManager {
         return instance;
     }
 
-    public static void setupInputs(long window, InputManager input, Player player) {
+    public static void setupInputs(long window, InputManager input, Player player, GameClient gameClient) {
         input.init(window);
 
         // Lier les touches aux actions
@@ -70,6 +72,7 @@ public class InputManager {
         input.bindAction("sauter", GLFW_KEY_SPACE);
         input.bindAction("quitter", GLFW_KEY_ESCAPE);
         input.bindAction("sprint", GLFW_KEY_LEFT_SHIFT);
+        input.bindAction("ajouter block", GLFW_KEY_B);
 
         // Action continue (appelée tant que la touche est enfoncée)
         input.onAction("avancer", (v) -> {
@@ -90,6 +93,11 @@ public class InputManager {
         input.onAction("droite", (v) -> {
             player.dirDepl.x = 1d;
             player.moveFromInput = true;
+        });
+
+        input.onActionRelease("ajouter block", () -> {
+            System.out.println("try add block");
+            gameClient.createBlock(new Vector2d(1d,5d));
         });
 
         input.onActionRelease("avancer", () -> player.dirDepl.y = 0);

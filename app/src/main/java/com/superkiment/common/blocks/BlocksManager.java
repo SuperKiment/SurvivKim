@@ -1,13 +1,14 @@
 package com.superkiment.common.blocks;
 
 import org.joml.Vector2d;
+import org.joml.Vector2i;
 
 import java.util.ArrayList;
 
 public class BlocksManager {
     private final ArrayList<Block> blocks;
 
-    BlocksManager() {
+    public BlocksManager() {
         blocks = new ArrayList<Block>();
     }
 
@@ -18,11 +19,12 @@ public class BlocksManager {
     public boolean addBlock(Vector2d pos) {
         for (Block block : blocks) {
             if (block.isBlockOnPos(pos)) {
-                System.out.println("Cannot place block " + pos);
+                System.out.println("Cannot place block " + (int) pos.x + " " + (int) pos.y);
                 return false;
             }
         }
 
+        System.out.println("Added block to BlockManager " + (int) pos.x + " " + (int) pos.y);
         blocks.add(new Block((int) pos.x, (int) pos.y));
         return true;
     }

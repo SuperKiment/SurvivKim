@@ -1,5 +1,6 @@
 package com.superkiment.client.graphics;
 
+import com.superkiment.common.blocks.Block;
 import com.superkiment.common.entities.Entity;
 import org.joml.Vector2d;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -8,6 +9,7 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.IntBuffer;
+import java.util.ArrayList;
 import java.util.Map;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -28,6 +30,16 @@ public class Renderer {
             double angleInRad = entity.dirLookLerp.angle(new Vector2d(1, 0)) * 57.2957795131d;
             glRotated(angleInRad, 0, 0, -1);
             entity.shapeModel.renderModel();
+
+            glPopMatrix();
+        }
+    }
+
+    public void renderBlocks(ArrayList<Block> blocks) {
+        for (Block block : blocks) {
+            glPushMatrix();
+            glTranslated(block.pos.x * 50, block.pos.y * 50, 0);
+            block.shapeModel.renderModel();
 
             glPopMatrix();
         }

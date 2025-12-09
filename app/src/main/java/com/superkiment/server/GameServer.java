@@ -1,5 +1,6 @@
 package com.superkiment.server;
 
+import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.entities.EntitiesManager;
 import com.superkiment.common.packets.*;
 import com.superkiment.server.monitor.MonitorWebServer;
@@ -17,6 +18,7 @@ public class GameServer {
     private ServerMonitor monitor;
 
     public static EntitiesManager entitiesManager;
+    public static BlocksManager blocksManager;
 
     public boolean running = false;
 
@@ -35,8 +37,9 @@ public class GameServer {
         monitorServer.start();
 
         entitiesManager = new EntitiesManager();
+        blocksManager = new BlocksManager();
 
-        Network.setupNetwork(entitiesManager.getEntities(), entitiesManager.getClients());
+        Network.setupNetwork(entitiesManager.getEntities(), entitiesManager.getClients(), blocksManager);
 
         running = true;
 

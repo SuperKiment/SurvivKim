@@ -2,6 +2,7 @@ package com.superkiment.client;
 
 import com.superkiment.client.graphics.Renderer;
 import com.superkiment.client.network.GameClient;
+import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.entities.EntitiesManager;
 import com.superkiment.common.entities.Entity;
 
@@ -19,6 +20,7 @@ public class Main {
     private Renderer renderer;
 
     public static EntitiesManager entitiesManager = new EntitiesManager();
+    public static BlocksManager blocksManager = new BlocksManager();
 
     public void run() {
         System.out.println("Hello LWJGL " + org.lwjgl.Version.getVersion() + "!");
@@ -43,15 +45,15 @@ public class Main {
     }
 
     private void init() {
-        gameClient = GameClient.tryConnectToServer(window, entitiesManager);
+        gameClient = GameClient.tryConnectToServer(window);
 
         //Setup inputs
         input = InputManager.getInstance();
-        InputManager.setupInputs(window, input, gameClient.getLocalPlayer());
+        InputManager.setupInputs(window, input, gameClient.getLocalPlayer(), gameClient);
 
         input.onActionPress("connecter", () -> {
             if (gameClient == null || !gameClient.isConnected()) {
-                gameClient = GameClient.tryConnectToServer(window, entitiesManager);
+                gameClient = GameClient.tryConnectToServer(window);
             }
         });
         input.bindAction("connecter", GLFW_KEY_C);
@@ -101,6 +103,7 @@ public class Main {
             GameClient.positionSendTimer = 0;
         }
         renderer.renderEntities(entitiesManager.getEntities(), localPlayer);
+        renderer.renderBlocks(blocksManager.getBlocks());
     }
 
     public static void main(String[] args) {

@@ -1,6 +1,8 @@
 package com.superkiment.client.network;
 
+import com.superkiment.client.Main;
 import com.superkiment.common.blocks.Block;
+import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.entities.EntitiesManager;
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.entities.Player;
@@ -28,17 +30,21 @@ public class GameClient {
     private TCPClient tcpClient;
     private UDPClient udpClient;
 
+    //Références
     private final EntitiesManager entitiesManager;
+    private final BlocksManager blocksManager;
+
     private Player localPlayer;
     private String playerId;
 
     private boolean connected = false;
 
-    public GameClient(String serverAddress, int tcpPort, int udpPort, EntitiesManager em) {
+    public GameClient(String serverAddress, int tcpPort, int udpPort) {
         this.serverAddress = serverAddress;
         this.tcpPort = tcpPort;
         this.udpPort = udpPort;
-        this.entitiesManager = em;
+        this.entitiesManager = Main.entitiesManager;
+        this.blocksManager = Main.blocksManager;
     }
 
     /**
@@ -85,9 +91,9 @@ public class GameClient {
         }
     }
 
-    public static GameClient tryConnectToServer(long window, EntitiesManager entitiesManager) {
+    public static GameClient tryConnectToServer(long window) {
         System.out.println("Tentative de connexion au serveur...");
-        GameClient gameClient = new GameClient(SERVER_ADDRESS, TCP_PORT, UDP_PORT, entitiesManager);
+        GameClient gameClient = new GameClient(SERVER_ADDRESS, TCP_PORT, UDP_PORT);
 
         boolean success = gameClient.connect("Player_" + System.currentTimeMillis() % 1000);
 
@@ -137,9 +143,19 @@ public class GameClient {
     }
 
     /**
+     * Créer un block (TCP - fiable)
+     */
+    public void createBlock(Vector2d position) {
+        String entityId = UUID.randomUUID().toString();
+        PacketCreateBlock packet = new PacketCreateBlock(position);
+        tcpClient.send(packet);
+    }
+
+    /**
      * Gérer les packets TCP reçus
      */
     public void handleTCPPacket(Packet packet) {
+        System.out.println("TEST SWITCH");
         switch (packet.getType()) {
             case CREATE_ENTITY:
                 handleCreateEntity((PacketCreateEntity) packet);
@@ -154,7 +170,9 @@ public class GameClient {
                 break;
 
             case CREATE_BLOCK:
+                System.out.println("TEST HANDLE");
                 handleCreateBlock((PacketCreateBlock) packet);
+                break;
 
             default:
                 System.out.println("Type de packet TCP non géré: " + packet.getType());
@@ -208,9 +226,8 @@ public class GameClient {
     }
 
     private void handleCreateBlock(PacketCreateBlock packet) {
-        Block block = new Block((int) packet.posX, (int) packet.posY);
-
-        System.out.println("Block créée: (" + block + ")");
+        blocksManager.addBlock(new Vector2d(packet.posX, packet.posY));
+        System.out.println("Block distant créé: (" + packet.posX + " " + packet.posY + ")");
     }
 
     /**

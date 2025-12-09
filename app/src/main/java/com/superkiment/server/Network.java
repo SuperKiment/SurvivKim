@@ -1,5 +1,7 @@
 package com.superkiment.server;
 
+import com.superkiment.common.blocks.Block;
+import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.packets.*;
 import com.superkiment.server.monitor.ServerMonitor;
@@ -7,6 +9,7 @@ import org.joml.Vector2d;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class Network {
@@ -14,12 +17,14 @@ public class Network {
     //Références
     private static Map<String, Entity> entities = null;
     private static Map<String, ClientConnection> clients = null;
+    private static BlocksManager blocksManager;
     private static ServerMonitor monitor;
 
-    public static void setupNetwork(Map<String, Entity> ents, Map<String, ClientConnection> clis) {
+    public static void setupNetwork(Map<String, Entity> ents, Map<String, ClientConnection> clis, BlocksManager bm) {
         entities = ents;
         clients = clis;
         monitor = ServerMonitor.getInstance();
+        blocksManager = bm;
     }
 
     /**
@@ -44,6 +49,10 @@ public class Network {
 
             case PLAYER_JOIN:
                 handlePlayerJoin((PacketPlayerJoin) packet, client);
+                break;
+
+            case CREATE_BLOCK:
+                handleCreateBlock((PacketCreateBlock) packet, client);
                 break;
 
             default:
@@ -114,6 +123,13 @@ public class Network {
         monitor.log("INFO", "Joueur a rejoint : " + client.playerId + " (" + client.playerName + ")");
     }
 
+    public static void handleCreateBlock(PacketCreateBlock packet, ClientConnection client) {
+        if (blocksManager.addBlock(new Vector2d(packet.posX, packet.posY))) {
+            broadcastTCP(packet, client);
+            monitor.log("INFO", "Block créé: " + packet.posX + " " + packet.posY);
+        }
+    }
+
     /**
      * Envoyer un packet TCP à tous les clients sauf l'expéditeur
      */
@@ -124,7 +140,10 @@ public class Network {
         }
 
         for (ClientConnection client : clients.values()) {
-            if (client != except) {
+            if (client != except
+                    || packet.getType() == Packet.PacketType.CREATE_BLOCK
+                    || packet.getType() == Packet.PacketType.DELETE_BLOCK
+            ) {
                 client.sendTCP(packet);
             }
         }
