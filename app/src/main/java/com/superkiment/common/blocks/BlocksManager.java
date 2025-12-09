@@ -1,18 +1,18 @@
 package com.superkiment.common.blocks;
 
 import org.joml.Vector2d;
-import org.joml.Vector2i;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class BlocksManager {
-    private final ArrayList<Block> blocks;
+    private final List<Block> blocks;
 
     public BlocksManager() {
-        blocks = new ArrayList<Block>();
+        blocks = new CopyOnWriteArrayList<>();
     }
 
-    public ArrayList<Block> getBlocks() {
+    public List<Block> getBlocks() {
         return blocks;
     }
 

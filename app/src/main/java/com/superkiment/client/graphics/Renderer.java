@@ -9,7 +9,7 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.IntBuffer;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -35,7 +35,7 @@ public class Renderer {
         }
     }
 
-    public void renderBlocks(ArrayList<Block> blocks) {
+    public void renderBlocks(List<Block> blocks) {
         for (Block block : blocks) {
             glPushMatrix();
             glTranslated(block.pos.x * 50, block.pos.y * 50, 0);

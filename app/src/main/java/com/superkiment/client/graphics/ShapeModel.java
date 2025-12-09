@@ -1,15 +1,16 @@
 package com.superkiment.client.graphics;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 
 public class ShapeModel {
-    public ArrayList<Shape> shapes;
+    public List<Shape> shapes;
 
     public ShapeModel() {
-        shapes = new ArrayList<Shape>();
+        shapes = new CopyOnWriteArrayList<>();
     }
 
     public void renderModel() {

@@ -100,15 +100,14 @@ public class InputManager {
             player.moveFromInput = true;
         });
 
-        input.onActionRelease("tirer", () -> {
+        input.onAction("tirer", (v) -> {
             EntityHandle.createEntity(new Projectile(player.pos, player.dirLookLerp));
         });
 
-        input.onActionRelease("ajouter block", () -> {
+        input.onAction("ajouter block", (v) -> {
             int posX = (int) round(player.pos.x / 50);
             int posY = (int) round(player.pos.y / 50);
             BlockHandle.createBlock(new Vector2d(posX, posY));
-            System.out.println("Trying to add block : " + posX + " " + posY);
         });
 
         input.onActionRelease("avancer", () -> player.dirDepl.y = 0);
