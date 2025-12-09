@@ -1,6 +1,7 @@
 package com.superkiment.client.network;
 
 import com.superkiment.common.packets.*;
+
 import java.io.*;
 import java.net.Socket;
 
@@ -38,6 +39,7 @@ public class TCPClient {
             while (!socket.isClosed()) {
                 try {
                     Packet packet = (Packet) in.readObject();
+                    System.out.println("Packet arriving : " + packet.getClass().getName());
                     gameClient.handleTCPPacket(packet);
                 } catch (EOFException e) {
                     break;
@@ -52,6 +54,7 @@ public class TCPClient {
 
     public void send(Packet packet) {
         try {
+            System.out.println("TCP SENT : " + packet);
             out.writeObject(packet);
             out.flush();
         } catch (IOException e) {

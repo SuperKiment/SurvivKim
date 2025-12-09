@@ -1,20 +1,19 @@
 package com.superkiment.server.network;
 
-import com.superkiment.common.blocks.Block;
-import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.entities.EntitiesManager;
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.packets.*;
-import com.superkiment.server.GameServer;
+import com.superkiment.common.packets.entity.PacketCreateEntity;
+import com.superkiment.common.packets.entity.PacketDeleteEntity;
+import com.superkiment.common.packets.entity.PacketEntityPosition;
 import com.superkiment.server.monitor.ServerMonitor;
 import com.superkiment.server.network.handles.BlockHandle;
 import com.superkiment.server.network.handles.EntityHandle;
 import com.superkiment.server.network.handles.PlayerHandle;
-import org.joml.Vector2d;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.Map;
+import java.util.Objects;
 
 public class Network {
 
@@ -93,12 +92,12 @@ public class Network {
         }
 
         for (ClientConnection client : entitiesManager.getClients().values()) {
-            if (client != except
-                    || packet.getType() == Packet.PacketType.CREATE_BLOCK
-                    || packet.getType() == Packet.PacketType.DELETE_BLOCK
-            ) {
-                client.sendTCP(packet);
-            }
+            if (client == except
+                    && packet.getType() == Packet.PacketType.CREATE_ENTITY
+                    && ((PacketCreateEntity) packet).entityId.equals(client.playerId)
+            ) continue;
+
+            client.sendTCP(packet);
         }
     }
 

@@ -1,7 +1,10 @@
 package com.superkiment.client;
 
 import com.superkiment.client.network.handles.BlockHandle;
+import com.superkiment.client.network.handles.EntityHandle;
+import com.superkiment.common.entities.EntitiesManager;
 import com.superkiment.common.entities.Player;
+import com.superkiment.common.entities.Projectile;
 import org.joml.Vector2d;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
@@ -74,6 +77,7 @@ public class InputManager {
         input.bindAction("quitter", GLFW_KEY_ESCAPE);
         input.bindAction("sprint", GLFW_KEY_LEFT_SHIFT);
         input.bindAction("ajouter block", GLFW_KEY_B);
+        input.bindAction("tirer", GLFW_KEY_E);
 
         // Action continue (appelée tant que la touche est enfoncée)
         input.onAction("avancer", (v) -> {
@@ -94,6 +98,10 @@ public class InputManager {
         input.onAction("droite", (v) -> {
             player.dirDepl.x = 1d;
             player.moveFromInput = true;
+        });
+
+        input.onActionRelease("tirer", () -> {
+            EntityHandle.createEntity(new Projectile(player.pos, player.dirLookLerp));
         });
 
         input.onActionRelease("ajouter block", () -> {

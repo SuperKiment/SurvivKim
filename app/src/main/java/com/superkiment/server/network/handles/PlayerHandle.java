@@ -3,7 +3,7 @@ package com.superkiment.server.network.handles;
 import com.superkiment.common.blocks.Block;
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.packets.PacketCreateBlock;
-import com.superkiment.common.packets.PacketCreateEntity;
+import com.superkiment.common.packets.entity.PacketCreateEntity;
 import com.superkiment.common.packets.PacketPlayerJoin;
 import com.superkiment.server.GameServer;
 import com.superkiment.server.monitor.ServerMonitor;

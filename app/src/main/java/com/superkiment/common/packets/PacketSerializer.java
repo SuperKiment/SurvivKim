@@ -1,5 +1,7 @@
 package com.superkiment.common.packets;
 
+import com.superkiment.common.packets.entity.PacketEntityPosition;
+
 import java.io.*;
 import java.nio.ByteBuffer;
 

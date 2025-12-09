@@ -1,6 +1,8 @@
 package com.superkiment.server.network;
 
 import com.superkiment.common.packets.*;
+import com.superkiment.common.packets.entity.PacketEntityPosition;
+
 import java.io.IOException;
 import java.net.*;
 

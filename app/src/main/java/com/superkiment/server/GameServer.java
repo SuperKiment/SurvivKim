@@ -2,6 +2,7 @@ package com.superkiment.server;
 
 import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.entities.EntitiesManager;
+import com.superkiment.common.entities.Entity;
 import com.superkiment.server.monitor.MonitorWebServer;
 import com.superkiment.server.monitor.ServerMonitor;
 import com.superkiment.server.network.Network;
@@ -84,6 +85,11 @@ public class GameServer {
     private void tick() {
         // Logique du serveur (update entités, etc.)
         // Pour l'instant, rien à faire ici
+        for (Entity entity : entitiesManager.getEntities().values()) {
+            entity.update();
+        }
+        //System.out.println(entitiesManager.getEntities().size());
+
     }
 
     public void stop() {

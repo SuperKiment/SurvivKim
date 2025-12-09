@@ -19,10 +19,10 @@ public class Shape {
     public static Vector3d color = new Vector3d(1f, 0f, 0f);
 
     public Vector2d position;
-    private ShapeType shapeType = ShapeType.RECT;
+    private final ShapeType shapeType;
 
     // Utilisé pour Cercle et Rectangle
-    private final Vector2d dimensions;
+    public final Vector2d dimensions;
 
     public Shape(Vector2d pos, Vector2d dim, ShapeType st) {
         this.position = pos;

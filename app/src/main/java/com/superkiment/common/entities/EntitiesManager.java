@@ -1,6 +1,6 @@
 package com.superkiment.common.entities;
 
-import com.superkiment.common.packets.PacketDeleteEntity;
+import com.superkiment.common.packets.entity.PacketDeleteEntity;
 import com.superkiment.server.network.ClientConnection;
 import com.superkiment.server.network.Network;
 

@@ -1,9 +1,10 @@
 package com.superkiment.common.entities;
 
 import com.superkiment.client.Time;
-import com.superkiment.client.graphics.Shape;
 import com.superkiment.client.graphics.ShapeModel;
 import org.joml.Vector2d;
+
+import java.util.UUID;
 
 import static com.superkiment.common.utils.Vector.Lerp;
 import static com.superkiment.common.utils.Vector.LerpRotation;
@@ -23,6 +24,7 @@ public class Entity {
     }
 
     public Entity(Vector2d pos) {
+        this.id = UUID.randomUUID().toString();
         this.pos = new Vector2d(pos.x, pos.y);
         this.posLerp = new Vector2d(pos.x, pos.y);
         this.dirLookTarget = new Vector2d(0, 1);
@@ -30,8 +32,6 @@ public class Entity {
         this.dirDepl = new Vector2d(0, 0);
 
         shapeModel = new ShapeModel();
-        shapeModel.addShape(new Shape(new Vector2d(0, 0), new Vector2d(20, 20), Shape.ShapeType.RECT));
-        shapeModel.addShape(new Shape(new Vector2d(20, 0), new Vector2d(10, 10), Shape.ShapeType.RECT));
     }
 
     public void update() {
@@ -43,7 +43,7 @@ public class Entity {
         this.dirLookTarget.set(dir);
     }
 
-    private void updateMovement() {
+    protected void updateMovement() {
         if (!moveFromInput) return;
 
         dirLookTarget.set(dirDepl.x, dirDepl.y);

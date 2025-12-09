@@ -9,6 +9,9 @@ import com.superkiment.common.entities.EntitiesManager;
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.entities.Player;
 import com.superkiment.common.packets.*;
+import com.superkiment.common.packets.entity.PacketCreateEntity;
+import com.superkiment.common.packets.entity.PacketDeleteEntity;
+import com.superkiment.common.packets.entity.PacketEntityPosition;
 import org.joml.Vector2d;
 
 import java.util.*;

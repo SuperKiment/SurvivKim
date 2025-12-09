@@ -1,7 +1,7 @@
 package com.superkiment.server.monitor;
 
 import com.superkiment.common.packets.Packet;
-import com.superkiment.common.packets.PacketEntityPosition;
+import com.superkiment.common.packets.entity.PacketEntityPosition;
 import com.superkiment.common.packets.PacketSerializer;
 import com.superkiment.server.GameServer;
 
