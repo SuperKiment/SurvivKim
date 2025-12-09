@@ -36,9 +36,9 @@ public class InputManager {
     private final Set<Integer> mouseButtonsJustReleased = new HashSet<>();
 
     // Position de la souris
-    private Vector2f mousePosition = new Vector2f(0, 0);
-    private Vector2f mouseDelta = new Vector2f(0, 0);
-    private Vector2f lastMousePosition = new Vector2f(0, 0);
+    private final Vector2f mousePosition = new Vector2f(0, 0);
+    private final Vector2f mouseDelta = new Vector2f(0, 0);
+    private final Vector2f lastMousePosition = new Vector2f(0, 0);
 
     // Scroll
     private float scrollDelta = 0;

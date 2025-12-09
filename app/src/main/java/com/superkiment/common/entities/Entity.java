@@ -30,8 +30,8 @@ public class Entity {
         this.dirDepl = new Vector2d(0, 0);
 
         shapeModel = new ShapeModel();
-        shapeModel.addShape(new Shape(new Vector2d(0, 0), new Vector2d(100, 100), Shape.ShapeType.RECT));
-        shapeModel.addShape(new Shape(new Vector2d(50, 0), new Vector2d(50, 50), Shape.ShapeType.RECT));
+        shapeModel.addShape(new Shape(new Vector2d(0, 0), new Vector2d(20, 20), Shape.ShapeType.RECT));
+        shapeModel.addShape(new Shape(new Vector2d(20, 0), new Vector2d(10, 10), Shape.ShapeType.RECT));
     }
 
     public void update() {

@@ -11,6 +11,7 @@ import java.util.Map;
 
 public class Network {
 
+    //Références
     private static Map<String, Entity> entities = null;
     private static Map<String, ClientConnection> clients = null;
     private static ServerMonitor monitor;

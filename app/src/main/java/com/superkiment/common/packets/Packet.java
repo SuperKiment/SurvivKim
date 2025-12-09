@@ -10,7 +10,9 @@ public abstract class Packet implements Serializable {
         ENTITY_POSITION,
         DELETE_ENTITY,
         PLAYER_JOIN,
-        PLAYER_LEAVE
+        PLAYER_LEAVE,
+        CREATE_BLOCK,
+        DELETE_BLOCK
     }
 
     public abstract PacketType getType();

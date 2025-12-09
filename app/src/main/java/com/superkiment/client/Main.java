@@ -2,6 +2,7 @@ package com.superkiment.client;
 
 import com.superkiment.client.graphics.Renderer;
 import com.superkiment.client.network.GameClient;
+import com.superkiment.common.entities.EntitiesManager;
 import com.superkiment.common.entities.Entity;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
@@ -16,6 +17,8 @@ public class Main {
     private InputManager input;
     private GameClient gameClient;
     private Renderer renderer;
+
+    public static EntitiesManager entitiesManager = new EntitiesManager();
 
     public void run() {
         System.out.println("Hello LWJGL " + org.lwjgl.Version.getVersion() + "!");
@@ -40,7 +43,7 @@ public class Main {
     }
 
     private void init() {
-        gameClient = GameClient.tryConnectToServer(window);
+        gameClient = GameClient.tryConnectToServer(window, entitiesManager);
 
         //Setup inputs
         input = InputManager.getInstance();
@@ -48,7 +51,7 @@ public class Main {
 
         input.onActionPress("connecter", () -> {
             if (gameClient == null || !gameClient.isConnected()) {
-                gameClient = GameClient.tryConnectToServer(window);
+                gameClient = GameClient.tryConnectToServer(window, entitiesManager);
             }
         });
         input.bindAction("connecter", GLFW_KEY_C);
@@ -87,7 +90,7 @@ public class Main {
     private void gameTick(float deltaTime) {
         Entity localPlayer = gameClient.getLocalPlayer();
 
-        for (Entity entity : gameClient.getEntities().values()) {
+        for (Entity entity : entitiesManager.getEntities().values()) {
             entity.update();
         }
 
@@ -97,7 +100,7 @@ public class Main {
             gameClient.sendPosition();
             GameClient.positionSendTimer = 0;
         }
-        renderer.renderEntities(gameClient.getEntities(), localPlayer);
+        renderer.renderEntities(entitiesManager.getEntities(), localPlayer);
     }
 
     public static void main(String[] args) {

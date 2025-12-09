@@ -1,5 +1,7 @@
 package com.superkiment.client.network;
 
+import com.superkiment.common.blocks.Block;
+import com.superkiment.common.entities.EntitiesManager;
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.entities.Player;
 import com.superkiment.common.packets.*;
@@ -26,16 +28,17 @@ public class GameClient {
     private TCPClient tcpClient;
     private UDPClient udpClient;
 
-    private final Map<String, Entity> entities = new ConcurrentHashMap<>();
+    private final EntitiesManager entitiesManager;
     private Player localPlayer;
     private String playerId;
 
     private boolean connected = false;
 
-    public GameClient(String serverAddress, int tcpPort, int udpPort) {
+    public GameClient(String serverAddress, int tcpPort, int udpPort, EntitiesManager em) {
         this.serverAddress = serverAddress;
         this.tcpPort = tcpPort;
         this.udpPort = udpPort;
+        this.entitiesManager = em;
     }
 
     /**
@@ -70,7 +73,7 @@ public class GameClient {
             tcpClient.send(createPacket);
 
             // Ajouter le joueur local aux entités
-            entities.put(playerId, localPlayer);
+            entitiesManager.getEntities().put(playerId, localPlayer);
 
             connected = true;
             System.out.println("Connecté au serveur en tant que " + playerName);
@@ -82,9 +85,9 @@ public class GameClient {
         }
     }
 
-    public static GameClient tryConnectToServer(long window) {
+    public static GameClient tryConnectToServer(long window, EntitiesManager entitiesManager) {
         System.out.println("Tentative de connexion au serveur...");
-        GameClient gameClient = new GameClient(SERVER_ADDRESS, TCP_PORT, UDP_PORT);
+        GameClient gameClient = new GameClient(SERVER_ADDRESS, TCP_PORT, UDP_PORT, entitiesManager);
 
         boolean success = gameClient.connect("Player_" + System.currentTimeMillis() % 1000);
 
@@ -150,6 +153,9 @@ public class GameClient {
                 handlePlayerJoin((PacketPlayerJoin) packet);
                 break;
 
+            case CREATE_BLOCK:
+                handleCreateBlock((PacketCreateBlock) packet);
+
             default:
                 System.out.println("Type de packet TCP non géré: " + packet.getType());
         }
@@ -164,7 +170,7 @@ public class GameClient {
             return;
         }
 
-        Entity entity = entities.get(packet.entityId);
+        Entity entity = entitiesManager.getEntities().get(packet.entityId);
         if (entity != null) {
             entity.pos.set(packet.posX, packet.posY);
             entity.dirLookTarget.set(packet.dirX, packet.dirY);
@@ -181,12 +187,12 @@ public class GameClient {
         entity.id = packet.entityId;
         entity.name = packet.entityName;
 
-        entities.put(entity.id, entity);
+        entitiesManager.getEntities().put(entity.id, entity);
         System.out.println("Entité distante créée: " + entity.name + " (" + entity.id + ")");
     }
 
     private void handleDeleteEntity(PacketDeleteEntity packet) {
-        Entity removed = entities.remove(packet.entityId);
+        Entity removed = entitiesManager.getEntities().remove(packet.entityId);
         if (removed != null) {
             System.out.println("Entité supprimée: " + removed.name);
         }
@@ -199,6 +205,12 @@ public class GameClient {
         }
 
         System.out.println("Joueur rejoint: " + packet.playerName);
+    }
+
+    private void handleCreateBlock(PacketCreateBlock packet) {
+        Block block = new Block((int) packet.posX, (int) packet.posY);
+
+        System.out.println("Block créée: (" + block + ")");
     }
 
     /**
@@ -217,10 +229,6 @@ public class GameClient {
     // Getters
     public Player getLocalPlayer() {
         return localPlayer;
-    }
-
-    public Map<String, Entity> getEntities() {
-        return entities;
     }
 
     public boolean isConnected() {
