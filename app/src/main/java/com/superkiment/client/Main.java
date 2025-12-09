@@ -2,6 +2,7 @@ package com.superkiment.client;
 
 import com.superkiment.client.graphics.Renderer;
 import com.superkiment.client.network.GameClient;
+import com.superkiment.client.network.PlayerHandle;
 import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.entities.EntitiesManager;
 import com.superkiment.common.entities.Entity;
@@ -16,7 +17,7 @@ public class Main {
 
     private long window;
     private InputManager input;
-    private GameClient gameClient;
+    public static GameClient gameClient;
     private Renderer renderer;
 
     public static EntitiesManager entitiesManager = new EntitiesManager();
@@ -99,7 +100,7 @@ public class Main {
         // Envoyer la position au serveur (UDP) régulièrement
         GameClient.positionSendTimer += deltaTime;
         if (GameClient.positionSendTimer >= GameClient.POSITION_SEND_RATE) {
-            gameClient.sendPosition();
+            PlayerHandle.sendPosition();
             GameClient.positionSendTimer = 0;
         }
         renderer.renderEntities(entitiesManager.getEntities(), localPlayer);

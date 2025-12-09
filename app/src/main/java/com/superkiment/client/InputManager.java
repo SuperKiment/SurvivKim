@@ -1,5 +1,6 @@
 package com.superkiment.client;
 
+import com.superkiment.client.network.BlockHandle;
 import com.superkiment.client.network.GameClient;
 import com.superkiment.common.entities.Player;
 import org.joml.Vector2d;
@@ -97,7 +98,7 @@ public class InputManager {
 
         input.onActionRelease("ajouter block", () -> {
             System.out.println("try add block");
-            gameClient.createBlock(new Vector2d(1d,5d));
+            BlockHandle.createBlock(new Vector2d(1d,5d));
         });
 
         input.onActionRelease("avancer", () -> player.dirDepl.y = 0);

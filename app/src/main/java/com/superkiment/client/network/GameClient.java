@@ -108,48 +108,6 @@ public class GameClient {
         return null;
     }
 
-    /**
-     * Envoyer la position du joueur (UDP)
-     */
-    public void sendPosition() {
-        if (!connected || localPlayer == null) return;
-
-        PacketEntityPosition packet = new PacketEntityPosition(
-                localPlayer.id,
-                localPlayer.pos.x,
-                localPlayer.pos.y,
-                localPlayer.dirLookTarget.x,
-                localPlayer.dirLookTarget.y
-        );
-
-        udpClient.sendPosition(packet);
-    }
-
-    /**
-     * Créer une entité (TCP - fiable)
-     */
-    public void createEntity(String name, Vector2d position) {
-        String entityId = UUID.randomUUID().toString();
-        PacketCreateEntity packet = new PacketCreateEntity(entityId, name, position);
-        tcpClient.send(packet);
-    }
-
-    /**
-     * Supprimer une entité (TCP - fiable)
-     */
-    public void deleteEntity(String entityId) {
-        PacketDeleteEntity packet = new PacketDeleteEntity(entityId);
-        tcpClient.send(packet);
-    }
-
-    /**
-     * Créer un block (TCP - fiable)
-     */
-    public void createBlock(Vector2d position) {
-        String entityId = UUID.randomUUID().toString();
-        PacketCreateBlock packet = new PacketCreateBlock(position);
-        tcpClient.send(packet);
-    }
 
     /**
      * Gérer les packets TCP reçus
@@ -158,20 +116,19 @@ public class GameClient {
         System.out.println("TEST SWITCH");
         switch (packet.getType()) {
             case CREATE_ENTITY:
-                handleCreateEntity((PacketCreateEntity) packet);
+                EntityHandle.handleCreateEntity((PacketCreateEntity) packet);
                 break;
 
             case DELETE_ENTITY:
-                handleDeleteEntity((PacketDeleteEntity) packet);
+                EntityHandle.handleDeleteEntity((PacketDeleteEntity) packet);
                 break;
 
             case PLAYER_JOIN:
-                handlePlayerJoin((PacketPlayerJoin) packet);
+                PlayerHandle.handlePlayerJoin((PacketPlayerJoin) packet);
                 break;
 
             case CREATE_BLOCK:
-                System.out.println("TEST HANDLE");
-                handleCreateBlock((PacketCreateBlock) packet);
+                BlockHandle.handleCreateBlock((PacketCreateBlock) packet);
                 break;
 
             default:
@@ -195,41 +152,6 @@ public class GameClient {
         }
     }
 
-    private void handleCreateEntity(PacketCreateEntity packet) {
-        // Ne pas créer si c'est notre propre entité
-        if (packet.entityId.equals(playerId)) {
-            return;
-        }
-
-        Entity entity = new Entity(new Vector2d(packet.posX, packet.posY));
-        entity.id = packet.entityId;
-        entity.name = packet.entityName;
-
-        entitiesManager.getEntities().put(entity.id, entity);
-        System.out.println("Entité distante créée: " + entity.name + " (" + entity.id + ")");
-    }
-
-    private void handleDeleteEntity(PacketDeleteEntity packet) {
-        Entity removed = entitiesManager.getEntities().remove(packet.entityId);
-        if (removed != null) {
-            System.out.println("Entité supprimée: " + removed.name);
-        }
-    }
-
-    private void handlePlayerJoin(PacketPlayerJoin packet) {
-        // Ne rien faire si c'est nous
-        if (packet.playerId.equals(playerId)) {
-            return;
-        }
-
-        System.out.println("Joueur rejoint: " + packet.playerName);
-    }
-
-    private void handleCreateBlock(PacketCreateBlock packet) {
-        blocksManager.addBlock(new Vector2d(packet.posX, packet.posY));
-        System.out.println("Block distant créé: (" + packet.posX + " " + packet.posY + ")");
-    }
-
     /**
      * Déconnecter du serveur
      */
@@ -250,5 +172,13 @@ public class GameClient {
 
     public boolean isConnected() {
         return connected;
+    }
+
+    public TCPClient getTCPClient() {
+        return tcpClient;
+    }
+
+    public UDPClient getUDPClient() {
+        return udpClient;
     }
 }
