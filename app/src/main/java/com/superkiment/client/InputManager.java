@@ -10,6 +10,8 @@ import org.lwjgl.glfw.GLFW;
 import java.util.*;
 import java.util.function.Consumer;
 
+import static java.lang.Math.floor;
+import static java.lang.Math.round;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
@@ -97,8 +99,10 @@ public class InputManager {
         });
 
         input.onActionRelease("ajouter block", () -> {
-            System.out.println("try add block");
-            BlockHandle.createBlock(new Vector2d(1d, 5d));
+            int posX = (int) round(player.pos.x / 50);
+            int posY = (int) round(player.pos.y / 50);
+            BlockHandle.createBlock(new Vector2d(posX, posY));
+            System.out.println("Trying to add block : " + posX + " " + posY);
         });
 
         input.onActionRelease("avancer", () -> player.dirDepl.y = 0);

@@ -111,7 +111,6 @@ public class GameClient {
      * Gérer les packets TCP reçus
      */
     public void handleTCPPacket(Packet packet) {
-        System.out.println("TEST SWITCH");
         switch (packet.getType()) {
             case CREATE_ENTITY:
                 EntityHandle.handleCreateEntity((PacketCreateEntity) packet);

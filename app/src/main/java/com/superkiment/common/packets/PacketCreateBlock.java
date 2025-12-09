@@ -8,7 +8,10 @@ public class PacketCreateBlock extends Packet {
     public double posX;
     public double posY;
 
-    public PacketCreateBlock() {}
+    /**
+     * Ne pas utiliser
+     */
+    private PacketCreateBlock() {}
 
     public PacketCreateBlock(Vector2d position) {
         this.posX = position.x;

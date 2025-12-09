@@ -118,6 +118,11 @@ public class Network {
             client.sendTCP(createPacket);
         }
 
+        for (Block block : blocksManager.getBlocks()) {
+            PacketCreateBlock packetCreateBlock = new PacketCreateBlock(block.pos);
+            client.sendTCP(packetCreateBlock);
+        }
+
         // Broadcaster le nouveau joueur aux autres
         broadcastTCP(packet, client);
         monitor.log("INFO", "Joueur a rejoint : " + client.playerId + " (" + client.playerName + ")");
