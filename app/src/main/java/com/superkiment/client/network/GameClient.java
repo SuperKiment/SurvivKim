@@ -1,7 +1,6 @@
 package com.superkiment.client.network;
 
 import com.superkiment.client.Main;
-import com.superkiment.common.blocks.Block;
 import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.entities.EntitiesManager;
 import com.superkiment.common.entities.Entity;
@@ -10,7 +9,6 @@ import com.superkiment.common.packets.*;
 import org.joml.Vector2d;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static org.lwjgl.glfw.GLFW.glfwSetWindowTitle;
 

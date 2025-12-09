@@ -62,7 +62,7 @@ public class InputManager {
         return instance;
     }
 
-    public static void setupInputs(long window, InputManager input, Player player, GameClient gameClient) {
+    public static void setupInputs(long window, InputManager input, Player player) {
         input.init(window);
 
         // Lier les touches aux actions
@@ -98,7 +98,7 @@ public class InputManager {
 
         input.onActionRelease("ajouter block", () -> {
             System.out.println("try add block");
-            BlockHandle.createBlock(new Vector2d(1d,5d));
+            BlockHandle.createBlock(new Vector2d(1d, 5d));
         });
 
         input.onActionRelease("avancer", () -> player.dirDepl.y = 0);
@@ -112,9 +112,7 @@ public class InputManager {
         // System.out.println("Saut ! Total: " + jumpCount);
         //});
 
-        input.onActionPress("quitter", () -> {
-            glfwSetWindowShouldClose(window, true);
-        });
+        input.onActionPress("quitter", () -> glfwSetWindowShouldClose(window, true));
 
         // Afficher les bindings
         input.printBindings();
@@ -138,12 +136,14 @@ public class InputManager {
         });
 
         // Callback position souris
-        GLFW.glfwSetCursorPosCallback(window, (win, xpos, ypos) -> {
-            mousePosition.set((float) xpos, (float) ypos);
-        });
+        GLFW.glfwSetCursorPosCallback(window, (win, xpos, ypos) ->
+                mousePosition.set((float) xpos, (float) ypos)
+        );
 
         // Callback boutons souris
-        GLFW.glfwSetMouseButtonCallback(window, (win, button, action, mods) -> {
+        GLFW.glfwSetMouseButtonCallback(window, (win, button, action, mods) ->
+
+        {
             if (action == GLFW.GLFW_PRESS) {
                 mouseButtonsPressed.add(button);
                 mouseButtonsJustPressed.add(button);
@@ -154,9 +154,9 @@ public class InputManager {
         });
 
         // Callback scroll
-        GLFW.glfwSetScrollCallback(window, (win, xoffset, yoffset) -> {
-            scrollDelta = (float) yoffset;
-        });
+        GLFW.glfwSetScrollCallback(window, (win, xoffset, yoffset) ->
+                scrollDelta = (float) yoffset
+        );
     }
 
     /**
@@ -181,7 +181,7 @@ public class InputManager {
         updateContinuousActions();
     }
 
-    // ========== CLAVIER ==========
+// ========== CLAVIER ==========
 
     /**
      * Vérifier si une touche est enfoncée
@@ -204,7 +204,7 @@ public class InputManager {
         return keysJustReleased.contains(keyCode);
     }
 
-    // ========== SOURIS ==========
+// ========== SOURIS ==========
 
     /**
      * Vérifier si un bouton de souris est enfoncé
@@ -248,7 +248,7 @@ public class InputManager {
         return scrollDelta;
     }
 
-    // ========== SYSTÈME D'ACTIONS ==========
+// ========== SYSTÈME D'ACTIONS ==========
 
     /**
      * Lier une ou plusieurs touches à une action
@@ -357,7 +357,7 @@ public class InputManager {
         actionOnRelease.clear();
     }
 
-    // ========== MÉTHODES INTERNES ==========
+// ========== MÉTHODES INTERNES ==========
 
     private void updateContinuousActions() {
         for (Map.Entry<String, Consumer<Void>> entry : actionCallbacks.entrySet()) {
@@ -389,7 +389,7 @@ public class InputManager {
         }
     }
 
-    // ========== UTILITAIRES ==========
+// ========== UTILITAIRES ==========
 
     /**
      * Obtenir une représentation textuelle d'un keycode

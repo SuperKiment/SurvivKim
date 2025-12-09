@@ -1,7 +1,6 @@
 package com.superkiment.client.network;
 
 import com.superkiment.client.Main;
-import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.packets.PacketCreateBlock;
 import org.joml.Vector2d;
 
@@ -18,8 +17,6 @@ public class BlockHandle {
      */
     public static void createBlock(Vector2d position) {
         TCPClient tcpClient = Main.gameClient.getTCPClient();
-
-        String entityId = UUID.randomUUID().toString();
         PacketCreateBlock packet = new PacketCreateBlock(position);
         tcpClient.send(packet);
     }

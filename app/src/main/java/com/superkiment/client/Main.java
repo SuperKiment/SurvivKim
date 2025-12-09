@@ -50,7 +50,7 @@ public class Main {
 
         //Setup inputs
         input = InputManager.getInstance();
-        InputManager.setupInputs(window, input, gameClient.getLocalPlayer(), gameClient);
+        InputManager.setupInputs(window, input, gameClient.getLocalPlayer());
 
         input.onActionPress("connecter", () -> {
             if (gameClient == null || !gameClient.isConnected()) {

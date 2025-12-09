@@ -1,7 +1,6 @@
 package com.superkiment.client.network;
 
 import com.superkiment.client.Main;
-import com.superkiment.common.entities.EntitiesManager;
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.packets.PacketCreateEntity;
 import com.superkiment.common.packets.PacketDeleteEntity;
