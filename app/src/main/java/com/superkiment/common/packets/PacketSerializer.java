@@ -1,9 +1,13 @@
 package com.superkiment.common.packets;
 
+import com.superkiment.common.entities.Entity;
 import com.superkiment.common.packets.entity.PacketEntityPosition;
 
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.ArrayList;
 
 public class PacketSerializer {
 
@@ -33,8 +37,9 @@ public class PacketSerializer {
      */
     public static byte[] serializePositionUDP(PacketEntityPosition packet) {
         byte[] idBytes = packet.entityId.getBytes();
-        ByteBuffer buffer = ByteBuffer.allocate(4 + idBytes.length + 8*4 + 8);
+        ByteBuffer buffer = ByteBuffer.allocate(1 + 4 + idBytes.length + 8 * 4 + 8);
 
+        buffer.put((byte) 1);
         buffer.putInt(idBytes.length);
         buffer.put(idBytes);
         buffer.putDouble(packet.posX);
@@ -51,11 +56,12 @@ public class PacketSerializer {
      */
     public static PacketEntityPosition deserializePositionUDP(byte[] data) {
         ByteBuffer buffer = ByteBuffer.wrap(data);
+        buffer.get(); // ignore header (byte type)
 
         int idLength = buffer.getInt();
         byte[] idBytes = new byte[idLength];
         buffer.get(idBytes);
-        String entityId = new String(idBytes);
+        String entityId = new String(idBytes, StandardCharsets.UTF_8);
 
         double posX = buffer.getDouble();
         double posY = buffer.getDouble();
@@ -66,5 +72,68 @@ public class PacketSerializer {
         PacketEntityPosition packet = new PacketEntityPosition(entityId, posX, posY, dirX, dirY);
         packet.timestamp = timestamp;
         return packet;
+    }
+
+    public static byte[] serializeBulk(PacketPositionsBulk bulk) {
+        // Calcul taille
+        int count = bulk.ids.size();
+        int size = 1 + Integer.BYTES; // type + count
+
+        for (int i = 0; i < count; i++) {
+            String id = bulk.ids.get(i);
+            byte[] idBytes = id.getBytes(StandardCharsets.UTF_8);
+            size += Integer.BYTES;           // id length
+            size += idBytes.length;          // id bytes
+            size += Double.BYTES;            // x
+            size += Double.BYTES;            // y
+        }
+
+        ByteBuffer buffer = ByteBuffer.allocate(size);
+        buffer.put((byte) 2);
+        buffer.putInt(count);
+
+        for (int i = 0; i < count; i++) {
+            String id = bulk.ids.get(i);
+            byte[] idBytes = id.getBytes(StandardCharsets.UTF_8);
+
+            buffer.putInt(idBytes.length);
+            buffer.put(idBytes);
+            buffer.putDouble(bulk.x.get(i));
+            buffer.putDouble(bulk.y.get(i));
+        }
+
+        return buffer.array();
+    }
+
+    public static PacketPositionsBulk deserializeBulkPositions(byte[] data) {
+        ByteBuffer buffer = ByteBuffer.wrap(data);
+        buffer.get(); // ignore header (byte type)
+
+        int count = buffer.getInt();
+
+        List<String> ids = new ArrayList<>(count);
+        List<Double> x = new ArrayList<>(count);
+        List<Double> y = new ArrayList<>(count);
+
+        for (int i = 0; i < count; i++) {
+            int idLen = buffer.getInt();
+            byte[] idBytes = new byte[idLen];
+            buffer.get(idBytes);
+            String id = new String(idBytes, StandardCharsets.UTF_8);
+
+            double px = buffer.getDouble();
+            double py = buffer.getDouble();
+
+            ids.add(id);
+            x.add(px);
+            y.add(py);
+        }
+
+        PacketPositionsBulk bulk = new PacketPositionsBulk(new ArrayList<Entity>());
+        bulk.ids = ids;
+        bulk.x = x;
+        bulk.y = y;
+
+        return bulk;
     }
 }

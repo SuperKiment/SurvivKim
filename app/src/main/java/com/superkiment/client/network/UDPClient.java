@@ -42,11 +42,25 @@ public class UDPClient {
                 socket.receive(packet);
 
                 // Désérialiser le packet
-                PacketEntityPosition posPacket = PacketSerializer.deserializePositionUDP(
-                        packet.getData()
-                );
 
-                gameClient.handleUDPPacket(posPacket);
+                switch (packet.getData()[0]) {
+                    case 1 -> {
+                        PacketEntityPosition posPacket = PacketSerializer.deserializePositionUDP(
+                                packet.getData()
+                        );
+
+                        gameClient.handleUDPPositionPacket(posPacket);
+                    }
+                    case 2 -> {
+                        PacketPositionsBulk posPacket = PacketSerializer.deserializeBulkPositions(
+                                packet.getData()
+                        );
+
+                        gameClient.handleUDPBulkPositionPacket(posPacket);
+                    }
+                }
+
+
 
             } catch (IOException e) {
                 if (!socket.isClosed()) {

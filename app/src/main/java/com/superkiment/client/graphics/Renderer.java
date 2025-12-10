@@ -25,6 +25,8 @@ public class Renderer {
         for (Entity entity : entities.values()) {
             boolean isLocal = entity.id.equals(localPlayer.id);
 
+            entity.updateLerp();
+
             glPushMatrix();
             glTranslated(entity.posLerp.x, entity.posLerp.y, 0);
             double angleInRad = entity.dirLookLerp.angle(new Vector2d(1, 0)) * 57.2957795131d;
@@ -32,6 +34,12 @@ public class Renderer {
             entity.shapeModel.renderModel();
 
             glPopMatrix();
+
+            /*
+            System.out.println();
+            System.out.println(entity.getClass().getName());
+            System.out.println(entity.pos);
+             */
         }
     }
 

@@ -1,15 +1,18 @@
 package com.superkiment.server.network;
 
+import com.superkiment.common.entities.EntitiesManager;
+import com.superkiment.common.entities.Entity;
 import com.superkiment.common.packets.*;
 import com.superkiment.common.packets.entity.PacketEntityPosition;
 
 import java.io.IOException;
 import java.net.*;
+import java.util.List;
 
 public class UDPServer {
 
     private final int port;
-    private DatagramSocket socket;
+    public DatagramSocket socket;
     private boolean running = false;
 
     public UDPServer(int port) {
@@ -30,9 +33,6 @@ public class UDPServer {
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
                     socket.receive(packet);
-
-                    // A remettre quand on aura du real time monitoring
-                    // System.out.println("From client: " + packet.getAddress() + ":" + packet.getPort());
 
                     // Désérialiser le packet
                     PacketEntityPosition posPacket = PacketSerializer.deserializePositionUDP(

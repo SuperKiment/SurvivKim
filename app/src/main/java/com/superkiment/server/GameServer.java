@@ -1,5 +1,6 @@
 package com.superkiment.server;
 
+import com.superkiment.client.Time;
 import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.entities.EntitiesManager;
 import com.superkiment.common.entities.Entity;
@@ -53,7 +54,7 @@ public class GameServer {
         new Thread(udpServer::start).start();
 
         //Mise à jour des stats
-        new Thread(()->monitor.statsUpdateLoop(this)).start();
+        new Thread(() -> monitor.statsUpdateLoop(this)).start();
 
         // Boucle principale du serveur
         gameLoop();
@@ -83,13 +84,14 @@ public class GameServer {
     }
 
     private void tick() {
-        // Logique du serveur (update entités, etc.)
-        // Pour l'instant, rien à faire ici
+        Time.updateDeltaTime();
+        
         for (Entity entity : entitiesManager.getEntities().values()) {
             entity.update();
         }
         //System.out.println(entitiesManager.getEntities().size());
 
+        Network.broadcastBulkPositionUDP(entitiesManager, udpServer);
     }
 
     public void stop() {

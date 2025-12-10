@@ -18,6 +18,7 @@ public class Entity {
     public ShapeModel shapeModel;
 
     public boolean moveFromInput = false;
+    public boolean dirtyPosition = false;
 
     public Entity() {
         this(new Vector2d(200f, 200f));
@@ -35,8 +36,8 @@ public class Entity {
     }
 
     public void update() {
+        dirtyPosition = false;
         updateMovement();
-        updateLerp();
     }
 
     public void turnToDirection(Vector2d dir) {
@@ -55,16 +56,13 @@ public class Entity {
                 .mul(Time.getDeltaTime());
         pos.add(mvt);
 
+        dirtyPosition = true;
+
         moveFromInput = false;
     }
 
-    private void updateLerp() {
+    public void updateLerp() {
         dirLookLerp = LerpRotation(dirLookLerp, dirLookTarget, 0.2);
         posLerp = Lerp(posLerp, pos, 0.3);
-    }
-
-    public void moveToPosition(Vector2d pos) {
-        this.pos.x = pos.x;
-        this.pos.y = pos.y;
     }
 }

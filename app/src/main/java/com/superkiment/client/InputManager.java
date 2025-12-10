@@ -2,7 +2,6 @@ package com.superkiment.client;
 
 import com.superkiment.client.network.handles.BlockHandle;
 import com.superkiment.client.network.handles.EntityHandle;
-import com.superkiment.common.entities.EntitiesManager;
 import com.superkiment.common.entities.Player;
 import com.superkiment.common.entities.Projectile;
 import org.joml.Vector2d;
@@ -100,7 +99,7 @@ public class InputManager {
             player.moveFromInput = true;
         });
 
-        input.onAction("tirer", (v) -> {
+        input.onActionPress("tirer", () -> {
             EntityHandle.createEntity(new Projectile(player.pos, player.dirLookLerp));
         });
 

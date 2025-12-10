@@ -35,5 +35,7 @@ public class Projectile extends Entity {
                 .mul(speed)
                 .mul(Time.getDeltaTime());
         pos.add(mvt);
+
+        dirtyPosition = true;
     }
 }

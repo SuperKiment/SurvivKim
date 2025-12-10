@@ -12,7 +12,10 @@ import com.superkiment.server.network.handles.EntityHandle;
 import com.superkiment.server.network.handles.PlayerHandle;
 
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.List;
 import java.util.Objects;
 
 public class Network {
@@ -109,13 +112,39 @@ public class Network {
 
         for (ClientConnection client : entitiesManager.getClients().values()) {
             int udpPort = client.getUdpPort();
-            if (udpPort == 0) {
-                continue;
-            }
+            if (udpPort == 0) continue;
+
             if (client.getAddress().equals(exceptAddress) && udpPort == exceptPort) {
                 continue;
             }
             udpServer.sendPosition(packet, client.getAddress(), udpPort);
+        }
+    }
+
+    public static void broadcastBulkPositionUDP(EntitiesManager entitiesManager, UDPServer udpServer) {
+        List<Entity> moved = entitiesManager.getEntities()
+                .values()
+                .stream()
+                .filter(e -> e.dirtyPosition)
+                .toList();
+
+        if (moved.isEmpty()) return;
+
+        PacketPositionsBulk packet = new PacketPositionsBulk(moved);
+        byte[] data = PacketSerializer.serializeBulk(packet);
+
+        for (ClientConnection client : entitiesManager.getClients().values()) {
+            int udpPort = client.getUdpPort();
+            if (udpPort == 0) continue;
+
+            try {
+                DatagramPacket datagramPacket = new DatagramPacket(
+                        data, data.length, client.getAddress(), udpPort
+                );
+                udpServer.socket.send(datagramPacket);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

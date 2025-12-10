@@ -142,7 +142,7 @@ public class GameClient {
     /**
      * Gérer les packets UDP reçus
      */
-    public void handleUDPPacket(PacketEntityPosition packet) {
+    public void handleUDPPositionPacket(PacketEntityPosition packet) {
         // Ne pas mettre à jour notre propre position
         if (packet.entityId.equals(playerId)) {
             return;
@@ -152,6 +152,20 @@ public class GameClient {
         if (entity != null) {
             entity.pos.set(packet.posX, packet.posY);
             entity.dirLookTarget.set(packet.dirX, packet.dirY);
+        }
+    }
+
+    public void handleUDPBulkPositionPacket(PacketPositionsBulk packet) {
+
+        for (int i = 0; i < packet.ids.size(); i++) {
+            String id = packet.ids.get(i);
+
+            Entity entity = entitiesManager.getEntities().get(id);
+
+            if (entity != null) {
+                entity.pos.x = packet.x.get(i);
+                entity.pos.y = packet.y.get(i);
+            }
         }
     }
 
