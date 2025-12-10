@@ -2,6 +2,7 @@ package com.superkiment.common.entities;
 
 import com.superkiment.common.packets.Packet;
 import com.superkiment.common.packets.entity.PacketCreateEntity;
+import com.superkiment.common.packets.entity.PacketCreateEntityPlayer;
 import com.superkiment.common.packets.entity.PacketCreateEntityProjectile;
 import org.joml.Vector2d;
 
@@ -36,9 +37,20 @@ public class EntityFactory {
             projectile.name = pp.entityName;
 
             System.out.println("USED PROJECTILE CREATOR");
-            System.out.println(projectile.shapeModel.shapes.size());
 
             return projectile;
+        });
+
+        creators.put(PacketCreateEntityPlayer.class, p -> {
+            PacketCreateEntityPlayer pp = (PacketCreateEntityPlayer) p;
+            Player player = new Player(new Vector2d(pp.posX, pp.posY));
+
+            player.id = pp.entityId;
+            player.name = pp.entityName;
+
+            System.out.println("USED PLAYER CREATOR");
+
+            return player;
         });
     }
 

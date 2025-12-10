@@ -107,16 +107,12 @@ public class PacketSerializer {
     public static PacketPositionsBulk deserializeBulkPositions(ByteBuffer buffer) {
 
         int count = buffer.getInt();
-        System.out.println("LOG DESERIALIZER, count : " + count);
-        System.out.println("LIMIT : " + buffer.limit());
 
         List<String> ids = new ArrayList<>(count);
         List<Double> x = new ArrayList<>(count);
         List<Double> y = new ArrayList<>(count);
 
         for (int i = 0; i < count; i++) {
-            System.out.println("BOUCLE : " + i);
-            System.out.println("REMAINING : " + buffer.remaining());
 
             int idLen = buffer.getInt();
 

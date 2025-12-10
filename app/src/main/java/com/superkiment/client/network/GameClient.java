@@ -10,6 +10,7 @@ import com.superkiment.common.entities.Entity;
 import com.superkiment.common.entities.Player;
 import com.superkiment.common.packets.*;
 import com.superkiment.common.packets.entity.PacketCreateEntity;
+import com.superkiment.common.packets.entity.PacketCreateEntityPlayer;
 import com.superkiment.common.packets.entity.PacketDeleteEntity;
 import com.superkiment.common.packets.entity.PacketEntityPosition;
 import org.joml.Vector2d;
@@ -77,7 +78,7 @@ public class GameClient {
             tcpClient.send(joinPacket);
 
             // Créer l'entité du joueur (TCP)
-            PacketCreateEntity createPacket = new PacketCreateEntity(
+            PacketCreateEntityPlayer createPacket = new PacketCreateEntityPlayer(
                     playerId, playerName, localPlayer.pos
             );
             tcpClient.send(createPacket);

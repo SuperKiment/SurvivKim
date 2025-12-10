@@ -15,7 +15,7 @@ public class Projectile extends Entity {
         this.dirLookTarget = new Vector2d(trajectory.x, trajectory.y);
         this.dirLookLerp = new Vector2d(trajectory.x, trajectory.y);
 
-        this.speed = 400f;
+        this.speed = 5f;
 
         this.shapeModel.addShape(
                 new Shape(new Vector2d(0, 0),
