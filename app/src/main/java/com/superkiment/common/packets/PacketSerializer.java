@@ -4,6 +4,7 @@ import com.superkiment.common.entities.Entity;
 import com.superkiment.common.packets.entity.PacketEntityPosition;
 
 import java.io.*;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -54,9 +55,7 @@ public class PacketSerializer {
     /**
      * Désérialiser un byte array en PacketEntityPosition (pour UDP)
      */
-    public static PacketEntityPosition deserializePositionUDP(byte[] data) {
-        ByteBuffer buffer = ByteBuffer.wrap(data);
-        buffer.get(); // ignore header (byte type)
+    public static PacketEntityPosition deserializePositionUDP(ByteBuffer buffer) {
 
         int idLength = buffer.getInt();
         byte[] idBytes = new byte[idLength];
@@ -105,18 +104,26 @@ public class PacketSerializer {
         return buffer.array();
     }
 
-    public static PacketPositionsBulk deserializeBulkPositions(byte[] data) {
-        ByteBuffer buffer = ByteBuffer.wrap(data);
-        buffer.get(); // ignore header (byte type)
+    public static PacketPositionsBulk deserializeBulkPositions(ByteBuffer buffer) {
 
         int count = buffer.getInt();
+        System.out.println("LOG DESERIALIZER, count : " + count);
+        System.out.println("LIMIT : " + buffer.limit());
 
         List<String> ids = new ArrayList<>(count);
         List<Double> x = new ArrayList<>(count);
         List<Double> y = new ArrayList<>(count);
 
         for (int i = 0; i < count; i++) {
+            System.out.println("BOUCLE : " + i);
+            System.out.println("REMAINING : " + buffer.remaining());
+
             int idLen = buffer.getInt();
+
+            if (buffer.remaining() < idLen + 16) { // id + 2 doubles
+                throw new BufferUnderflowException();
+            }
+
             byte[] idBytes = new byte[idLen];
             buffer.get(idBytes);
             String id = new String(idBytes, StandardCharsets.UTF_8);

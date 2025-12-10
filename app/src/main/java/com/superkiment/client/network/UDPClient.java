@@ -5,6 +5,7 @@ import com.superkiment.common.packets.entity.PacketEntityPosition;
 
 import java.io.IOException;
 import java.net.*;
+import java.nio.ByteBuffer;
 
 public class UDPClient {
 
@@ -41,34 +42,29 @@ public class UDPClient {
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 socket.receive(packet);
 
-                // Désérialiser le packet
+                ByteBuffer packetBuffer = ByteBuffer.wrap(packet.getData(), 0, packet.getLength());
+                byte type = packetBuffer.get();
 
-                switch (packet.getData()[0]) {
+                switch (type) {
                     case 1 -> {
-                        PacketEntityPosition posPacket = PacketSerializer.deserializePositionUDP(
-                                packet.getData()
-                        );
-
+                        PacketEntityPosition posPacket =
+                                PacketSerializer.deserializePositionUDP(packetBuffer);
                         gameClient.handleUDPPositionPacket(posPacket);
                     }
                     case 2 -> {
-                        PacketPositionsBulk posPacket = PacketSerializer.deserializeBulkPositions(
-                                packet.getData()
-                        );
 
+                        PacketPositionsBulk posPacket =
+                                PacketSerializer.deserializeBulkPositions(packetBuffer);
                         gameClient.handleUDPBulkPositionPacket(posPacket);
                     }
                 }
 
-
-
             } catch (IOException e) {
-                if (!socket.isClosed()) {
-                    e.printStackTrace();
-                }
+                if (!socket.isClosed()) e.printStackTrace();
             }
         }
     }
+
 
     public void sendPosition(PacketEntityPosition packet) {
         try {

@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -130,20 +131,40 @@ public class Network {
 
         if (moved.isEmpty()) return;
 
-        PacketPositionsBulk packet = new PacketPositionsBulk(moved);
-        byte[] data = PacketSerializer.serializeBulk(packet);
+        //On divise la liste en petites listes de 17 entités pour éviter de passer au-dessus de la limite du buffer
+        List<List<Entity>> dividedMoved = new ArrayList<>();
+        List<Entity> currentList = new ArrayList<>();
+
+        for (int i = 0; i < moved.size(); i++) {
+            if (i % 17 == 0) {
+                dividedMoved.add(new ArrayList<>());
+                currentList = dividedMoved.get(dividedMoved.size() - 1);
+            }
+
+            currentList.add(moved.get(i));
+        }
+
+        //On sérialise toutes les listes
+        List<byte[]> dividedDatas = new ArrayList<>();
+        for (List<Entity> part : dividedMoved) {
+            byte[] data = PacketSerializer.serializeBulk(new PacketPositionsBulk(part));
+            dividedDatas.add(data);
+        }
 
         for (ClientConnection client : entitiesManager.getClients().values()) {
             int udpPort = client.getUdpPort();
             if (udpPort == 0) continue;
 
-            try {
-                DatagramPacket datagramPacket = new DatagramPacket(
-                        data, data.length, client.getAddress(), udpPort
-                );
-                udpServer.socket.send(datagramPacket);
-            } catch (IOException e) {
-                e.printStackTrace();
+            //Et on envoie tous les serials à chaque client
+            for (byte[] data : dividedDatas) {
+                try {
+                    DatagramPacket datagramPacket = new DatagramPacket(
+                            data, data.length, client.getAddress(), udpPort
+                    );
+                    udpServer.socket.send(datagramPacket);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

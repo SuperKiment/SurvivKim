@@ -7,6 +7,7 @@ import com.superkiment.common.packets.entity.PacketEntityPosition;
 
 import java.io.IOException;
 import java.net.*;
+import java.nio.ByteBuffer;
 import java.util.List;
 
 public class UDPServer {
@@ -26,26 +27,36 @@ public class UDPServer {
             running = true;
             System.out.println("Serveur UDP démarré sur le port " + socket.getLocalPort());
 
-            byte[] buffer = new byte[1024];
 
             while (running) {
                 try {
+                    byte[] buffer = new byte[1024];
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-
                     socket.receive(packet);
 
-                    // Désérialiser le packet
-                    PacketEntityPosition posPacket = PacketSerializer.deserializePositionUDP(
-                            packet.getData()
-                    );
+                    ByteBuffer packetBuffer = ByteBuffer.wrap(packet.getData(), 0, packet.getLength());
+                    byte type = packetBuffer.get();
+
+                    switch (type) {
+                        case 1 -> {
+                            PacketEntityPosition posPacket =
+                                    PacketSerializer.deserializePositionUDP(packetBuffer);
+
+                            Network.handleUDPPacket(posPacket, packet.getAddress(), packet.getPort(), this);
+                        }
+                        case 2 -> {
+                            throw new Exception("Pas supposé avoir ce UDP ici");
+                        }
+                    }
 
                     // Traiter le packet
-                    Network.handleUDPPacket(posPacket, packet.getAddress(), packet.getPort(), this);
 
                 } catch (IOException e) {
                     if (running) {
                         e.printStackTrace();
                     }
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
             }
         } catch (SocketException e) {
