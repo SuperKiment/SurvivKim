@@ -45,14 +45,6 @@ public class Entity extends Collisionable {
         shapeModel = new ShapeModel();
 
         collisionsManager = new CollisionsManager(this);
-        collisionsManager.addCollisionShape(
-                new CollisionShape(
-                        new Vector2d(0, 0),
-                        new Vector2d(25, 25),
-                        Shape.ShapeType.RECT_OUTLINE,
-                        this
-                )
-        );
     }
 
     public void updateLogic(EntitiesManager entitiesManager, BlocksManager blocksManager) {
