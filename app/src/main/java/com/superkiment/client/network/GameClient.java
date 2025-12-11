@@ -84,7 +84,7 @@ public class GameClient {
             tcpClient.send(createPacket);
 
             // Ajouter le joueur local aux entités
-            entitiesManager.getEntities().put(playerId, localPlayer);
+            entitiesManager.addEntity(localPlayer);
 
             connected = true;
             System.out.println("Connecté au serveur en tant que " + playerName);

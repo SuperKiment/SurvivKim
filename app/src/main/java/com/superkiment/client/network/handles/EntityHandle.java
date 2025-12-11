@@ -43,7 +43,7 @@ public class EntityHandle {
 
         Entity entity = EntityFactory.getInstance().create(packet);
 
-        entitiesManager.getEntities().put(entity.id, entity);
+        entitiesManager.addEntity(entity);
         System.out.println("Entité distante créée: " + entity.name + " (" + entity.id + ") à la position " + entity.pos);
     }
 

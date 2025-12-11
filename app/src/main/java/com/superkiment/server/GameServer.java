@@ -87,7 +87,7 @@ public class GameServer {
         Time.updateDeltaTime();
         
         for (Entity entity : entitiesManager.getEntities().values()) {
-            entity.update();
+            entity.updateLogic(entitiesManager, blocksManager);
         }
         //System.out.println(entitiesManager.getEntities().size());
 

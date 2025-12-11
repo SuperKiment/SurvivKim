@@ -93,7 +93,7 @@ public class Main {
     private void gameTick(float deltaTime) {
         Entity localPlayer = gameClient.getLocalPlayer();
 
-        localPlayer.update();
+        localPlayer.updateLogic(entitiesManager, blocksManager);
 
         // Envoyer la position au serveur (UDP) régulièrement
         GameClient.positionSendTimer += deltaTime;

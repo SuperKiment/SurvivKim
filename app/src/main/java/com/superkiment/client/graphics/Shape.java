@@ -1,5 +1,6 @@
 package com.superkiment.client.graphics;
 
+import com.superkiment.common.collisions.Collisionable;
 import org.joml.Vector2d;
 import org.joml.Vector3d;
 
@@ -20,10 +21,10 @@ public class Shape {
     public static Vector3d color = new Vector3d(1f, 0f, 0f);
 
     public Vector2d position;
-    protected final ShapeType shapeType;
+    protected ShapeType shapeType = ShapeType.CIRCLE;
 
     // Utilisé pour Cercle et Rectangle
-    public final Vector2d dimensions;
+    public Vector2d dimensions = null;
     public final int segments = 10;
     public final float lineWidth = 3f;
 
@@ -33,8 +34,7 @@ public class Shape {
         this.shapeType = st;
     }
 
-    public Shape() {
-        this(new Vector2d(100d, 100d), new Vector2d(100d, 200d), ShapeType.RECT);
+    private Shape() {
     }
 
     public void draw() {
@@ -98,5 +98,14 @@ public class Shape {
 
     public void setColor(float r, float g, float b) {
         color = new Vector3d(r, g, b);
+    }
+
+    protected ShapeType getBaseType(ShapeType type) {
+        return switch (type) {
+            case RECT_OUTLINE -> ShapeType.RECT;
+            case CIRCLE_OUTLINE -> ShapeType.CIRCLE;
+            case TRIANGLE_OUTLINE -> ShapeType.TRIANGLE;
+            default -> type;
+        };
     }
 }

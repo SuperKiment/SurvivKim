@@ -16,7 +16,7 @@ public class EntityHandle {
     public static void handleCreateEntity(PacketCreateEntity packet, ClientConnection client) {
         Entity entity = EntityFactory.getInstance().create(packet);
 
-        GameServer.entitiesManager.getEntities().put(entity.id, entity);
+        GameServer.entitiesManager.addEntity(entity);
 
         // Broadcaster à tous les clients
         broadcastTCP(packet, client);

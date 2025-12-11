@@ -36,4 +36,9 @@ public class EntitiesManager {
             }
         }
     }
+
+    public void addEntity(Entity entity) {
+        entity.setEntitiesManager(this);
+        entities.put(entity.id, entity);
+    }
 }
