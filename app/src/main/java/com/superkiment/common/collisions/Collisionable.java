@@ -7,6 +7,7 @@ public abstract class Collisionable {
     public Vector2d pos;
     public ShapeModel shapeModel;
     public CollisionsManager collisionsManager;
+    public boolean dirtyPosition = false;
 
     /**
      * Retourne la position mondiale de l'objet
