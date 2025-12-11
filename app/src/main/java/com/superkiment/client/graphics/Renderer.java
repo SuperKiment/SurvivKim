@@ -34,12 +34,6 @@ public class Renderer {
             entity.shapeModel.renderModel();
 
             glPopMatrix();
-
-            /*
-            System.out.println();
-            System.out.println(entity.getClass().getName());
-            System.out.println(entity.pos);
-             */
         }
     }
 

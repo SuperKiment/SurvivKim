@@ -25,4 +25,8 @@ public class ShapeModel {
     public void addShape(Shape s) {
         shapes.add(s);
     }
+
+    public void addShapes(List<Shape> newShapes) {
+        shapes.addAll(newShapes);
+    }
 }
