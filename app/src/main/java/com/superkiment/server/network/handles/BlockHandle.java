@@ -8,6 +8,9 @@ import org.joml.Vector2d;
 
 import static com.superkiment.server.network.Network.broadcastTCP;
 
+/**
+ *  Le handle qui contient les fonctions nécessaires à la création de blocs et la récéption de données concernant la création de blocks.
+ */
 public class BlockHandle {
 
     public static void handleCreateBlock(PacketCreateBlock packet, ClientConnection client) {

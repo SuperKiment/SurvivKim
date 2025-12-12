@@ -2,7 +2,10 @@ package com.superkiment.common.packets;
 
 import org.joml.Vector2d;
 
+import java.io.Serial;
+
 public class PacketCreateBlock extends Packet {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public double posX;

@@ -4,6 +4,9 @@ import com.superkiment.client.graphics.Shape;
 import com.superkiment.common.collisions.CollisionShape;
 import org.joml.Vector2d;
 
+/**
+ * Le Joueur et autres joueurs.
+ */
 public class Player extends Entity {
     public Player() {
         super();

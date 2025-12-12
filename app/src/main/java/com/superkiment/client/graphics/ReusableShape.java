@@ -10,8 +10,8 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class ReusableShape {
 
-    private Vector2f position;
-    private Vector3f color;
+    private final Vector2f position;
+    private final Vector3f color;
     private float rotation; // en degrés
 
     public ReusableShape(float x, float y) {

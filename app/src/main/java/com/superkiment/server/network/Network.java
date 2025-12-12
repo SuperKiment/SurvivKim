@@ -6,6 +6,7 @@ import com.superkiment.common.packets.*;
 import com.superkiment.common.packets.entity.PacketCreateEntity;
 import com.superkiment.common.packets.entity.PacketDeleteEntity;
 import com.superkiment.common.packets.entity.PacketEntityPosition;
+import com.superkiment.server.GameServer;
 import com.superkiment.server.monitor.ServerMonitor;
 import com.superkiment.server.network.handles.BlockHandle;
 import com.superkiment.server.network.handles.EntityHandle;
@@ -13,21 +14,23 @@ import com.superkiment.server.network.handles.PlayerHandle;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
+/**
+ * Classe contenant uniquement des fonctions statiques sur le handling de paquets et l'envoi de paquets.
+ */
 public class Network {
 
-    //Références
-    private static ServerMonitor monitor;
-    private static EntitiesManager entitiesManager;
+    //Références pour la facilité.
+    private static final ServerMonitor monitor;
+    private static final EntitiesManager entitiesManager;
 
-    public static void setupNetwork(EntitiesManager em) {
+    //Récupération des références.
+    static {
         monitor = ServerMonitor.getInstance();
-        entitiesManager = em;
+        entitiesManager = GameServer.entitiesManager;
     }
 
     /**
@@ -64,7 +67,7 @@ public class Network {
     }
 
     /**
-     * Gérer les packets UDP reçus
+     * Gérer les packets UDP sur la mise à jour d'une seule entité reçus.
      */
     public static void handleUDPPacket(PacketEntityPosition packet, InetAddress address, int port, UDPServer udpServer) {
         monitor.logUDPReceived(packet);
@@ -85,9 +88,8 @@ public class Network {
         }
     }
 
-
     /**
-     * Envoyer un packet TCP à tous les clients sauf l'expéditeur
+     * Envoyer un packet TCP à tous les clients (sauf l'expéditeur en cas de création de player)
      */
     public static void broadcastTCP(Packet packet, ClientConnection except) {
         try {
@@ -106,7 +108,7 @@ public class Network {
     }
 
     /**
-     * Envoyer une position UDP à tous les clients sauf l'expéditeur
+     * Envoyer une position UDP à tous les clients sauf l'expéditeur (mise à jour d'une seule entité).
      */
     public static void broadcastPositionUDP(PacketEntityPosition packet, InetAddress exceptAddress, int exceptPort, UDPServer udpServer) {
         monitor.logUDPSent(packet);
@@ -122,6 +124,9 @@ public class Network {
         }
     }
 
+    /**
+     * Envoyer une position UDP à tous les clients sauf l'expéditeur (mise à jour de toutes les entités qui ont bougé).
+     */
     public static void broadcastBulkPositionUDP(EntitiesManager entitiesManager, UDPServer udpServer) {
         List<Entity> moved = entitiesManager.getEntities()
                 .values()

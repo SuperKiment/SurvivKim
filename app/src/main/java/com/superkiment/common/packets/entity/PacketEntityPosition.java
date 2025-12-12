@@ -2,7 +2,10 @@ package com.superkiment.common.packets.entity;
 
 import com.superkiment.common.packets.Packet;
 
+import java.io.Serial;
+
 public class PacketEntityPosition extends Packet {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public String entityId;

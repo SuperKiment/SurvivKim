@@ -3,6 +3,9 @@ package com.superkiment.common.collisions;
 import com.superkiment.client.graphics.ShapeModel;
 import org.joml.Vector2d;
 
+/**
+ * Une classe qui étend Collisionable se définit comme ouverte aux intéractions de type collision.
+ */
 public abstract class Collisionable {
     public Vector2d pos;
     public ShapeModel shapeModel;

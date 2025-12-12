@@ -6,6 +6,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 
+/**
+ * Un objet permettant une collection de Shapes et de toutes les render d'un coup, permettant de les bind à une direction.
+ */
 public class ShapeModel {
     public List<Shape> shapes;
 

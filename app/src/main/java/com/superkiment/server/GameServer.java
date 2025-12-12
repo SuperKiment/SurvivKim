@@ -1,6 +1,6 @@
 package com.superkiment.server;
 
-import com.superkiment.client.Time;
+import com.superkiment.common.Time;
 import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.entities.EntitiesManager;
 import com.superkiment.common.entities.Entity;
@@ -42,7 +42,7 @@ public class GameServer {
         entitiesManager = new EntitiesManager();
         blocksManager = new BlocksManager();
 
-        Network.setupNetwork(entitiesManager);
+        //Network.setupNetwork(entitiesManager);
 
         running = true;
 
@@ -56,12 +56,16 @@ public class GameServer {
         //Mise à jour des stats
         new Thread(() -> monitor.statsUpdateLoop(this)).start();
 
-        // Boucle principale du serveur
-        gameLoop();
+        loop();
     }
 
-    private void gameLoop() {
+    /**
+     * Boucle principale du serveur.
+     */
+    private void loop() {
         long lastTime = System.nanoTime();
+
+        // = nano-seconds Per Tick
         double nsPerTick = 1_000_000_000.0 / TICK_RATE;
         double delta = 0;
 
@@ -83,9 +87,12 @@ public class GameServer {
         }
     }
 
+    /**
+     * Une loop du jeu en lui-même
+     */
     private void tick() {
         Time.updateDeltaTime();
-        
+
         for (Entity entity : entitiesManager.getEntities().values()) {
             entity.updateLogic(entitiesManager, blocksManager);
         }

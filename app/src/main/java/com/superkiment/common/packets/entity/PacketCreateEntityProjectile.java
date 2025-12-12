@@ -5,8 +5,6 @@ import com.superkiment.common.entities.Projectile;
 import com.superkiment.common.packets.Packet;
 import org.joml.Vector2d;
 
-import java.io.Serial;
-
 public class PacketCreateEntityProjectile extends PacketCreateEntity {
 
     public double trajX;

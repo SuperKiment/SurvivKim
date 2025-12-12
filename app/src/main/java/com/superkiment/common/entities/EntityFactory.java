@@ -10,8 +10,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * Usine d'entités pour transformer des packets en entités prêtes à être ajoutées à l'EntitiesManager.
+ */
 public class EntityFactory {
     private static EntityFactory instance;
+
+    /**
+     * Liaison entre une classe de Packet et une fonction qui crée une entité en fonction de cette même classe de Packet.
+     */
     private final Map<Class<? extends Packet>, Function<Packet, Entity>> creators;
 
     private EntityFactory() {

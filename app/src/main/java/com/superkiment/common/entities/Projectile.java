@@ -1,11 +1,13 @@
 package com.superkiment.common.entities;
 
-import com.superkiment.client.Time;
+import com.superkiment.common.Time;
 import com.superkiment.client.graphics.Shape;
-import com.superkiment.client.graphics.ShapeModel;
 import com.superkiment.common.collisions.CollisionShape;
 import org.joml.Vector2d;
 
+/**
+ * Super-classe qui permettra de prendre des dégâts et autres effets.
+ */
 public class Projectile extends Entity {
     private Projectile() {
     }

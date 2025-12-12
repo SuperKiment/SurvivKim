@@ -8,17 +8,23 @@ import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.entities.EntitiesManager;
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.entities.Player;
-import com.superkiment.common.packets.*;
+import com.superkiment.common.packets.Packet;
+import com.superkiment.common.packets.PacketCreateBlock;
+import com.superkiment.common.packets.PacketPlayerJoin;
+import com.superkiment.common.packets.PacketPositionsBulk;
 import com.superkiment.common.packets.entity.PacketCreateEntity;
 import com.superkiment.common.packets.entity.PacketCreateEntityPlayer;
 import com.superkiment.common.packets.entity.PacketDeleteEntity;
 import com.superkiment.common.packets.entity.PacketEntityPosition;
 import org.joml.Vector2d;
 
-import java.util.*;
+import java.util.UUID;
 
 import static org.lwjgl.glfw.GLFW.glfwSetWindowTitle;
 
+/**
+ * Client unique pour la récéption et le handling des données entrantes et sortantes.
+ */
 public class GameClient {
 
     public static final String SERVER_ADDRESS = "localhost"; // ou "127.0.0.1"
@@ -52,10 +58,7 @@ public class GameClient {
         this.blocksManager = Main.blocksManager;
     }
 
-    /**
-     * Se connecter au serveur
-     */
-    public boolean connect(String playerName) {
+    private boolean connect(String playerName) {
         try {
             // Générer un ID unique pour le joueur
             playerId = UUID.randomUUID().toString();
@@ -96,6 +99,11 @@ public class GameClient {
         }
     }
 
+    /**
+     * Tentative de connexion au serveur.
+     * @param window
+     * @return
+     */
     public static GameClient tryConnectToServer(long window) {
         System.out.println("Tentative de connexion au serveur...");
         GameClient gameClient = new GameClient(SERVER_ADDRESS, TCP_PORT, UDP_PORT);
@@ -141,7 +149,7 @@ public class GameClient {
     }
 
     /**
-     * Gérer les packets UDP reçus
+     * Gérer les packets UDP sur la position d'une entité unique reçus
      */
     public void handleUDPPositionPacket(PacketEntityPosition packet) {
         // Ne pas mettre à jour notre propre position
@@ -156,6 +164,10 @@ public class GameClient {
         }
     }
 
+    /**
+     * Gérer les packets UDP sur la position de plusieurs entités reçus
+     * @param packet
+     */
     public void handleUDPBulkPositionPacket(PacketPositionsBulk packet) {
 
         for (int i = 0; i < packet.ids.size(); i++) {

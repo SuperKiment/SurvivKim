@@ -7,10 +7,12 @@ import com.superkiment.common.packets.entity.PacketDeleteEntity;
 import com.superkiment.server.GameServer;
 import com.superkiment.server.monitor.ServerMonitor;
 import com.superkiment.server.network.ClientConnection;
-import org.joml.Vector2d;
 
 import static com.superkiment.server.network.Network.broadcastTCP;
 
+/**
+ * Le handle qui contient les fonctions nécessaires à la création et suppression d'entités et la récéption de données concernant la création et suppression d'entités.
+ */
 public class EntityHandle {
 
     public static void handleCreateEntity(PacketCreateEntity packet, ClientConnection client) {

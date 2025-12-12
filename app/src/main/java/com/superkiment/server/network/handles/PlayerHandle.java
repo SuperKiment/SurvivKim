@@ -5,7 +5,6 @@ import com.superkiment.common.entities.Entity;
 import com.superkiment.common.packets.Packet;
 import com.superkiment.common.packets.PacketCreateBlock;
 import com.superkiment.common.packets.entity.LinkEntityPacket;
-import com.superkiment.common.packets.entity.PacketCreateEntity;
 import com.superkiment.common.packets.PacketPlayerJoin;
 import com.superkiment.server.GameServer;
 import com.superkiment.server.monitor.ServerMonitor;
@@ -13,6 +12,9 @@ import com.superkiment.server.network.ClientConnection;
 
 import static com.superkiment.server.network.Network.broadcastTCP;
 
+/**
+ * Le handle qui contient les fonctions nécessaires à la création de joueurs et la récéption de données concernant la création de joueurs.
+ */
 public class PlayerHandle {
 
     public static void handlePlayerJoin(PacketPlayerJoin packetPlayerJoin, ClientConnection client) {

@@ -1,17 +1,13 @@
 package com.superkiment.client.graphics;
 
-import com.superkiment.common.collisions.Collisionable;
 import org.joml.Vector2d;
 import org.joml.Vector3d;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glColor3f;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glVertex2f;
 
+/**
+ * Une classe qui permet de stocker et afficher des données sur des formes, permet également de les afficher.
+ */
 public class Shape {
     public enum ShapeType {
         RECT, CIRCLE, TRIANGLE,

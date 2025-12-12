@@ -13,15 +13,6 @@ import java.util.function.Consumer;
 
 import static java.lang.Math.round;
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
 
 /**
  * Gestionnaire d'inputs pour clavier et souris
@@ -113,12 +104,6 @@ public class InputManager {
         input.onActionRelease("reculer", () -> player.dirDepl.y = 0);
         input.onActionRelease("gauche", () -> player.dirDepl.x = 0);
         input.onActionRelease("droite", () -> player.dirDepl.x = 0);
-
-        // Action au moment du press (une seule fois)
-        //input.onActionPress("sauter", () -> {
-        //  jumpCount++;
-        // System.out.println("Saut ! Total: " + jumpCount);
-        //});
 
         input.onActionPress("quitter", () -> glfwSetWindowShouldClose(window, true));
 
@@ -336,7 +321,7 @@ public class InputManager {
 
     /**
      * Obtenir la force de l'action (pour les mouvements directionnels)
-     * Retourne -1, 0 ou 1
+     * Retourne -1, 0 ou 1.
      */
     public float getActionAxis(String negativeAction, String positiveAction) {
         float value = 0;

@@ -1,21 +1,16 @@
 package com.superkiment.common.entities;
 
-import com.superkiment.client.Time;
-import com.superkiment.common.blocks.Block;
+import com.superkiment.common.Time;
 import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.collisions.CollisionData;
 import com.superkiment.common.collisions.Collisionable;
-import com.superkiment.client.graphics.Shape;
 import com.superkiment.client.graphics.ShapeModel;
 import com.superkiment.common.collisions.CollisionsManager;
-import com.superkiment.common.collisions.CollisionShape;
 import org.joml.Vector2d;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static com.superkiment.common.collisions.CollisionShape.GetCollisionType;
 import static com.superkiment.common.utils.Vector.Lerp;
 import static com.superkiment.common.utils.Vector.LerpRotation;
 
@@ -47,6 +42,12 @@ public class Entity extends Collisionable {
         collisionsManager = new CollisionsManager(this);
     }
 
+    /**
+     * Update toute la logique d'une entité. Utilisé par le serveur, à part pour le localPlayer dans le Client.
+     *
+     * @param entitiesManager
+     * @param blocksManager
+     */
     public void updateLogic(EntitiesManager entitiesManager, BlocksManager blocksManager) {
         dirtyPosition = false;
         updateMovement();
@@ -60,6 +61,9 @@ public class Entity extends Collisionable {
         this.dirLookTarget.set(dir);
     }
 
+    /**
+     * Met à jour le mouvement en fonction de la vitesse et de la direction.
+     */
     protected void updateMovement() {
         if (!moveFromInput) return;
 
@@ -76,11 +80,15 @@ public class Entity extends Collisionable {
         moveFromInput = false;
     }
 
+    /**
+     * Met à jour les différents lerp pour fluidifier les mouvements : rotation et déplacement.
+     */
     public void updateLerp() {
         dirLookLerp = LerpRotation(dirLookLerp, dirLookTarget, 0.2);
         posLerp = Lerp(posLerp, pos, 0.3);
     }
 
+    //GETTERS ET SETTERS
     public void setEntitiesManager(EntitiesManager entitiesManager) {
         this.entitiesManager = entitiesManager;
     }

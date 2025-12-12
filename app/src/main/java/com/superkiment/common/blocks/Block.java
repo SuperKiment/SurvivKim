@@ -7,6 +7,9 @@ import com.superkiment.common.collisions.CollisionsManager;
 import com.superkiment.common.collisions.CollisionShape;
 import org.joml.Vector2d;
 
+/**
+ * Un block dans le monde, non-déplaçable.
+ */
 public class Block extends Collisionable {
     public static int blockSize = 50;
 

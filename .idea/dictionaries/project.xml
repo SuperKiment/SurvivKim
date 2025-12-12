@@ -4,7 +4,9 @@
       <w>collisionable</w>
       <w>depl</w>
       <w>lerp</w>
+      <w>perp</w>
       <w>superkiment</w>
+      <w>vect</w>
     </words>
   </dictionary>
 </component>

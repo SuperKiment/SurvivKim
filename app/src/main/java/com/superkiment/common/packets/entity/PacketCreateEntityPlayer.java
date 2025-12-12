@@ -2,7 +2,6 @@ package com.superkiment.common.packets.entity;
 
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.entities.Player;
-import com.superkiment.common.entities.Projectile;
 import com.superkiment.common.packets.Packet;
 import org.joml.Vector2d;
 

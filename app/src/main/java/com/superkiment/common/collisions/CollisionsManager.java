@@ -1,6 +1,6 @@
 package com.superkiment.common.collisions;
 
-import com.superkiment.client.Time;
+import com.superkiment.common.Time;
 import com.superkiment.common.blocks.Block;
 import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.entities.EntitiesManager;
@@ -12,6 +12,9 @@ import java.util.List;
 
 import static com.superkiment.common.collisions.CollisionShape.GetCollisionType;
 
+/**
+ * Manager de collisions pour un Collisionable. Cherche les collisions et applique les réactions. Collectionne également les CollectionShapes.
+ */
 public class CollisionsManager {
     public Collisionable parent;
     public List<CollisionShape> collisionShapes;
@@ -34,20 +37,6 @@ public class CollisionsManager {
         parent.shapeModel.addShape(collisionShape);
         collisionShapes.add(collisionShape);
     }
-
-    public boolean isInCollisionWith(CollisionsManager other) {
-        for (CollisionShape thisShape : collisionShapes) {
-            for (CollisionShape otherShape : other.collisionShapes) {
-                if (thisShape.isInCollisionWith(otherShape)) {
-                    System.out.println("COLLISION");
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
 
     public List<CollisionData> findCollisionsWithData(EntitiesManager entitiesManager,
                                                       BlocksManager blocksManager) {
@@ -141,7 +130,7 @@ public class CollisionsManager {
         // Calcule les vélocités relatives
         Vector2d otherVelocity = new Vector2d(0, 0);
         if (collision.other.parent instanceof Entity) {
-            otherVelocity.set(((Entity) collision.other.parent).collisionsManager.velocity);
+            otherVelocity.set((collision.other.parent).collisionsManager.velocity);
         }
 
         Vector2d relativeVelocity = new Vector2d(velocity).sub(otherVelocity);
@@ -150,16 +139,16 @@ public class CollisionsManager {
         // Ne résout que si les objets se rapprochent
         if (velocityAlongNormal < 0) {
             // Calcule l'impulsion
-            float otherMass = 1.0f;
+            float otherMass;
             if (collision.other.parent instanceof Entity) {
-                otherMass = ((Entity) collision.other.parent).collisionsManager.mass;
+                otherMass = (collision.other.parent).collisionsManager.mass;
             } else {
                 otherMass = Float.MAX_VALUE; // Objet immobile
             }
 
             float e = Math.min(bounciness,
                     collision.other.parent instanceof Entity ?
-                            ((Entity) collision.other.parent).collisionsManager.bounciness : 0);
+                            (collision.other.parent).collisionsManager.bounciness : 0);
 
             double j = -(1 + e) * velocityAlongNormal;
             j /= (1 / mass + 1 / otherMass);
@@ -213,10 +202,8 @@ public class CollisionsManager {
         Vector2d rectCenter = rect.getWorldPosition();
         Vector2d separation = new Vector2d(circleCenter).sub(rectCenter);
 
-        double distance = separation.length();
-        if (distance < 0.001) {
+        if (separation.length() < 0.001) {
             separation.set(1, 0); // Direction par défaut
-            distance = 1;
         }
 
         Vector2d normal = new Vector2d(separation).normalize();
@@ -244,12 +231,10 @@ public class CollisionsManager {
         if (penetration > 0) {
             Vector2d push = new Vector2d(normal).mul(penetration);
 
+            parent.pos.add(push);
+            double velocityAlongNormal = velocity.dot(normal);
             if (isThisCircle) {
-                // Le cercle glisse
-                parent.pos.add(push);
 
-                // Calcule la vélocité tangentielle
-                double velocityAlongNormal = velocity.dot(normal);
                 if (velocityAlongNormal < 0) {
                     Vector2d tangent = new Vector2d(-normal.y, normal.x);
                     double velocityAlongTangent = velocity.dot(tangent);
@@ -263,11 +248,6 @@ public class CollisionsManager {
                     }
                 }
             } else {
-                // Le rectangle s'arrête net
-                parent.pos.add(push);
-
-                // Annule la vélocité dans la direction normale
-                double velocityAlongNormal = velocity.dot(normal);
                 if (velocityAlongNormal < 0) {
                     velocity.sub(new Vector2d(normal).mul(velocityAlongNormal));
                 }

@@ -7,9 +7,16 @@ import com.superkiment.server.network.Network;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * La collection et gestion des entités et clients dans le monde.
+ */
 public class EntitiesManager {
 
     private final Map<String, Entity> entities = new ConcurrentHashMap<>();
+
+    /**
+     * Uniquement utilisé par le serveur.
+     */
     private final Map<String, ClientConnection> clients = new ConcurrentHashMap<>();
 
     public EntitiesManager() {}

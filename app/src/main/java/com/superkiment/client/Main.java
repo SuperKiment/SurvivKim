@@ -3,6 +3,7 @@ package com.superkiment.client;
 import com.superkiment.client.graphics.Renderer;
 import com.superkiment.client.network.GameClient;
 import com.superkiment.client.network.handles.PlayerHandle;
+import com.superkiment.common.Time;
 import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.entities.EntitiesManager;
 import com.superkiment.common.entities.Entity;

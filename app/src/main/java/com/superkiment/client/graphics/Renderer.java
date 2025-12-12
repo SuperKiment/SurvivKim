@@ -17,10 +17,18 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
+/**
+ * The Renderer for the window ; all rendering is launched here
+ */
 public class Renderer {
     public Renderer() {
     }
 
+    /**
+     * Renders the entities on the window using OpenGL
+     * @param entities
+     * @param localPlayer
+     */
     public void renderEntities(Map<String, Entity> entities, Entity localPlayer) {
         for (Entity entity : entities.values()) {
             boolean isLocal = entity.id.equals(localPlayer.id);
@@ -37,6 +45,10 @@ public class Renderer {
         }
     }
 
+    /**
+     * Renders the blocks on the window using OpenGL
+     * @param blocks
+     */
     public void renderBlocks(List<Block> blocks) {
         for (Block block : blocks) {
             glPushMatrix();
@@ -50,9 +62,11 @@ public class Renderer {
     public void renderFloor() {
     }
 
+    /**
+     *
+     * @return a fully setup window as long
+     */
     public long SetupWindow() {
-        // Setup error callback
-
         long window;
 
         GLFWErrorCallback.createPrint(System.err).set();

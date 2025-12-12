@@ -43,6 +43,8 @@ public class UDPClient {
                 socket.receive(packet);
 
                 ByteBuffer packetBuffer = ByteBuffer.wrap(packet.getData(), 0, packet.getLength());
+
+                // Le premier octet permet de connaître le type de packet UDP.
                 byte type = packetBuffer.get();
 
                 switch (type) {

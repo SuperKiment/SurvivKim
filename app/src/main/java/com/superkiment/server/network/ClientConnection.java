@@ -6,10 +6,12 @@ import com.superkiment.server.GameServer;
 import java.io.*;
 import java.net.*;
 
+/**
+ * La liaison entre le client TCP/UDP et le Player actif dans le monde.
+ */
 public class ClientConnection implements Runnable {
 
     private final Socket socket;
-    private final GameServer gameServer;
     private ObjectOutputStream out;
     private ObjectInputStream in;
 
@@ -17,9 +19,8 @@ public class ClientConnection implements Runnable {
     public String playerName;
     private int udpPort;
 
-    public ClientConnection(Socket socket, GameServer gameServer) {
+    public ClientConnection(Socket socket) {
         this.socket = socket;
-        this.gameServer = gameServer;
     }
 
     @Override

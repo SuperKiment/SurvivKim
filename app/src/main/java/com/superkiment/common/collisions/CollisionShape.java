@@ -3,6 +3,9 @@ package com.superkiment.common.collisions;
 import com.superkiment.client.graphics.Shape;
 import org.joml.Vector2d;
 
+/**
+ * Sous-classe de Shape qui permet à la fois la visualisation des shapes en débug et la réutilisation du code de Shape.
+ */
 public class CollisionShape extends Shape {
     public final Collisionable parent;
 

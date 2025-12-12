@@ -10,8 +10,10 @@ import com.superkiment.common.packets.entity.PacketCreateEntity;
 import com.superkiment.common.packets.entity.PacketDeleteEntity;
 
 import static com.superkiment.client.Main.entitiesManager;
-import static com.superkiment.common.packets.entity.LinkEntityPacket.entityToPacketCreator;
 
+/**
+ *  Le handle qui contient les fonctions nécessaires à la création et suppression d'entités et la récéption de données concernant la création et suppression d'entités.
+ */
 public class EntityHandle {
 
     public static void createEntity(Entity entity) {

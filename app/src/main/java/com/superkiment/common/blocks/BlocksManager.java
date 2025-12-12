@@ -5,6 +5,9 @@ import org.joml.Vector2d;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * La collection et gestion des blocks dans le monde.
+ */
 public class BlocksManager {
     private final List<Block> blocks;
 

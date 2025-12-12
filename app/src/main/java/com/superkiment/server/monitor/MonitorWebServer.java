@@ -117,7 +117,7 @@ public class MonitorWebServer {
                     <title>Server Monitor</title>
                     <style>
                         * { margin: 0; padding: 0; box-sizing: border-box; }
-                        body { 
+                        body {
                             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                             color: #fff;
@@ -125,9 +125,9 @@ public class MonitorWebServer {
                             min-height: 100vh;
                         }
                         .container { max-width: 1400px; margin: 0 auto; }
-                        h1 { 
-                            text-align: center; 
-                            margin-bottom: 30px; 
+                        h1 {
+                            text-align: center;
+                            margin-bottom: 30px;
                             font-size: 2.5em;
                             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
                         }
@@ -229,7 +229,7 @@ public class MonitorWebServer {
                 <body>
                     <div class="container">
                         <h1><span class="status-indicator"></span> Server Monitor Dashboard</h1>
-                
+               
                         <div class="stats-grid">
                             <div class="stat-card">
                                 <div class="stat-label">Clients connectés</div>
@@ -264,7 +264,7 @@ public class MonitorWebServer {
                                 <div class="stat-value" id="bytesOut">0<span class="stat-unit">KB</span></div>
                             </div>
                         </div>
-                
+               
                         <div class="logs-container">
                             <div class="logs-title">
                                 <span>📋 Logs récents</span>
@@ -273,20 +273,20 @@ public class MonitorWebServer {
                             <div id="logs"></div>
                         </div>
                     </div>
-                
+               
                     <script>
                         const eventSource = new EventSource('/stats');
                         const logsContainer = document.getElementById('logs');
                         let autoScroll = true;
-                
+               
                         logsContainer.addEventListener('scroll', () => {
                             const isAtBottom = logsContainer.scrollHeight - logsContainer.scrollTop === logsContainer.clientHeight;
                             autoScroll = isAtBottom;
                         });
-                
+               
                         eventSource.onmessage = (event) => {
                             const data = JSON.parse(event.data);
-                
+               
                             document.getElementById('clients').textContent = data.connectedClients;
                             document.getElementById('entities').textContent = data.totalEntities;
                             document.getElementById('tcp').textContent = data.totalTCPPackets.toLocaleString();
@@ -295,7 +295,7 @@ public class MonitorWebServer {
                             document.getElementById('udpPerSec').innerHTML = data.udpPacketsPerSecond + '<span class="stat-unit">pkt/s</span>';
                             document.getElementById('bytesIn').innerHTML = (data.totalBytesReceived / 1024).toFixed(2) + '<span class="stat-unit">KB</span>';
                             document.getElementById('bytesOut').innerHTML = (data.totalBytesSent / 1024).toFixed(2) + '<span class="stat-unit">KB</span>';
-                
+               
                             logsContainer.innerHTML = '';
                             data.recentLogs.reverse().forEach(log => {
                                 const logEl = document.createElement('div');
@@ -307,12 +307,12 @@ public class MonitorWebServer {
                                 `;
                                 logsContainer.appendChild(logEl);
                             });
-                
+               
                             if (autoScroll) {
                                 logsContainer.scrollTop = logsContainer.scrollHeight;
                             }
                         };
-                
+               
                         function clearLogs() {
                             if (confirm('Effacer tous les logs ?')) {
                                 logsContainer.innerHTML = '<div style="text-align: center; opacity: 0.5; padding: 50px;">Logs effacés</div>';
@@ -321,7 +321,7 @@ public class MonitorWebServer {
                     </script>
                 </body>
                 </html>
-                """;
+               """;
     }
 
     public void stop() {

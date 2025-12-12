@@ -1,14 +1,14 @@
 package com.superkiment.server.network;
 
-import com.superkiment.common.entities.EntitiesManager;
-import com.superkiment.common.entities.Entity;
-import com.superkiment.common.packets.*;
+import com.superkiment.common.packets.PacketSerializer;
 import com.superkiment.common.packets.entity.PacketEntityPosition;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
 import java.nio.ByteBuffer;
-import java.util.List;
 
 public class UDPServer {
 
@@ -37,19 +37,7 @@ public class UDPServer {
                     ByteBuffer packetBuffer = ByteBuffer.wrap(packet.getData(), 0, packet.getLength());
                     byte type = packetBuffer.get();
 
-                    switch (type) {
-                        case 1 -> {
-                            PacketEntityPosition posPacket =
-                                    PacketSerializer.deserializePositionUDP(packetBuffer);
-
-                            Network.handleUDPPacket(posPacket, packet.getAddress(), packet.getPort(), this);
-                        }
-                        case 2 -> {
-                            throw new Exception("Pas supposé avoir ce UDP ici");
-                        }
-                    }
-
-                    // Traiter le packet
+                    handlePacket(type, packet, packetBuffer);
 
                 } catch (IOException e) {
                     if (running) {
@@ -80,6 +68,19 @@ public class UDPServer {
         running = false;
         if (socket != null) {
             socket.close();
+        }
+    }
+
+    private void handlePacket(byte type, DatagramPacket packet, ByteBuffer packetBuffer) throws Exception {
+        switch (type) {
+            case 1 -> {
+                PacketEntityPosition posPacket =
+                        PacketSerializer.deserializePositionUDP(packetBuffer);
+
+                Network.handleUDPPacket(posPacket, packet.getAddress(), packet.getPort(), this);
+            }
+            case 2 -> throw new Exception("Pas supposé avoir ce UDP ici");
+            default -> throw new IllegalStateException("Unexpected value: " + type);
         }
     }
 }

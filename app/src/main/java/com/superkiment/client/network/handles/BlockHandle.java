@@ -7,9 +7,10 @@ import org.joml.Vector2d;
 
 import static com.superkiment.client.Main.blocksManager;
 
+/**
+ * Le handle qui contient les fonctions nécessaires à la création de blocs et la récéption de données concernant la création de block.
+ */
 public class BlockHandle {
-
-
 
     /**
      * Créer un block (TCP - fiable)

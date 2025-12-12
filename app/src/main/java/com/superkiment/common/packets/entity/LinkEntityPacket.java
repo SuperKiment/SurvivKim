@@ -9,6 +9,9 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Permet de trouver automatiquement le paquet lié à l'entité et permettre la création de cette dernière dans le EntityCreator.
+ */
 public class LinkEntityPacket {
     public static Map<Class<? extends Entity>, IPacketCreator> entityToPacketCreator = new HashMap<>();
 
@@ -48,20 +51,19 @@ public class LinkEntityPacket {
         Method instanciateMethod = packetClass.getDeclaredMethod("instanciateFromEntity", Entity.class);
 
         // Crée un PacketCreator qui appelle la méthode statique
-        IPacketCreator creator = entity1 -> {
+        return entity1 -> {
             try {
                 return (Packet) instanciateMethod.invoke(null, entity1);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException("Failed to instantiate packet via instanciateFromEntity", e);
             }
         };
-        return creator;
     }
 
     public static Packet CreatePacketFromEntity(Entity entity) {
         // Si l'entrée n'existe pas, l'ajouter d'abord
         if (!entityToPacketCreator.containsKey(entity.getClass())) LinkEntityToPacket(entity);
 
-        return entityToPacketCreator.get(entity.getClass()).instanciateFromEntity(entity);
+        return entityToPacketCreator.get(entity.getClass()).instantiateFromEntity(entity);
     }
 }

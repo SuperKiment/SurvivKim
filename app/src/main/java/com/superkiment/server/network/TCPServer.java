@@ -29,7 +29,7 @@ public class TCPServer {
             while (running) {
                 try {
                     Socket clientSocket = serverSocket.accept();
-                    ClientConnection client = new ClientConnection(clientSocket, gameServer);
+                    ClientConnection client = new ClientConnection(clientSocket);
                     threadPool.execute(client);
 
                     System.out.println("Nouvelle connexion TCP: " + clientSocket.getInetAddress());
