@@ -11,4 +11,5 @@ plugins {
 }
 
 rootProject.name = 'SurvivKim'
-include('app', 'list', 'utilities')
+
+include 'client', 'server', 'common'
