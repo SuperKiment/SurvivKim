@@ -24,4 +24,6 @@ public abstract class Collisionable {
     public Vector2d getDirection() {
         return new Vector2d(0, 1);
     }
+
+    public abstract void onCollision(Collisionable other);
 }

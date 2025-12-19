@@ -1,6 +1,7 @@
 package com.superkiment.common.entities;
 
 import com.superkiment.common.Time;
+import com.superkiment.common.collisions.Collisionable;
 import com.superkiment.common.shapes.Shape;
 import com.superkiment.common.collisions.CollisionShape;
 import org.joml.Vector2d;
@@ -9,6 +10,7 @@ import org.joml.Vector2d;
  * Super-classe qui permettra de prendre des dégâts et autres effets.
  */
 public class Projectile extends Entity {
+
     private Projectile() {
     }
 
@@ -47,5 +49,10 @@ public class Projectile extends Entity {
         pos.add(mvt);
 
         dirtyPosition = true;
+    }
+
+    @Override
+    public void onCollision(Collisionable other) {
+        System.out.println("KABOOM");
     }
 }

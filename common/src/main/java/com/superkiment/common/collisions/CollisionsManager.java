@@ -1,7 +1,6 @@
 package com.superkiment.common.collisions;
 
 import com.superkiment.common.Time;
-import com.superkiment.common.blocks.Block;
 import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.entities.EntitiesManager;
 import com.superkiment.common.entities.Entity;
@@ -41,42 +40,34 @@ public class CollisionsManager {
     public List<CollisionData> findCollisionsWithData(EntitiesManager entitiesManager,
                                                       BlocksManager blocksManager) {
         List<CollisionData> collisions = new ArrayList<>();
+        List<Collisionable> testedCollisionManagers = new ArrayList<>();
 
-        // Collisions avec les entités
+        // Récupère les CollisionsManager
         for (Entity entity : entitiesManager.getEntities().values()) {
             if (entity == parent) continue;
+            testedCollisionManagers.add(entity);
+        }
 
+        testedCollisionManagers.addAll(blocksManager.getBlocks());
+
+        //Traite les CollisionsManager
+        for (Collisionable otherCollisionable : testedCollisionManagers) {
             for (CollisionShape thisShape : parent.collisionsManager.collisionShapes) {
-                for (CollisionShape otherShape : entity.collisionsManager.collisionShapes) {
+                for (CollisionShape otherShape : otherCollisionable.collisionsManager.collisionShapes) {
                     if (thisShape.isInCollisionWith(otherShape)) {
                         String type = GetCollisionType(thisShape, otherShape);
                         collisions.add(new CollisionData(
-                                entity.collisionsManager,
+                                otherCollisionable.collisionsManager,
                                 thisShape,
                                 otherShape,
                                 type
                         ));
+                        parent.onCollision(otherCollisionable);
                     }
                 }
             }
         }
 
-        // Collisions avec les blocs
-        for (Block block : blocksManager.getBlocks()) {
-            for (CollisionShape thisShape : parent.collisionsManager.collisionShapes) {
-                for (CollisionShape otherShape : block.collisionsManager.collisionShapes) {
-                    if (thisShape.isInCollisionWith(otherShape)) {
-                        String type = GetCollisionType(thisShape, otherShape);
-                        collisions.add(new CollisionData(
-                                block.collisionsManager,
-                                thisShape,
-                                otherShape,
-                                type
-                        ));
-                    }
-                }
-            }
-        }
 
         return collisions;
     }
