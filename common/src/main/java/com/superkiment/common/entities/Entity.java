@@ -89,6 +89,14 @@ public class Entity extends Collisionable {
         posLerp = Lerp(posLerp, pos, 0.3);
     }
 
+    public void onDeleted() {
+        System.out.println("i was deleted : " + this);
+    }
+
+    public void deleteSelf() {
+        this.entitiesManager.addToBeDeleted(this);
+    }
+
     //GETTERS ET SETTERS
     public void setEntitiesManager(EntitiesManager entitiesManager) {
         this.entitiesManager = entitiesManager;

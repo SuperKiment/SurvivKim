@@ -40,18 +40,21 @@ public class CollisionsManager {
     public List<CollisionData> findCollisionsWithData(EntitiesManager entitiesManager,
                                                       BlocksManager blocksManager) {
         List<CollisionData> collisions = new ArrayList<>();
-        List<Collisionable> testedCollisionManagers = new ArrayList<>();
+        List<Collisionable> testedCollisionables = new ArrayList<>();
 
         // Récupère les CollisionsManager
         for (Entity entity : entitiesManager.getEntities().values()) {
             if (entity == parent) continue;
-            testedCollisionManagers.add(entity);
+            testedCollisionables.add(entity);
         }
 
-        testedCollisionManagers.addAll(blocksManager.getBlocks());
+        testedCollisionables.addAll(blocksManager.getBlocks());
 
         //Traite les CollisionsManager
-        for (Collisionable otherCollisionable : testedCollisionManagers) {
+        for (Collisionable otherCollisionable : testedCollisionables) {
+            //Ignorer les exceptions
+            if (parent.exceptionsCollisions.contains(otherCollisionable)) continue;
+
             for (CollisionShape thisShape : parent.collisionsManager.collisionShapes) {
                 for (CollisionShape otherShape : otherCollisionable.collisionsManager.collisionShapes) {
                     if (thisShape.isInCollisionWith(otherShape)) {
@@ -73,9 +76,11 @@ public class CollisionsManager {
     }
 
     public void reactToCollisions(List<CollisionData> collisions) {
-        if (collisions.isEmpty()) return;
+        if (collisions.isEmpty() || !parent.doReactCollision) return;
 
         for (CollisionData collision : collisions) {
+            if (!collision.other.parent.doReactCollision) continue;
+
             switch (collision.collisionType) {
                 case "RR" -> handleRectRectCollision(collision);
                 case "CC" -> handleCircleCircleCollision(collision);

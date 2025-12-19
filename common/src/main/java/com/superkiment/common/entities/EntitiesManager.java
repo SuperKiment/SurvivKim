@@ -1,5 +1,7 @@
 package com.superkiment.common.entities;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -8,24 +10,30 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class EntitiesManager {
 
-    private final Map<String, Entity> entities = new ConcurrentHashMap<>();
+    protected final Map<String, Entity> entities = new ConcurrentHashMap<>();
+    protected final List<Entity> toBeDeletedEntities = new ArrayList<>();
 
-    /**
-     * Uniquement utilisé par le serveur.
-     */
-
-    public EntitiesManager() {}
+    public EntitiesManager() {
+    }
 
     public Map<String, Entity> getEntities() {
         return entities;
     }
 
-
-
-
-
     public void addEntity(Entity entity) {
         entity.setEntitiesManager(this);
         entities.put(entity.id, entity);
+    }
+
+    public void addToBeDeleted(Entity entity) {
+        toBeDeletedEntities.add(entity);
+    }
+
+    public void deleteAllEntitiesToBeDeleted() {
+        for (Entity entity : toBeDeletedEntities) {
+            entity.onDeleted();
+        }
+
+        toBeDeletedEntities.clear();
     }
 }

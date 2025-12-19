@@ -15,6 +15,11 @@ import static com.superkiment.server.network.Network.broadcastTCP;
  */
 public class EntityHandle {
 
+    public static void deleteEntity(String id) {
+        PacketDeleteEntity packet = new PacketDeleteEntity(id);
+        handleDeleteEntity(packet);
+    }
+
     public static void handleCreateEntity(PacketCreateEntity packet, ClientConnection client) {
         Entity entity = EntityFactory.getInstance().create(packet);
 

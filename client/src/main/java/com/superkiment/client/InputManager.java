@@ -91,7 +91,16 @@ public class InputManager {
         });
 
         input.onActionPress("tirer", () -> {
-            EntityHandle.createEntity(new Projectile(player.pos, player.dirLookLerp));
+            Vector2d projPos = new Vector2d(player.pos.x, player.pos.y);
+            Vector2d projDir = new Vector2d(player.dirLookLerp.x, player.dirLookLerp.y);
+
+            projDir
+                    .normalize()
+                    .mul(30);
+            projPos.add(projDir);
+            projDir.normalize();
+
+            EntityHandle.createEntity(new Projectile(projPos, projDir));
         });
 
         input.onAction("ajouter block", (v) -> {

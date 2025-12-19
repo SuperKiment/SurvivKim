@@ -1,9 +1,11 @@
 package com.superkiment.server.entities;
 
 import com.superkiment.common.entities.EntitiesManager;
+import com.superkiment.common.entities.Entity;
 import com.superkiment.common.packets.entity.PacketDeleteEntity;
 import com.superkiment.server.network.ClientConnection;
 import com.superkiment.server.network.Network;
+import com.superkiment.server.network.handles.EntityHandle;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,5 +31,13 @@ public class ServerEntitiesManager extends EntitiesManager {
         }
     }
 
+    @Override
+    public void deleteAllEntitiesToBeDeleted() {
+        for (Entity entity : toBeDeletedEntities) {
+            entity.onDeleted();
+            EntityHandle.deleteEntity(entity.id);
+        }
 
+        toBeDeletedEntities.clear();
+    }
 }

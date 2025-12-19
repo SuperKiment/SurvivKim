@@ -96,7 +96,8 @@ public class GameServer {
         for (Entity entity : entitiesManager.getEntities().values()) {
             entity.updateLogic(entitiesManager, blocksManager);
         }
-        //System.out.println(entitiesManager.getEntities().size());
+
+        entitiesManager.deleteAllEntitiesToBeDeleted();
 
         Network.broadcastBulkPositionUDP(udpServer);
     }

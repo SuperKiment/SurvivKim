@@ -21,6 +21,7 @@ public class Projectile extends Entity {
         this.dirLookLerp = new Vector2d(trajectory.x, trajectory.y);
 
         this.speed = 50f;
+        this.doReactCollision = false;
 
         this.shapeModel.addShape(
                 new Shape(new Vector2d(0, 0),
@@ -54,5 +55,6 @@ public class Projectile extends Entity {
     @Override
     public void onCollision(Collisionable other) {
         System.out.println("KABOOM");
+        deleteSelf();
     }
 }
