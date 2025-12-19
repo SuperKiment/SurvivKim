@@ -13,7 +13,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class MonitorWebServer {
 
-    private static final int PORT = 8080;
+    private static final int PORT = 56204;
     private HttpServer server;
     private static final List<HttpExchange> sseClients = new CopyOnWriteArrayList<>();
 

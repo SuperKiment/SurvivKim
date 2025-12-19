@@ -28,8 +28,8 @@ import static org.lwjgl.glfw.GLFW.glfwSetWindowTitle;
 public class GameClient {
 
     public static final String SERVER_ADDRESS = "localhost"; // ou "127.0.0.1"
-    public static final int TCP_PORT = 7777;
-    public static final int UDP_PORT = 7778;
+    public static final int TCP_PORT = 56201;
+    public static final int UDP_PORT = 56202;
 
     public static float positionSendTimer = 0;
     public static final float POSITION_SEND_RATE = 1.0f / 30.0f; // 30 Hz

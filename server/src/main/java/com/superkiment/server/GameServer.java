@@ -12,8 +12,8 @@ import com.superkiment.server.network.UDPServer;
 
 public class GameServer {
 
-    private static final int TCP_PORT = 7777;
-    private static final int UDP_PORT = 7778;
+    private static final int TCP_PORT = 56201;
+    private static final int UDP_PORT = 56202;
     private static final int TICK_RATE = 20; // 20 ticks par seconde
 
     private TCPServer tcpServer;
