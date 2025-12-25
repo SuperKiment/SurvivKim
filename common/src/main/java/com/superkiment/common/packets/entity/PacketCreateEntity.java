@@ -3,28 +3,27 @@ package com.superkiment.common.packets.entity;
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.packets.Packet;
 
-import java.io.Serial;
-
 /**
  * Une classe abstraite qui hérite de Packet et qui permet la création de paquets pour la création d'entités.
  */
 public abstract class PacketCreateEntity extends Packet {
-    @Serial
-    private static final long serialVersionUID = 1L;
 
     public String entityId;
     public String entityName;
     public double posX;
     public double posY;
-
-    private PacketCreateEntity() {
-    }
+    public String[] exceptions;
 
     public PacketCreateEntity(Entity entity) {
         this.entityId = entity.id;
         this.entityName = entity.name;
         this.posX = entity.pos.x;
         this.posY = entity.pos.y;
+
+        exceptions = new String[entity.exceptionsCollisions.size()];
+        for (int i = 0; i < entity.exceptionsCollisions.size(); i++) {
+            exceptions[i] = ((Entity) entity.exceptionsCollisions.get(i)).id;
+        }
     }
 
     @Override
