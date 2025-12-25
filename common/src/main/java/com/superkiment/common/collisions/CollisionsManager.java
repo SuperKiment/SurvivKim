@@ -53,7 +53,7 @@ public class CollisionsManager {
         //Traite les CollisionsManager
         for (Collisionable otherCollisionable : testedCollisionables) {
             //Ignorer les exceptions
-            if (parent.exceptionsCollisions.contains(otherCollisionable)) continue;
+            if (parent.hasCollisionException(otherCollisionable)) continue;
 
             for (CollisionShape thisShape : parent.collisionsManager.collisionShapes) {
                 for (CollisionShape otherShape : otherCollisionable.collisionsManager.collisionShapes) {

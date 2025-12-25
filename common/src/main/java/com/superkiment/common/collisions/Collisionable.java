@@ -1,5 +1,6 @@
 package com.superkiment.common.collisions;
 
+import com.superkiment.common.entities.Entity;
 import com.superkiment.common.shapes.ShapeModel;
 import org.joml.Vector2d;
 
@@ -37,7 +38,7 @@ public abstract class Collisionable {
     /**
      * Liste d'exceptions qui seront complètement ignorées par le Collisionable. (Ne veut pas dire que l'autre l'ignorera)
      */
-    public List<Collisionable> exceptionsCollisions = new ArrayList<>();
+    private final List<Collisionable> exceptionsCollisions = new ArrayList<>();
 
     /**
      * Retourne la position mondiale de l'objet.
@@ -53,4 +54,21 @@ public abstract class Collisionable {
     }
 
     public abstract void onCollision(Collisionable other);
+
+
+    public void addCollisionException(Entity e) {
+        exceptionsCollisions.add(e);
+    }
+
+    public boolean hasCollisionException(Collisionable c) {
+        return exceptionsCollisions.contains(c);
+    }
+
+    public int numberOfCollisionExceptions() {
+        return exceptionsCollisions.size();
+    }
+
+    public Collisionable getCollisionException(int i) {
+        return exceptionsCollisions.get(i);
+    }
 }

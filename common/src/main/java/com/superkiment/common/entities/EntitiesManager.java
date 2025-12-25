@@ -36,4 +36,8 @@ public class EntitiesManager {
 
         toBeDeletedEntities.clear();
     }
+
+    public Entity getEntityFromID(String id) {
+        return entities.get(id);
+    }
 }

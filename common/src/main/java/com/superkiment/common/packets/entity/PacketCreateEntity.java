@@ -20,9 +20,9 @@ public abstract class PacketCreateEntity extends Packet {
         this.posX = entity.pos.x;
         this.posY = entity.pos.y;
 
-        exceptions = new String[entity.exceptionsCollisions.size()];
-        for (int i = 0; i < entity.exceptionsCollisions.size(); i++) {
-            exceptions[i] = ((Entity) entity.exceptionsCollisions.get(i)).id;
+        exceptions = new String[entity.numberOfCollisionExceptions()];
+        for (int i = 0; i < entity.numberOfCollisionExceptions(); i++) {
+            exceptions[i] = ((Entity) entity.getCollisionException(i)).id;
         }
     }
 

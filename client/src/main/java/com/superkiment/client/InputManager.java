@@ -100,7 +100,9 @@ public class InputManager {
             projPos.add(projDir);
             projDir.normalize();
 
-            EntityHandle.createEntity(new Projectile(projPos, projDir));
+            Projectile projectile = new Projectile(projPos, projDir);
+            projectile.addCollisionException(player);
+            EntityHandle.createEntity(projectile);
         });
 
         input.onAction("ajouter block", (v) -> {
