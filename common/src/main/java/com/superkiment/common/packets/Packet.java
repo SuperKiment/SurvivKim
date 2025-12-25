@@ -7,6 +7,9 @@ public abstract class Packet implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    protected Packet() {
+    }
+
     public enum PacketType {
         CREATE_ENTITY,
         ENTITY_POSITION,

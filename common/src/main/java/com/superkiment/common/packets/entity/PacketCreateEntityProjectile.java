@@ -3,17 +3,16 @@ package com.superkiment.common.packets.entity;
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.entities.Projectile;
 import com.superkiment.common.packets.Packet;
-import org.joml.Vector2d;
 
 public class PacketCreateEntityProjectile extends PacketCreateEntity {
 
     public double trajX;
     public double trajY;
 
-    public PacketCreateEntityProjectile(String entityId, String entityName, Vector2d position, Vector2d trajectory) {
-        super(entityId, entityName, position);
-        this.trajX = trajectory.x;
-        this.trajY = trajectory.y;
+    public PacketCreateEntityProjectile(Projectile projectile) {
+        super(projectile);
+        this.trajX = projectile.dirDepl.x;
+        this.trajY = projectile.dirDepl.y;
     }
 
     @Override
@@ -23,7 +22,6 @@ public class PacketCreateEntityProjectile extends PacketCreateEntity {
     }
 
     public static Packet instanciateFromEntity(Entity e) {
-        Projectile p = (Projectile) e;
-        return new PacketCreateEntityProjectile(e.id, e.name, e.pos, e.dirDepl);
+        return new PacketCreateEntityProjectile((Projectile) e);
     }
 }

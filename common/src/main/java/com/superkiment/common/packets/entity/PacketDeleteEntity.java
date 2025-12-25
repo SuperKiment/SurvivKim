@@ -10,9 +10,6 @@ public class PacketDeleteEntity extends Packet {
 
     public String entityId;
 
-    public PacketDeleteEntity() {
-    }
-
     public PacketDeleteEntity(String entityId) {
         this.entityId = entityId;
     }

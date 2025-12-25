@@ -1,30 +1,29 @@
 package com.superkiment.common.packets.entity;
 
+import com.superkiment.common.entities.Entity;
 import com.superkiment.common.packets.Packet;
-import org.joml.Vector2d;
-
-import java.io.Serial;
 
 /**
  * Une classe abstraite qui hérite de Packet et qui permet la création de paquets pour la création d'entités.
  */
 public abstract class PacketCreateEntity extends Packet {
-    @Serial
-    private static final long serialVersionUID = 1L;
 
     public String entityId;
     public String entityName;
     public double posX;
     public double posY;
+    public String[] exceptions;
 
-    private PacketCreateEntity() {
-    }
+    public PacketCreateEntity(Entity entity) {
+        this.entityId = entity.id;
+        this.entityName = entity.name;
+        this.posX = entity.pos.x;
+        this.posY = entity.pos.y;
 
-    public PacketCreateEntity(String entityId, String entityName, Vector2d position) {
-        this.entityId = entityId;
-        this.entityName = entityName;
-        this.posX = position.x;
-        this.posY = position.y;
+        exceptions = new String[entity.numberOfCollisionExceptions()];
+        for (int i = 0; i < entity.numberOfCollisionExceptions(); i++) {
+            exceptions[i] = ((Entity) entity.getCollisionException(i)).id;
+        }
     }
 
     @Override

@@ -15,6 +15,7 @@ import java.util.function.Function;
  */
 public class EntityFactory {
     private static EntityFactory instance;
+    public EntitiesManager entitiesManager;
 
     /**
      * Liaison entre une classe de Packet et une fonction qui crée une entité en fonction de cette même classe de Packet.
@@ -43,7 +44,12 @@ public class EntityFactory {
             projectile.id = pp.entityId;
             projectile.name = pp.entityName;
 
-            System.out.println("USED PROJECTILE CREATOR");
+            // trouver les exceptions
+            for (String id : pp.exceptions) {
+                projectile.addCollisionException(entitiesManager.getEntityFromID(id));
+            }
+
+            System.out.println("USED PROJECTILE CREATOR, " + projectile.numberOfCollisionExceptions() + " collision exceptions.");
 
             return projectile;
         });
@@ -59,6 +65,18 @@ public class EntityFactory {
 
             return player;
         });
+    }
+
+    /**
+     * Utilisé une seule fois en début de client/serveur
+     * @param entitiesManager
+     */
+    public static void CreateInstance(EntitiesManager entitiesManager) {
+        if (instance == null) {
+            instance = new EntityFactory();
+            instance.entitiesManager = entitiesManager;
+            System.out.println(instance.entitiesManager);
+        }
     }
 
     public static EntityFactory getInstance() {

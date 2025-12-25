@@ -11,6 +11,7 @@ import org.joml.Vector2d;
 import java.util.List;
 import java.util.UUID;
 
+import static com.superkiment.common.utils.StringUtils.GetLastTerm;
 import static com.superkiment.common.utils.Vector.Lerp;
 import static com.superkiment.common.utils.Vector.LerpRotation;
 
@@ -88,6 +89,14 @@ public class Entity extends Collisionable {
         posLerp = Lerp(posLerp, pos, 0.3);
     }
 
+    public void onDeleted() {
+        System.out.println("i was deleted : " + this);
+    }
+
+    public void deleteSelf() {
+        this.entitiesManager.addToBeDeleted(this);
+    }
+
     //GETTERS ET SETTERS
     public void setEntitiesManager(EntitiesManager entitiesManager) {
         this.entitiesManager = entitiesManager;
@@ -99,7 +108,17 @@ public class Entity extends Collisionable {
     }
 
     @Override
+    public void onCollision(Collisionable other) {
+        System.out.println(this + " collided with " + other);
+    }
+
+    @Override
     public Vector2d getDirection() {
         return new Vector2d(dirLookLerp).normalize();
+    }
+
+    @Override
+    public String toString() {
+        return GetLastTerm(this.getClass().getName()) + "::" + pos + "::" + name;
     }
 }

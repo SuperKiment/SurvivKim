@@ -7,6 +7,8 @@ import com.superkiment.common.collisions.CollisionsManager;
 import com.superkiment.common.collisions.CollisionShape;
 import org.joml.Vector2d;
 
+import static com.superkiment.common.utils.StringUtils.GetLastTerm;
+
 /**
  * Un block dans le monde, non-déplaçable.
  */
@@ -36,5 +38,15 @@ public class Block extends Collisionable {
     @Override
     public Vector2d getWorldPosition() {
         return new Vector2d(pos.x * Block.blockSize, pos.y * Block.blockSize);
+    }
+
+    @Override
+    public void onCollision(Collisionable other) {
+
+    }
+
+    @Override
+    public String toString() {
+        return GetLastTerm(this.getClass().getName()) + "::" + pos;
     }
 }

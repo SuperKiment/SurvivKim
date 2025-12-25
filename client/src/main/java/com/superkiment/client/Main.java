@@ -1,18 +1,18 @@
 package com.superkiment.client;
 
 import com.superkiment.client.graphics.Renderer;
+import com.superkiment.client.graphics.ReusableShape;
 import com.superkiment.client.network.GameClient;
 import com.superkiment.client.network.handles.PlayerHandle;
 import com.superkiment.common.Time;
 import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.entities.EntitiesManager;
 import com.superkiment.common.entities.Entity;
+import com.superkiment.common.entities.EntityFactory;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
-
-import com.superkiment.client.graphics.ReusableShape;
 
 public class Main {
 
@@ -48,6 +48,7 @@ public class Main {
 
     private void init() {
         gameClient = GameClient.tryConnectToServer(window);
+        EntityFactory.CreateInstance(entitiesManager);
 
         //Setup inputs
         input = InputManager.getInstance();

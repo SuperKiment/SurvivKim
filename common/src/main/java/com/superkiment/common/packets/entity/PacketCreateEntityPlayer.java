@@ -3,13 +3,11 @@ package com.superkiment.common.packets.entity;
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.entities.Player;
 import com.superkiment.common.packets.Packet;
-import org.joml.Vector2d;
 
 public class PacketCreateEntityPlayer extends PacketCreateEntity {
 
-    public PacketCreateEntityPlayer(String entityId, String entityName, Vector2d position) {
-        super(entityId, entityName, position);
-
+    public PacketCreateEntityPlayer(Player player) {
+        super(player);
     }
 
     @Override
@@ -19,7 +17,6 @@ public class PacketCreateEntityPlayer extends PacketCreateEntity {
     }
 
     public static Packet instanciateFromEntity(Entity e) {
-        Player p = (Player) e;
-        return new PacketCreateEntityPlayer(e.id, e.name, e.pos);
+        return new PacketCreateEntityPlayer((Player) e);
     }
 }

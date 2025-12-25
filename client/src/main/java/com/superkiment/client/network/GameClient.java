@@ -81,9 +81,7 @@ public class GameClient {
             tcpClient.send(joinPacket);
 
             // Créer l'entité du joueur (TCP)
-            PacketCreateEntityPlayer createPacket = new PacketCreateEntityPlayer(
-                    playerId, playerName, localPlayer.pos
-            );
+            PacketCreateEntityPlayer createPacket = new PacketCreateEntityPlayer(localPlayer);
             tcpClient.send(createPacket);
 
             // Ajouter le joueur local aux entités
@@ -101,6 +99,7 @@ public class GameClient {
 
     /**
      * Tentative de connexion au serveur.
+     *
      * @param window
      * @return
      */
@@ -166,6 +165,7 @@ public class GameClient {
 
     /**
      * Gérer les packets UDP sur la position de plusieurs entités reçus
+     *
      * @param packet
      */
     public void handleUDPBulkPositionPacket(PacketPositionsBulk packet) {

@@ -15,10 +15,9 @@ public class PacketEntityPosition extends Packet {
     public double dirY;
     public long timestamp;
 
-    public PacketEntityPosition() {}
 
-    public PacketEntityPosition(String entityId, double posX, double posY,
-                                double dirX, double dirY) {
+    public PacketEntityPosition(String entityId, double posX, double posY, double dirX, double dirY) {
+        super();
         this.entityId = entityId;
         this.posX = posX;
         this.posY = posY;

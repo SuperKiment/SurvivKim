@@ -3,6 +3,7 @@ package com.superkiment.server;
 import com.superkiment.common.Time;
 import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.entities.Entity;
+import com.superkiment.common.entities.EntityFactory;
 import com.superkiment.server.entities.ServerEntitiesManager;
 import com.superkiment.server.monitor.MonitorWebServer;
 import com.superkiment.server.monitor.ServerMonitor;
@@ -42,7 +43,7 @@ public class GameServer {
         entitiesManager = new ServerEntitiesManager();
         blocksManager = new BlocksManager();
 
-        //Network.setupNetwork(entitiesManager);
+        EntityFactory.CreateInstance(entitiesManager);
 
         running = true;
 
@@ -96,7 +97,8 @@ public class GameServer {
         for (Entity entity : entitiesManager.getEntities().values()) {
             entity.updateLogic(entitiesManager, blocksManager);
         }
-        //System.out.println(entitiesManager.getEntities().size());
+
+        entitiesManager.deleteAllEntitiesToBeDeleted();
 
         Network.broadcastBulkPositionUDP(udpServer);
     }
