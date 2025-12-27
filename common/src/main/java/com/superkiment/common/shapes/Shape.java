@@ -12,8 +12,7 @@ public class Shape {
         RECT_OUTLINE, CIRCLE_OUTLINE, TRIANGLE_OUTLINE
     }
 
-    public static Vector3d color = new Vector3d(1f, 0f, 0f);
-
+    public Vector3d color = new Vector3d(1f, 0f, 0f);
     public Vector2d position;
     public ShapeType shapeType = ShapeType.CIRCLE;
 
@@ -26,6 +25,13 @@ public class Shape {
         this.position = pos;
         this.dimensions = dim;
         this.shapeType = st;
+    }
+
+    public Shape(Vector2d pos, Vector2d dim, ShapeType st, Vector3d col) {
+        this.position = pos;
+        this.dimensions = dim;
+        this.shapeType = st;
+        this.color = col;
     }
 
     private Shape() {

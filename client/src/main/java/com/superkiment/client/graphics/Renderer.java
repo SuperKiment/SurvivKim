@@ -1,5 +1,6 @@
 package com.superkiment.client.graphics;
 
+import com.superkiment.client.graphics.ui.UIElement;
 import com.superkiment.common.blocks.Block;
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.shapes.Shape;
@@ -15,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.superkiment.common.shapes.Shape.ShapeType;
-import static com.superkiment.common.shapes.Shape.color;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
@@ -26,6 +26,15 @@ import static org.lwjgl.system.MemoryUtil.NULL;
  */
 public class Renderer {
     public Renderer() {
+    }
+
+    public void renderUI(List<UIElement> elements) {
+        for (UIElement element : elements) {
+            glPushMatrix();
+            glTranslated(element.pos.x, element.pos.y, 0);
+            renderModel(element.shapeModel);
+            glPopMatrix();
+        }
     }
 
     /**
@@ -83,7 +92,7 @@ public class Renderer {
 
         glPushMatrix();
         glTranslated(position.x, position.y, 0);
-        glColor3d(color.x, color.y, color.z);
+        glColor3d(shape.color.x, shape.color.y, shape.color.z);
 
         switch (shapeType) {
             case ShapeType.RECT -> {
@@ -108,6 +117,7 @@ public class Renderer {
             }
             case ShapeType.TRIANGLE -> {
             }
+
             case ShapeType.RECT_OUTLINE -> {
                 glLineWidth(lineWidth);
                 glColor3d(0, 0, 0);
@@ -140,6 +150,7 @@ public class Renderer {
     }
 
     public void renderFloor() {
+        glClearColor(0.06f, 0.6f, 0.3f, 1.0f);
     }
 
     /**
@@ -151,27 +162,27 @@ public class Renderer {
 
         GLFWErrorCallback.createPrint(System.err).set();
 
-        // Initialiser GLFW
         if (!glfwInit())
             throw new IllegalStateException("Unable to initialize GLFW");
 
-        // Configuration de la fenêtre
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-        // Créer la fenêtre
         window = glfwCreateWindow(800, 600, "Mon Jeu LWJGL", NULL, NULL);
         if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
 
-        // Setup key callback
         glfwSetKeyCallback(window, (window2, key, scancode, action, mods) -> {
             if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
                 glfwSetWindowShouldClose(window2, true);
         });
 
-        // Centrer la fenêtre
+        // Callback pour le redimensionnement
+        glfwSetFramebufferSizeCallback(window, (window2, width, height) -> {
+            updateViewport(width, height);
+        });
+
         try (MemoryStack stack = stackPush()) {
             IntBuffer pWidth = stack.mallocInt(1);
             IntBuffer pHeight = stack.mallocInt(1);
@@ -187,23 +198,29 @@ public class Renderer {
             );
         }
 
-        // Activer le contexte OpenGL
         glfwMakeContextCurrent(window);
-        glfwSwapInterval(1); // Enable v-sync
-
+        glfwSwapInterval(1);
         glfwShowWindow(window);
 
         GL.createCapabilities();
 
-        // Setup projection orthographique
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glOrtho(0, 800, 600, 0, -1, 1); // (left, right, bottom, top, near, far)
-        glMatrixMode(GL_MODELVIEW);
+        // Configuration initiale
+        updateViewport(800, 600);
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         return window;
+    }
+
+    // Méthode pour mettre à jour le viewport et la projection
+    private void updateViewport(int width, int height) {
+        glViewport(0, 0, width, height);
+
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(0, width, height, 0, -1, 1);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
     }
 }

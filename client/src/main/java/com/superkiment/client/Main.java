@@ -2,6 +2,7 @@ package com.superkiment.client;
 
 import com.superkiment.client.graphics.Renderer;
 import com.superkiment.client.graphics.ReusableShape;
+import com.superkiment.client.graphics.ui.UIElement;
 import com.superkiment.client.network.GameClient;
 import com.superkiment.client.network.handles.PlayerHandle;
 import com.superkiment.common.Time;
@@ -9,6 +10,10 @@ import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.entities.EntitiesManager;
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.entities.EntityFactory;
+import org.joml.Vector2d;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -23,6 +28,8 @@ public class Main {
 
     public static EntitiesManager entitiesManager = new EntitiesManager();
     public static BlocksManager blocksManager = new BlocksManager();
+
+    public static List<UIElement> uiElements = new ArrayList<>();
 
     public void run() {
         System.out.println("Hello LWJGL " + org.lwjgl.Version.getVersion() + "!");
@@ -47,6 +54,8 @@ public class Main {
     }
 
     private void init() {
+        uiElements.add(new UIElement(new Vector2d(100, 100), new Vector2d(200, 50)));
+
         gameClient = GameClient.tryConnectToServer(window);
         EntityFactory.CreateInstance(entitiesManager);
 
@@ -63,7 +72,6 @@ public class Main {
     }
 
     private void loop() {
-        glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 
         while (!glfwWindowShouldClose(window)) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -103,8 +111,10 @@ public class Main {
             PlayerHandle.sendPosition();
             GameClient.positionSendTimer = 0;
         }
+        renderer.renderFloor();
         renderer.renderEntities(entitiesManager.getEntities(), localPlayer);
         renderer.renderBlocks(blocksManager.getBlocks());
+        renderer.renderUI(uiElements);
     }
 
     public static void main(String[] args) {

@@ -109,7 +109,7 @@ public class Entity extends Collisionable {
 
     @Override
     public void onCollision(Collisionable other) {
-        System.out.println(this + " collided with " + other);
+        //System.out.println(this + " collided with " + other);
     }
 
     @Override
