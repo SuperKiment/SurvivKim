@@ -25,6 +25,9 @@ public class UIElement {
     }
 
     public boolean isClicked(float x, float y) {
-        return false;
+        Vector2d topLeft = new Vector2d(pos.x - dim.x / 2, pos.y - dim.y / 2);
+        Vector2d bottomRight = new Vector2d(pos.x + dim.x / 2, pos.y + dim.y / 2);
+
+        return (x > topLeft.x && x < bottomRight.x && y > topLeft.y && y < bottomRight.y);
     }
 }

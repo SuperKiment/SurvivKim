@@ -69,6 +69,9 @@ public class InputManager {
         input.bindAction("ajouter block", GLFW_KEY_B);
         input.bindAction("tirer", GLFW_KEY_E);
 
+        input.bindAction("action principale", -GLFW_MOUSE_BUTTON_LEFT);
+        input.bindAction("action secondaire", -GLFW_MOUSE_BUTTON_RIGHT);
+
         // Action continue (appelée tant que la touche est enfoncée)
         input.onAction("avancer", (v) -> {
             player.dirDepl.y = -1d;
@@ -105,10 +108,14 @@ public class InputManager {
             EntityHandle.createEntity(projectile);
         });
 
-        input.onAction("ajouter block", (v) -> {
+        input.onActionPress("ajouter block", () -> {
             int posX = (int) round(player.pos.x / 50);
             int posY = (int) round(player.pos.y / 50);
             BlockHandle.createBlock(new Vector2d(posX, posY));
+        });
+
+        input.onActionPress("action principale", () -> {
+            System.out.println("test souris");
         });
 
         input.onActionRelease("avancer", () -> player.dirDepl.y = 0);
@@ -145,15 +152,15 @@ public class InputManager {
         );
 
         // Callback boutons souris
-        GLFW.glfwSetMouseButtonCallback(window, (win, button, action, mods) ->
-
-        {
+        GLFW.glfwSetMouseButtonCallback(window, (win, button, action, mods) -> {
             if (action == GLFW.GLFW_PRESS) {
                 mouseButtonsPressed.add(button);
                 mouseButtonsJustPressed.add(button);
+                triggerActionOnPressMouseButton(button);
             } else if (action == GLFW.GLFW_RELEASE) {
                 mouseButtonsPressed.remove(button);
                 mouseButtonsJustReleased.add(button);
+                triggerActionOnReleaseMouseButton(button);
             }
         });
 
@@ -255,7 +262,8 @@ public class InputManager {
 // ========== SYSTÈME D'ACTIONS ==========
 
     /**
-     * Lier une ou plusieurs touches à une action
+     * Lier une ou plusieurs touches/boutons à une action
+     * Pour les boutons de souris, utiliser des valeurs négatives (ex: -GLFW_MOUSE_BUTTON_LEFT)
      */
     public void bindAction(String actionName, int... keyCodes) {
         actionBindings.putIfAbsent(actionName, new ArrayList<>());
@@ -293,8 +301,15 @@ public class InputManager {
         if (keys == null) return false;
 
         for (int key : keys) {
-            if (keysPressed.contains(key)) {
-                return true;
+            // Si la valeur est négative, c'est un bouton de souris
+            if (key < 0) {
+                if (mouseButtonsPressed.contains(-key)) {
+                    return true;
+                }
+            } else {
+                if (keysPressed.contains(key)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -308,8 +323,14 @@ public class InputManager {
         if (keys == null) return false;
 
         for (int key : keys) {
-            if (keysJustPressed.contains(key)) {
-                return true;
+            if (key < 0) {
+                if (mouseButtonsJustPressed.contains(-key)) {
+                    return true;
+                }
+            } else {
+                if (keysJustPressed.contains(key)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -323,8 +344,14 @@ public class InputManager {
         if (keys == null) return false;
 
         for (int key : keys) {
-            if (keysJustReleased.contains(key)) {
-                return true;
+            if (key < 0) {
+                if (mouseButtonsJustReleased.contains(-key)) {
+                    return true;
+                }
+            } else {
+                if (keysJustReleased.contains(key)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -382,6 +409,17 @@ public class InputManager {
         }
     }
 
+    private void triggerActionOnPressMouseButton(int button) {
+        for (Map.Entry<String, List<Integer>> entry : actionBindings.entrySet()) {
+            if (entry.getValue().contains(-button)) {
+                Runnable callback = actionOnPress.get(entry.getKey());
+                if (callback != null) {
+                    callback.run();
+                }
+            }
+        }
+    }
+
     private void triggerActionOnRelease(int keyCode) {
         for (Map.Entry<String, List<Integer>> entry : actionBindings.entrySet()) {
             if (entry.getValue().contains(keyCode)) {
@@ -393,12 +431,40 @@ public class InputManager {
         }
     }
 
+    private void triggerActionOnReleaseMouseButton(int button) {
+        for (Map.Entry<String, List<Integer>> entry : actionBindings.entrySet()) {
+            if (entry.getValue().contains(-button)) {
+                Runnable callback = actionOnRelease.get(entry.getKey());
+                if (callback != null) {
+                    callback.run();
+                }
+            }
+        }
+    }
+
 // ========== UTILITAIRES ==========
 
     /**
-     * Obtenir une représentation textuelle d'un keycode
+     * Obtenir une représentation textuelle d'un keycode ou bouton de souris
      */
     public static String getKeyName(int keyCode) {
+        // Si c'est un bouton de souris (valeur négative)
+        if (keyCode < 1) {
+            int mouseButton = -keyCode;
+            return switch (mouseButton) {
+                case GLFW_MOUSE_BUTTON_LEFT -> "MOUSE_LEFT";
+                case GLFW_MOUSE_BUTTON_RIGHT -> "MOUSE_RIGHT";
+                case GLFW_MOUSE_BUTTON_MIDDLE -> "MOUSE_MIDDLE";
+                case GLFW_MOUSE_BUTTON_4 -> "MOUSE_4";
+                case GLFW_MOUSE_BUTTON_5 -> "MOUSE_5";
+                case GLFW_MOUSE_BUTTON_6 -> "MOUSE_6";
+                case GLFW_MOUSE_BUTTON_7 -> "MOUSE_7";
+                case GLFW_MOUSE_BUTTON_8 -> "MOUSE_8";
+                default -> "MOUSE_" + mouseButton;
+            };
+        }
+
+        // Pour les touches du clavier
         String name = GLFW.glfwGetKeyName(keyCode, 0);
         return name != null ? name.toUpperCase() : "KEY_" + keyCode;
     }
