@@ -192,51 +192,7 @@ public class InputManager {
         updateContinuousActions();
     }
 
-// ========== CLAVIER ==========
-
-    /**
-     * Vérifier si une touche est enfoncée
-     */
-    public boolean isKeyPressed(int keyCode) {
-        return keysPressed.contains(keyCode);
-    }
-
-    /**
-     * Vérifier si une touche vient d'être pressée (ce frame uniquement)
-     */
-    public boolean isKeyJustPressed(int keyCode) {
-        return keysJustPressed.contains(keyCode);
-    }
-
-    /**
-     * Vérifier si une touche vient d'être relâchée
-     */
-    public boolean isKeyJustReleased(int keyCode) {
-        return keysJustReleased.contains(keyCode);
-    }
-
 // ========== SOURIS ==========
-
-    /**
-     * Vérifier si un bouton de souris est enfoncé
-     */
-    public boolean isMouseButtonPressed(int button) {
-        return mouseButtonsPressed.contains(button);
-    }
-
-    /**
-     * Vérifier si un bouton vient d'être pressé
-     */
-    public boolean isMouseButtonJustPressed(int button) {
-        return mouseButtonsJustPressed.contains(button);
-    }
-
-    /**
-     * Vérifier si un bouton vient d'être relâché
-     */
-    public boolean isMouseButtonJustReleased(int button) {
-        return mouseButtonsJustReleased.contains(button);
-    }
 
     /**
      * Obtenir la position de la souris
@@ -482,4 +438,5 @@ public class InputManager {
             System.out.println();
         }
     }
+
 }
