@@ -1,5 +1,6 @@
 package com.superkiment.client;
 
+import com.superkiment.client.graphics.ui.UIElement;
 import com.superkiment.client.network.handles.BlockHandle;
 import com.superkiment.client.network.handles.EntityHandle;
 import com.superkiment.common.entities.Player;
@@ -32,7 +33,7 @@ public class InputManager {
     private final Set<Integer> mouseButtonsJustReleased = new HashSet<>();
 
     // Position de la souris
-    private final Vector2f mousePosition = new Vector2f(0, 0);
+    private static final Vector2f mousePosition = new Vector2f(0, 0);
     private final Vector2f mouseDelta = new Vector2f(0, 0);
     private final Vector2f lastMousePosition = new Vector2f(0, 0);
 
@@ -116,6 +117,14 @@ public class InputManager {
 
         input.onActionPress("action principale", () -> {
             System.out.println("test souris");
+
+            float x = InputManager.getMousePosition().x;
+            float y = InputManager.getMousePosition().y;
+
+            // Tester les UIElements
+            for (UIElement element : Main.uiElements) {
+                if (element.isClicked(x, y)) element.onClick();
+            }
         });
 
         input.onActionRelease("avancer", () -> player.dirDepl.y = 0);
@@ -197,7 +206,7 @@ public class InputManager {
     /**
      * Obtenir la position de la souris
      */
-    public Vector2f getMousePosition() {
+    public static Vector2f getMousePosition() {
         return new Vector2f(mousePosition);
     }
 

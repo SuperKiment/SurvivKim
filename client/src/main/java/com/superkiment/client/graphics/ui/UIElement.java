@@ -17,11 +17,7 @@ public class UIElement {
         this.dim = dim;
         this.shapeModel = new ShapeModel();
 
-        shapeModel.addShape(new Shape(pos, dim, Shape.ShapeType.RECT, new Vector3d(.5, .5, .5)));
-    }
-
-    public void Render() {
-
+        shapeModel.addShape(new Shape(new Vector2d(0, 0), dim, Shape.ShapeType.RECT, new Vector3d(.5, .5, .5)));
     }
 
     public boolean isClicked(float x, float y) {
@@ -29,5 +25,9 @@ public class UIElement {
         Vector2d bottomRight = new Vector2d(pos.x + dim.x / 2, pos.y + dim.y / 2);
 
         return (x > topLeft.x && x < bottomRight.x && y > topLeft.y && y < bottomRight.y);
+    }
+
+    public void onClick() {
+        System.out.printf("Blank UIElement on pos %f/%f is clicked !", (float) pos.x, (float) pos.y);
     }
 }
