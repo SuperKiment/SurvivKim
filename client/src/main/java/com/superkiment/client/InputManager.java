@@ -56,9 +56,7 @@ public class InputManager {
         return instance;
     }
 
-    public static void setupInputs(long window, InputManager input, Player player) {
-        input.init(window);
-
+    public static void setupGameInputs(long window, InputManager input, Player player) {
         // Lier les touches aux actions
         input.bindAction("avancer", GLFW_KEY_W, GLFW_KEY_UP);
         input.bindAction("reculer", GLFW_KEY_S, GLFW_KEY_DOWN);
@@ -69,9 +67,6 @@ public class InputManager {
         input.bindAction("sprint", GLFW_KEY_LEFT_SHIFT);
         input.bindAction("ajouter block", GLFW_KEY_B);
         input.bindAction("tirer", GLFW_KEY_E);
-
-        input.bindAction("action principale", -GLFW_MOUSE_BUTTON_LEFT);
-        input.bindAction("action secondaire", -GLFW_MOUSE_BUTTON_RIGHT);
 
         // Action continue (appelée tant que la touche est enfoncée)
         input.onAction("avancer", (v) -> {
@@ -115,15 +110,6 @@ public class InputManager {
             BlockHandle.createBlock(new Vector2d(posX, posY));
         });
 
-        input.onActionPress("action principale", () -> {
-            float x = InputManager.getMousePosition().x;
-            float y = InputManager.getMousePosition().y;
-
-            for (UIElement element : Main.uiManager.getAllUIElements()) {
-                if (element.isClicked(x, y)) element.onClick();
-            }
-        });
-
         input.onActionRelease("avancer", () -> player.dirDepl.y = 0);
         input.onActionRelease("reculer", () -> player.dirDepl.y = 0);
         input.onActionRelease("gauche", () -> player.dirDepl.x = 0);
@@ -133,6 +119,20 @@ public class InputManager {
 
         // Afficher les bindings
         input.printBindings();
+    }
+
+    public static void setupGeneralInputs(InputManager input) {
+        input.bindAction("action principale", -GLFW_MOUSE_BUTTON_LEFT);
+        input.bindAction("action secondaire", -GLFW_MOUSE_BUTTON_RIGHT);
+
+        input.onActionPress("action principale", () -> {
+            float x = InputManager.getMousePosition().x;
+            float y = InputManager.getMousePosition().y;
+
+            for (UIElement element : Main.uiManager.getAllUIElements()) {
+                if (element.isClicked(x, y)) element.onClick();
+            }
+        });
     }
 
     /**

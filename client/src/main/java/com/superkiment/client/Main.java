@@ -1,7 +1,6 @@
 package com.superkiment.client;
 
 import com.superkiment.client.graphics.Renderer;
-import com.superkiment.client.graphics.ReusableShape;
 import com.superkiment.client.graphics.ui.UIManager;
 import com.superkiment.client.network.GameClient;
 import com.superkiment.client.network.handles.PlayerHandle;
@@ -51,17 +50,16 @@ public class Main {
         //Setup et lancer les services
         uiManager.setup();
 
-        gameClient = GameClient.tryConnectToServer(window);
-
         EntityFactory.CreateInstance(entitiesManager);
-
-        //Setup inputs
         input = InputManager.getInstance();
-        InputManager.setupInputs(window, input, gameClient.getLocalPlayer());
+        input.init(window);
+        InputManager.setupGeneralInputs(input);
 
         input.onActionPress("connecter", () -> {
             if (gameClient == null || !gameClient.isConnected()) {
                 gameClient = GameClient.tryConnectToServer(window);
+                input = InputManager.getInstance();
+                InputManager.setupGameInputs(window, input, gameClient.getLocalPlayer());
             }
         });
         input.bindAction("connecter", GLFW_KEY_C);
@@ -78,12 +76,9 @@ public class Main {
             // ========== GESTION DU RÉSEAU ==========
             if (gameClient != null && gameClient.isConnected()) {
                 gameTick(dt);
-            } else {
-                // Message de déconnexion
-                new ReusableShape(400, 300)
-                        .setColor(1.0f, 0.5f, 0.2f)
-                        .drawRect(200, 50);
             }
+
+            renderer.renderUI(uiManager.getUIElementsSortedByZ());
 
             // Quitter avec ESC
             if (input.isActionJustPressed("quitter")) {
@@ -110,7 +105,6 @@ public class Main {
         renderer.renderFloor();
         renderer.renderEntities(entitiesManager.getEntities(), localPlayer);
         renderer.renderBlocks(blocksManager.getBlocks());
-        renderer.renderUI(uiManager.getUIElementsSortedByZ());
     }
 
     public static void main(String[] args) {
