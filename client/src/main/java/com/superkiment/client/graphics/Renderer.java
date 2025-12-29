@@ -29,6 +29,7 @@ public class Renderer {
     }
 
     public void renderUI(List<UIElement> elements) {
+
         for (UIElement element : elements) {
             glPushMatrix();
             glTranslated(element.pos.x, element.pos.y, 0);

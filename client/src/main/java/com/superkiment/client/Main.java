@@ -2,7 +2,7 @@ package com.superkiment.client;
 
 import com.superkiment.client.graphics.Renderer;
 import com.superkiment.client.graphics.ReusableShape;
-import com.superkiment.client.graphics.ui.UIElement;
+import com.superkiment.client.graphics.ui.UIManager;
 import com.superkiment.client.network.GameClient;
 import com.superkiment.client.network.handles.PlayerHandle;
 import com.superkiment.common.Time;
@@ -10,10 +10,6 @@ import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.entities.EntitiesManager;
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.entities.EntityFactory;
-import org.joml.Vector2d;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -24,18 +20,16 @@ public class Main {
     private long window;
     private InputManager input;
     public static GameClient gameClient;
-    private Renderer renderer;
 
-    public static EntitiesManager entitiesManager = new EntitiesManager();
-    public static BlocksManager blocksManager = new BlocksManager();
-
-    public static List<UIElement> uiElements = new ArrayList<>();
+    private static final Renderer renderer = new Renderer();
+    public static final UIManager uiManager = new UIManager();
+    public static final EntitiesManager entitiesManager = new EntitiesManager();
+    public static final BlocksManager blocksManager = new BlocksManager();
 
     public void run() {
         System.out.println("Hello LWJGL " + org.lwjgl.Version.getVersion() + "!");
 
         //Setup window
-        renderer = new Renderer();
         window = renderer.SetupWindow();
 
         //Lancer le vrai jeu
@@ -54,9 +48,11 @@ public class Main {
     }
 
     private void init() {
-        uiElements.add(new UIElement(new Vector2d(100, 100), new Vector2d(200, 50)));
+        //Setup et lancer les services
+        uiManager.setup();
 
         gameClient = GameClient.tryConnectToServer(window);
+
         EntityFactory.CreateInstance(entitiesManager);
 
         //Setup inputs
@@ -114,7 +110,7 @@ public class Main {
         renderer.renderFloor();
         renderer.renderEntities(entitiesManager.getEntities(), localPlayer);
         renderer.renderBlocks(blocksManager.getBlocks());
-        renderer.renderUI(uiElements);
+        renderer.renderUI(uiManager.getUIElementsSortedByZ());
     }
 
     public static void main(String[] args) {

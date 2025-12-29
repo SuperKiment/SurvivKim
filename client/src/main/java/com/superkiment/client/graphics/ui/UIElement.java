@@ -1,26 +1,39 @@
 package com.superkiment.client.graphics.ui;
 
-import com.superkiment.common.shapes.Shape;
 import com.superkiment.common.shapes.ShapeModel;
 import org.joml.Vector2d;
-import org.joml.Vector3d;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class UIElement {
     public Vector2d pos, dim;
     public ShapeModel shapeModel;
+    public List<UIElement> children;
+    public UIElement parent;
 
-    protected UIElement() {
-    }
+    /**
+     * 0 = derrière, 1000 = devant
+     */
+    public int zIndex = 0;
+    public boolean isClickable = false, isVisible = true, isHovered = false;
 
-    public UIElement(Vector2d pos, Vector2d dim) {
+    /**
+     *
+     * @param pos
+     * @param z   doit être positif
+     */
+    public UIElement(Vector2d pos, int z) {
         this.pos = pos;
-        this.dim = dim;
+        this.dim = new Vector2d(100, 100);
         this.shapeModel = new ShapeModel();
-
-        shapeModel.addShape(new Shape(new Vector2d(0, 0), dim, Shape.ShapeType.RECT, new Vector3d(.5, .5, .5)));
+        this.zIndex = z;
+        this.children = new ArrayList<>();
     }
 
     public boolean isClicked(float x, float y) {
+        if (!isClickable) return false;
+
         Vector2d topLeft = new Vector2d(pos.x - dim.x / 2, pos.y - dim.y / 2);
         Vector2d bottomRight = new Vector2d(pos.x + dim.x / 2, pos.y + dim.y / 2);
 
@@ -28,6 +41,27 @@ public class UIElement {
     }
 
     public void onClick() {
-        System.out.printf("Blank UIElement on pos %f/%f is clicked !", (float) pos.x, (float) pos.y);
+        System.out.printf("Blank & clickable UIElement on pos %f/%f was clicked !%n", (float) pos.x, (float) pos.y);
+    }
+
+    public void addYourselfAndChildrenToThisList(List<UIElement> list) {
+        list.add(this);
+        for (UIElement child : children) {
+            if (child != null)
+                child.addYourselfAndChildrenToThisList(list);
+        }
+    }
+
+    public void addChild(UIElement e) {
+        e.setParent(this);
+        children.add(e);
+    }
+
+    public int getZIndex() {
+        return zIndex;
+    }
+
+    public void setParent(UIElement p) {
+        if (parent == null) parent = p;
     }
 }

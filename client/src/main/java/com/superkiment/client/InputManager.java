@@ -116,13 +116,10 @@ public class InputManager {
         });
 
         input.onActionPress("action principale", () -> {
-            System.out.println("test souris");
-
             float x = InputManager.getMousePosition().x;
             float y = InputManager.getMousePosition().y;
 
-            // Tester les UIElements
-            for (UIElement element : Main.uiElements) {
+            for (UIElement element : Main.uiManager.getAllUIElements()) {
                 if (element.isClicked(x, y)) element.onClick();
             }
         });
