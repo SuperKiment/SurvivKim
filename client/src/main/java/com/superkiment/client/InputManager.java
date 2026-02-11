@@ -10,6 +10,7 @@ import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import static java.lang.Math.round;
@@ -41,10 +42,10 @@ public class InputManager {
     private float scrollDelta = 0;
 
     // Système d'actions
-    private final Map<String, List<Integer>> actionBindings = new HashMap<>();
-    private final Map<String, Consumer<Void>> actionCallbacks = new HashMap<>();
-    private final Map<String, Runnable> actionOnPress = new HashMap<>();
-    private final Map<String, Runnable> actionOnRelease = new HashMap<>();
+    private final Map<String, List<Integer>> actionBindings = new ConcurrentHashMap<>();
+    private final Map<String, Consumer<Void>> actionCallbacks = new ConcurrentHashMap<>();
+    private final Map<String, Runnable> actionOnPress = new ConcurrentHashMap<>();
+    private final Map<String, Runnable> actionOnRelease = new ConcurrentHashMap<>();
 
     private InputManager() {
     }

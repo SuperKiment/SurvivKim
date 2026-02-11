@@ -1,5 +1,6 @@
 package com.superkiment.client.graphics.ui;
 
+import com.superkiment.client.Main;
 import org.joml.Vector2d;
 
 import java.util.ArrayList;
@@ -29,9 +30,17 @@ public class UIManager {
         return elements;
     }
 
-    public void setup() {
+    public void setup(long window) {
+
         baseElement.addChild(
-                new UIButton(new Vector2d(100, 100), new Vector2d(200, 50), 50)
+                new UIButton(new Vector2d(100, 100), new Vector2d(200, 50), 50) {
+                    @Override
+                    public void onClick() {
+                        System.out.println("coucou");
+
+                        Main.connect();
+                    }
+                }
         );
     }
 }

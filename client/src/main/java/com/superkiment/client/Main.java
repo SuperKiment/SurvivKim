@@ -16,7 +16,7 @@ import static org.lwjgl.opengl.GL11.*;
 
 public class Main {
 
-    private long window;
+    private static long window;
     private InputManager input;
     public static GameClient gameClient;
 
@@ -48,20 +48,14 @@ public class Main {
 
     private void init() {
         //Setup et lancer les services
-        uiManager.setup();
+        uiManager.setup(window);
 
         EntityFactory.CreateInstance(entitiesManager);
         input = InputManager.getInstance();
         input.init(window);
         InputManager.setupGeneralInputs(input);
 
-        input.onActionPress("connecter", () -> {
-            if (gameClient == null || !gameClient.isConnected()) {
-                gameClient = GameClient.tryConnectToServer(window);
-                input = InputManager.getInstance();
-                InputManager.setupGameInputs(window, input, gameClient.getLocalPlayer());
-            }
-        });
+        input.onActionPress("connecter", Main::connect);
         input.bindAction("connecter", GLFW_KEY_C);
     }
 
@@ -109,5 +103,15 @@ public class Main {
 
     public static void main(String[] args) {
         new Main().run();
+    }
+
+    public static void connect() {
+        if (gameClient == null || !gameClient.isConnected()) {
+            gameClient = GameClient.tryConnectToServer(window);
+
+            if (gameClient != null) {
+                InputManager.setupGameInputs(window, InputManager.getInstance(), gameClient.getLocalPlayer());
+            }
+        }
     }
 }
