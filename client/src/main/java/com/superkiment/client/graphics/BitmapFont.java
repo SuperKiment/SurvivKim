@@ -17,10 +17,10 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class BitmapFont {
     private int textureId;
-    private int textureWidth = 512;
-    private int textureHeight = 512;
-    private Map<Character, CharInfo> charMap = new HashMap<>();
-    private int baseFontSize; // Taille de base de la police
+    private final static int textureWidth = 512;
+    private final static int textureHeight = 512;
+    private final Map<Character, CharInfo> charMap = new HashMap<>();
+    private final int baseFontSize; // Taille de base de la police
 
     private static class CharInfo {
         float u, v;           // Coordonnées UV de départ
@@ -39,22 +39,6 @@ public class BitmapFont {
         Font font = new Font(fontName, Font.PLAIN, fontSize);
         this.baseFontSize = fontSize;
         generateTexture(font, antialiasing);
-    }
-
-    /**
-     * Crée une bitmap font à partir d'un fichier de police custom
-     * @param fontPath Chemin vers le fichier .ttf ou .otf
-     * @param fontSize Taille de la police
-     * @param antialiasing Activer l'antialiasing
-     */
-    public BitmapFont(String fontPath, int fontSize, boolean antialiasing, boolean isCustomFont) {
-        try {
-            Font font = loadCustomFont(fontPath, fontSize);
-            this.baseFontSize = fontSize;
-            generateTexture(font, antialiasing);
-        } catch (Exception e) {
-            throw new RuntimeException("Erreur lors du chargement de la police custom: " + fontPath, e);
-        }
     }
 
     /**

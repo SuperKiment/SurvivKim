@@ -29,17 +29,6 @@ public class EntityHandle {
         tcpClient.send(packet);
     }
 
-    /**
-     * Supprimer une entité (TCP - fiable)
-     */
-    public static void deleteEntity(String entityId) {
-        TCPClient tcpClient = Main.gameClient.getTCPClient();
-
-        PacketDeleteEntity packet = new PacketDeleteEntity(entityId);
-        tcpClient.send(packet);
-    }
-
-
     public static void handleCreateEntity(PacketCreateEntity packet) {
         String playerId = Main.gameClient.getLocalPlayer().id;
 

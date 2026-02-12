@@ -8,14 +8,14 @@ import java.util.Map;
  * Gestionnaire centralisé pour les polices du jeu
  */
 public class FontManager {
-    private Map<String, BitmapFont> fonts = new HashMap<>();
+    private final Map<String, BitmapFont> fonts = new HashMap<>();
     private BitmapFont defaultFont;
 
     /**
      * Initialise le gestionnaire avec les polices du jeu
      */
     public void initialize() {
-        defaultFont = new BitmapFont("Arial", 32, true);
+        defaultFont = new BitmapFont("Arial", 32);
         fonts.put("default", defaultFont);
 
         // Charger depuis un fichier externe
@@ -27,7 +27,7 @@ public class FontManager {
      */
     public void loadCustomFont(String name, String fontPath, int fontSize) {
         try {
-            BitmapFont font = new BitmapFont(fontPath, fontSize, true, true);
+            BitmapFont font = new BitmapFont(fontPath, fontSize, true);
             fonts.put(name, font);
             System.out.println("Police '" + name + "' chargée avec succès");
         } catch (Exception e) {

@@ -16,7 +16,6 @@ public abstract class Packet implements Serializable {
         ENTITY_POSITION,
         DELETE_ENTITY,
         PLAYER_JOIN,
-        PLAYER_LEAVE,
         CREATE_BLOCK,
         DELETE_BLOCK,
         BULK_POSITION
