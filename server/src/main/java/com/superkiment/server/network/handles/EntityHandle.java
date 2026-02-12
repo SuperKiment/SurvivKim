@@ -4,6 +4,7 @@ import com.superkiment.common.entities.Entity;
 import com.superkiment.common.entities.EntityFactory;
 import com.superkiment.common.packets.entity.PacketCreateEntity;
 import com.superkiment.common.packets.entity.PacketDeleteEntity;
+import com.superkiment.common.packets.entity.PacketUpdateEntity;
 import com.superkiment.server.GameServer;
 import com.superkiment.server.monitor.ServerMonitor;
 import com.superkiment.server.network.ClientConnection;
@@ -37,5 +38,13 @@ public class EntityHandle {
         // Broadcaster à tous les clients
         broadcastTCP(packet, null);
         ServerMonitor.getInstance().log("INFO", "Entité supprimée: " + packet.entityId);
+    }
+
+    public static void handleUpdateEntity(PacketUpdateEntity packet, ClientConnection client) {
+        Entity entity = GameServer.entitiesManager.getEntityFromID(packet.entityId);
+        EntityFactory.ApplyBasePacketToEntity(packet, entity);
+
+        broadcastTCP(packet, client);
+        ServerMonitor.getInstance().log("INFO", "Entité mise à jour: " + entity.id + " (" + entity.name + ")");
     }
 }

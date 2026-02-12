@@ -21,15 +21,28 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
-/**
- * The Renderer for the window ; all rendering is launched here
- */
 public class Renderer {
+    private FontManager fontManager;
+
     public Renderer() {
     }
 
-    public void renderUI(List<UIElement> elements) {
+    /**
+     * Initialise les polices après la création du contexte OpenGL
+     */
+    public void initializeFonts() {
+        fontManager = new FontManager();
+        fontManager.initialize();
+    }
 
+    /**
+     * Récupère le gestionnaire de polices
+     */
+    public FontManager getFontManager() {
+        return fontManager;
+    }
+
+    public void renderUI(List<UIElement> elements) {
         for (UIElement element : elements) {
             glPushMatrix();
             glTranslated(element.pos.x, element.pos.y, 0);
@@ -38,12 +51,6 @@ public class Renderer {
         }
     }
 
-    /**
-     * Renders the entities on the window using OpenGL
-     *
-     * @param entities
-     * @param localPlayer
-     */
     public void renderEntities(Map<String, Entity> entities, Entity localPlayer) {
         for (Entity entity : entities.values()) {
             boolean isLocal = entity.id.equals(localPlayer.id);
@@ -60,11 +67,6 @@ public class Renderer {
         }
     }
 
-    /**
-     * Renders the blocks on the window using OpenGL
-     *
-     * @param blocks
-     */
     public void renderBlocks(List<Block> blocks) {
         for (Block block : blocks) {
             glPushMatrix();
@@ -78,7 +80,6 @@ public class Renderer {
     public void renderModel(ShapeModel shapeModel) {
         glPushMatrix();
         for (Shape shape : shapeModel.shapes) {
-            //Render all shapes
             renderShape(shape);
         }
         glPopMatrix();
@@ -106,7 +107,7 @@ public class Renderer {
             }
             case ShapeType.CIRCLE -> {
                 glBegin(GL_TRIANGLE_FAN);
-                glVertex2f(0, 0); // Centre
+                glVertex2f(0, 0);
 
                 for (int i = 0; i <= segments; i++) {
                     float angle = (float) (2.0 * Math.PI * i / segments);
@@ -129,8 +130,6 @@ public class Renderer {
                 glVertex2d(dimensions.x / 2, dimensions.y / 2);
                 glVertex2d(-dimensions.x / 2, dimensions.y / 2);
                 glEnd();
-
-                glPopMatrix();
             }
             case ShapeType.CIRCLE_OUTLINE -> {
                 glLineWidth(lineWidth);
@@ -147,17 +146,44 @@ public class Renderer {
             }
             default -> throw new IllegalStateException("Unexpected value: " + shapeType);
         }
+
+        // Rendu du texte si présent
+        if (shape.hasText() && fontManager != null) {
+            renderText(shape);
+        }
+
         glPopMatrix();
+    }
+
+    /**
+     * Rendu du texte avec la bitmap font
+     */
+    private void renderText(Shape shape) {
+        // Utiliser la police spécifiée ou la police par défaut
+        BitmapFont font = fontManager.getFont(shape.fontName);
+
+        float scale = shape.fontSize / (float) font.getBaseFontSize();
+
+        // Calculer la position pour centrer le texte
+        float textWidth = font.getTextWidth(shape.text, scale);
+        float x = -textWidth / 2;
+        float y = -shape.fontSize / 2;
+
+        font.drawText(
+                shape.text,
+                x,
+                y,
+                scale,
+                (float) shape.textColor.x,
+                (float) shape.textColor.y,
+                (float) shape.textColor.z
+        );
     }
 
     public void renderFloor() {
         glClearColor(0.06f, 0.6f, 0.3f, 1.0f);
     }
 
-    /**
-     *
-     * @return a fully setup window as long
-     */
     public long SetupWindow() {
         long window;
 
@@ -179,7 +205,6 @@ public class Renderer {
                 glfwSetWindowShouldClose(window2, true);
         });
 
-        // Callback pour le redimensionnement
         glfwSetFramebufferSizeCallback(window, (window2, width, height) -> {
             updateViewport(width, height);
         });
@@ -205,16 +230,17 @@ public class Renderer {
 
         GL.createCapabilities();
 
-        // Configuration initiale
         updateViewport(800, 600);
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+        // Initialiser les polices après la création du contexte OpenGL
+        initializeFonts();
+
         return window;
     }
 
-    // Méthode pour mettre à jour le viewport et la projection
     private void updateViewport(int width, int height) {
         glViewport(0, 0, width, height);
 
@@ -223,5 +249,14 @@ public class Renderer {
         glOrtho(0, width, height, 0, -1, 1);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
+    }
+
+    /**
+     * Nettoie les ressources
+     */
+    public void cleanup() {
+        if (fontManager != null) {
+            fontManager.cleanup();
+        }
     }
 }

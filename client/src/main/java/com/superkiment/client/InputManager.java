@@ -68,6 +68,7 @@ public class InputManager {
         input.bindAction("sprint", GLFW_KEY_LEFT_SHIFT);
         input.bindAction("ajouter block", GLFW_KEY_B);
         input.bindAction("tirer", GLFW_KEY_E);
+        input.bindAction("tests", GLFW_KEY_L);
 
         // Action continue (appelée tant que la touche est enfoncée)
         input.onAction("avancer", (v) -> {
@@ -115,6 +116,11 @@ public class InputManager {
         input.onActionRelease("reculer", () -> player.dirDepl.y = 0);
         input.onActionRelease("gauche", () -> player.dirDepl.x = 0);
         input.onActionRelease("droite", () -> player.dirDepl.x = 0);
+
+        input.onActionRelease("tests", () -> {
+            player.shapeModel.shapes.get(0).text = "I said a thing !";
+            EntityHandle.updateEntity(player);
+        });
 
         input.onActionPress("quitter", () -> glfwSetWindowShouldClose(window, true));
 

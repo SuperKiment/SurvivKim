@@ -13,6 +13,7 @@ public abstract class PacketCreateEntity extends Packet {
     public double posX;
     public double posY;
     public String[] exceptions;
+    public String[] shapesTexts;
 
     public PacketCreateEntity(Entity entity) {
         this.entityId = entity.id;
@@ -20,9 +21,14 @@ public abstract class PacketCreateEntity extends Packet {
         this.posX = entity.pos.x;
         this.posY = entity.pos.y;
 
-        exceptions = new String[entity.numberOfCollisionExceptions()];
+        this.exceptions = new String[entity.numberOfCollisionExceptions()];
         for (int i = 0; i < entity.numberOfCollisionExceptions(); i++) {
             exceptions[i] = ((Entity) entity.getCollisionException(i)).id;
+        }
+
+        this.shapesTexts = new String[entity.shapeModel.shapes.size()];
+        for (int i = 0; i < entity.shapeModel.shapes.size(); i++) {
+            shapesTexts[i] = entity.shapeModel.shapes.get(i).text;
         }
     }
 

@@ -8,6 +8,7 @@ import com.superkiment.common.packets.Packet;
 import com.superkiment.common.packets.entity.LinkEntityPacket;
 import com.superkiment.common.packets.entity.PacketCreateEntity;
 import com.superkiment.common.packets.entity.PacketDeleteEntity;
+import com.superkiment.common.packets.entity.PacketUpdateEntity;
 
 import static com.superkiment.client.Main.entitiesManager;
 
@@ -18,6 +19,12 @@ public class EntityHandle {
 
     public static void createEntity(Entity entity) {
         Packet packet = LinkEntityPacket.CreatePacketFromEntity(entity);
+        TCPClient tcpClient = Main.gameClient.getTCPClient();
+        tcpClient.send(packet);
+    }
+
+    public static void updateEntity(Entity entity) {
+        Packet packet = new PacketUpdateEntity(entity);
         TCPClient tcpClient = Main.gameClient.getTCPClient();
         tcpClient.send(packet);
     }
@@ -54,5 +61,15 @@ public class EntityHandle {
         if (removed != null) {
             System.out.println("Entité supprimée: " + removed.name);
         }
+    }
+
+    public static void handleUpdateEntity(PacketCreateEntity packet) {
+
+        System.out.println("Handling update entity : " + packet.getClass().getName());
+
+        Entity entity = entitiesManager.getEntityFromID(packet.entityId);
+        EntityFactory.ApplyBasePacketToEntity(packet, entity);
+
+        System.out.println("Entité distante mise à jour: " + entity.name + " (" + entity.id + ") à la position " + entity.pos);
     }
 }
