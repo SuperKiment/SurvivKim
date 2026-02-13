@@ -15,7 +15,7 @@ public class FontManager {
      * Initialise le gestionnaire avec les polices du jeu
      */
     public void initialize() {
-        defaultFont = new BitmapFont("Arial", 32);
+        defaultFont = new BitmapFont("Arial", 32, true);
         fonts.put("default", defaultFont);
 
         // Charger depuis un fichier externe
