@@ -136,7 +136,7 @@ public class InputManager {
             float x = InputManager.getMousePosition().x;
             float y = InputManager.getMousePosition().y;
 
-            for (UIElement element : Main.uiManager.getAllUIElements()) {
+            for (UIElement element : Main.uiManager.getEnabledElements()) {
                 if (element.isClicked(x, y)) element.onClick();
             }
         });

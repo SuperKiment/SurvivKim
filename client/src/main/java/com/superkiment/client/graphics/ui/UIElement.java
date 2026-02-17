@@ -16,7 +16,7 @@ public class UIElement {
      * 0 = derrière, 1000 = devant
      */
     public int zIndex = 0;
-    public boolean isClickable = false, isVisible = true, isHovered = false;
+    public boolean isClickable = false, isHovered = false;
 
     /**
      *

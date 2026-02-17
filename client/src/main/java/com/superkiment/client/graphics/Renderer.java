@@ -259,4 +259,15 @@ public class Renderer {
             fontManager.cleanup();
         }
     }
+
+    public static Vector2d GetCurrentWindowSize(long window) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer pWidth = stack.mallocInt(1);
+            IntBuffer pHeight = stack.mallocInt(1);
+
+            glfwGetWindowSize(window, pWidth, pHeight);
+
+            return new Vector2d(pWidth.get(0), pHeight.get(0));
+        }
+    }
 }
