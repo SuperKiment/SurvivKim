@@ -1,5 +1,6 @@
 package com.superkiment.client;
 
+import com.superkiment.client.graphics.ui.UIElement;
 import com.superkiment.client.network.handles.BlockHandle;
 import com.superkiment.client.network.handles.EntityHandle;
 import com.superkiment.common.entities.Player;
@@ -9,6 +10,7 @@ import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import static java.lang.Math.round;
@@ -32,7 +34,7 @@ public class InputManager {
     private final Set<Integer> mouseButtonsJustReleased = new HashSet<>();
 
     // Position de la souris
-    private final Vector2f mousePosition = new Vector2f(0, 0);
+    private static final Vector2f mousePosition = new Vector2f(0, 0);
     private final Vector2f mouseDelta = new Vector2f(0, 0);
     private final Vector2f lastMousePosition = new Vector2f(0, 0);
 
@@ -40,10 +42,10 @@ public class InputManager {
     private float scrollDelta = 0;
 
     // Système d'actions
-    private final Map<String, List<Integer>> actionBindings = new HashMap<>();
-    private final Map<String, Consumer<Void>> actionCallbacks = new HashMap<>();
-    private final Map<String, Runnable> actionOnPress = new HashMap<>();
-    private final Map<String, Runnable> actionOnRelease = new HashMap<>();
+    private final Map<String, List<Integer>> actionBindings = new ConcurrentHashMap<>();
+    private final Map<String, Consumer<Void>> actionCallbacks = new ConcurrentHashMap<>();
+    private final Map<String, Runnable> actionOnPress = new ConcurrentHashMap<>();
+    private final Map<String, Runnable> actionOnRelease = new ConcurrentHashMap<>();
 
     private InputManager() {
     }
@@ -55,9 +57,7 @@ public class InputManager {
         return instance;
     }
 
-    public static void setupInputs(long window, InputManager input, Player player) {
-        input.init(window);
-
+    public static void setupGameInputs(long window, InputManager input, Player player) {
         // Lier les touches aux actions
         input.bindAction("avancer", GLFW_KEY_W, GLFW_KEY_UP);
         input.bindAction("reculer", GLFW_KEY_S, GLFW_KEY_DOWN);
@@ -68,6 +68,7 @@ public class InputManager {
         input.bindAction("sprint", GLFW_KEY_LEFT_SHIFT);
         input.bindAction("ajouter block", GLFW_KEY_B);
         input.bindAction("tirer", GLFW_KEY_E);
+        input.bindAction("tests", GLFW_KEY_L);
 
         // Action continue (appelée tant que la touche est enfoncée)
         input.onAction("avancer", (v) -> {
@@ -105,7 +106,7 @@ public class InputManager {
             EntityHandle.createEntity(projectile);
         });
 
-        input.onAction("ajouter block", (v) -> {
+        input.onActionPress("ajouter block", () -> {
             int posX = (int) round(player.pos.x / 50);
             int posY = (int) round(player.pos.y / 50);
             BlockHandle.createBlock(new Vector2d(posX, posY));
@@ -116,10 +117,29 @@ public class InputManager {
         input.onActionRelease("gauche", () -> player.dirDepl.x = 0);
         input.onActionRelease("droite", () -> player.dirDepl.x = 0);
 
+        input.onActionRelease("tests", () -> {
+            player.shapeModel.shapes.get(0).text = "I said a thing !";
+            EntityHandle.updateEntity(player);
+        });
+
         input.onActionPress("quitter", () -> glfwSetWindowShouldClose(window, true));
 
         // Afficher les bindings
         input.printBindings();
+    }
+
+    public static void setupGeneralInputs(InputManager input) {
+        input.bindAction("action principale", -GLFW_MOUSE_BUTTON_LEFT);
+        input.bindAction("action secondaire", -GLFW_MOUSE_BUTTON_RIGHT);
+
+        input.onActionPress("action principale", () -> {
+            float x = InputManager.getMousePosition().x;
+            float y = InputManager.getMousePosition().y;
+
+            for (UIElement element : Main.uiManager.getEnabledElements()) {
+                if (element.isClicked(x, y)) element.onClick();
+            }
+        });
     }
 
     /**
@@ -145,15 +165,15 @@ public class InputManager {
         );
 
         // Callback boutons souris
-        GLFW.glfwSetMouseButtonCallback(window, (win, button, action, mods) ->
-
-        {
+        GLFW.glfwSetMouseButtonCallback(window, (win, button, action, mods) -> {
             if (action == GLFW.GLFW_PRESS) {
                 mouseButtonsPressed.add(button);
                 mouseButtonsJustPressed.add(button);
+                triggerActionOnPressMouseButton(button);
             } else if (action == GLFW.GLFW_RELEASE) {
                 mouseButtonsPressed.remove(button);
                 mouseButtonsJustReleased.add(button);
+                triggerActionOnReleaseMouseButton(button);
             }
         });
 
@@ -185,56 +205,12 @@ public class InputManager {
         updateContinuousActions();
     }
 
-// ========== CLAVIER ==========
-
-    /**
-     * Vérifier si une touche est enfoncée
-     */
-    public boolean isKeyPressed(int keyCode) {
-        return keysPressed.contains(keyCode);
-    }
-
-    /**
-     * Vérifier si une touche vient d'être pressée (ce frame uniquement)
-     */
-    public boolean isKeyJustPressed(int keyCode) {
-        return keysJustPressed.contains(keyCode);
-    }
-
-    /**
-     * Vérifier si une touche vient d'être relâchée
-     */
-    public boolean isKeyJustReleased(int keyCode) {
-        return keysJustReleased.contains(keyCode);
-    }
-
 // ========== SOURIS ==========
-
-    /**
-     * Vérifier si un bouton de souris est enfoncé
-     */
-    public boolean isMouseButtonPressed(int button) {
-        return mouseButtonsPressed.contains(button);
-    }
-
-    /**
-     * Vérifier si un bouton vient d'être pressé
-     */
-    public boolean isMouseButtonJustPressed(int button) {
-        return mouseButtonsJustPressed.contains(button);
-    }
-
-    /**
-     * Vérifier si un bouton vient d'être relâché
-     */
-    public boolean isMouseButtonJustReleased(int button) {
-        return mouseButtonsJustReleased.contains(button);
-    }
 
     /**
      * Obtenir la position de la souris
      */
-    public Vector2f getMousePosition() {
+    public static Vector2f getMousePosition() {
         return new Vector2f(mousePosition);
     }
 
@@ -255,7 +231,8 @@ public class InputManager {
 // ========== SYSTÈME D'ACTIONS ==========
 
     /**
-     * Lier une ou plusieurs touches à une action
+     * Lier une ou plusieurs touches/boutons à une action
+     * Pour les boutons de souris, utiliser des valeurs négatives (ex: -GLFW_MOUSE_BUTTON_LEFT)
      */
     public void bindAction(String actionName, int... keyCodes) {
         actionBindings.putIfAbsent(actionName, new ArrayList<>());
@@ -293,8 +270,15 @@ public class InputManager {
         if (keys == null) return false;
 
         for (int key : keys) {
-            if (keysPressed.contains(key)) {
-                return true;
+            // Si la valeur est négative, c'est un bouton de souris
+            if (key < 0) {
+                if (mouseButtonsPressed.contains(-key)) {
+                    return true;
+                }
+            } else {
+                if (keysPressed.contains(key)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -308,8 +292,14 @@ public class InputManager {
         if (keys == null) return false;
 
         for (int key : keys) {
-            if (keysJustPressed.contains(key)) {
-                return true;
+            if (key < 0) {
+                if (mouseButtonsJustPressed.contains(-key)) {
+                    return true;
+                }
+            } else {
+                if (keysJustPressed.contains(key)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -323,8 +313,14 @@ public class InputManager {
         if (keys == null) return false;
 
         for (int key : keys) {
-            if (keysJustReleased.contains(key)) {
-                return true;
+            if (key < 0) {
+                if (mouseButtonsJustReleased.contains(-key)) {
+                    return true;
+                }
+            } else {
+                if (keysJustReleased.contains(key)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -382,6 +378,17 @@ public class InputManager {
         }
     }
 
+    private void triggerActionOnPressMouseButton(int button) {
+        for (Map.Entry<String, List<Integer>> entry : actionBindings.entrySet()) {
+            if (entry.getValue().contains(-button)) {
+                Runnable callback = actionOnPress.get(entry.getKey());
+                if (callback != null) {
+                    callback.run();
+                }
+            }
+        }
+    }
+
     private void triggerActionOnRelease(int keyCode) {
         for (Map.Entry<String, List<Integer>> entry : actionBindings.entrySet()) {
             if (entry.getValue().contains(keyCode)) {
@@ -393,12 +400,40 @@ public class InputManager {
         }
     }
 
+    private void triggerActionOnReleaseMouseButton(int button) {
+        for (Map.Entry<String, List<Integer>> entry : actionBindings.entrySet()) {
+            if (entry.getValue().contains(-button)) {
+                Runnable callback = actionOnRelease.get(entry.getKey());
+                if (callback != null) {
+                    callback.run();
+                }
+            }
+        }
+    }
+
 // ========== UTILITAIRES ==========
 
     /**
-     * Obtenir une représentation textuelle d'un keycode
+     * Obtenir une représentation textuelle d'un keycode ou bouton de souris
      */
     public static String getKeyName(int keyCode) {
+        // Si c'est un bouton de souris (valeur négative)
+        if (keyCode < 1) {
+            int mouseButton = -keyCode;
+            return switch (mouseButton) {
+                case GLFW_MOUSE_BUTTON_LEFT -> "MOUSE_LEFT";
+                case GLFW_MOUSE_BUTTON_RIGHT -> "MOUSE_RIGHT";
+                case GLFW_MOUSE_BUTTON_MIDDLE -> "MOUSE_MIDDLE";
+                case GLFW_MOUSE_BUTTON_4 -> "MOUSE_4";
+                case GLFW_MOUSE_BUTTON_5 -> "MOUSE_5";
+                case GLFW_MOUSE_BUTTON_6 -> "MOUSE_6";
+                case GLFW_MOUSE_BUTTON_7 -> "MOUSE_7";
+                case GLFW_MOUSE_BUTTON_8 -> "MOUSE_8";
+                default -> "MOUSE_" + mouseButton;
+            };
+        }
+
+        // Pour les touches du clavier
         String name = GLFW.glfwGetKeyName(keyCode, 0);
         return name != null ? name.toUpperCase() : "KEY_" + keyCode;
     }
@@ -416,4 +451,5 @@ public class InputManager {
             System.out.println();
         }
     }
+
 }

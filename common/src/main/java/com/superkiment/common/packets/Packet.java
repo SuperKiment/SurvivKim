@@ -12,10 +12,10 @@ public abstract class Packet implements Serializable {
 
     public enum PacketType {
         CREATE_ENTITY,
+        UPDATE_ENTITY,
         ENTITY_POSITION,
         DELETE_ENTITY,
         PLAYER_JOIN,
-        PLAYER_LEAVE,
         CREATE_BLOCK,
         DELETE_BLOCK,
         BULK_POSITION

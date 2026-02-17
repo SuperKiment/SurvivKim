@@ -2,7 +2,7 @@ package com.superkiment.common.utils;
 
 import org.joml.Vector2d;
 
-public class Vector {
+public abstract class Vector {
     /**
      * Permet de lerp de Vector2d à Vector2d mais en gardant la magnitude, uniquement sur l'angle de rotation.
      *

@@ -8,9 +8,6 @@ import org.joml.Vector2d;
  * Le Joueur et autres joueurs.
  */
 public class Player extends Entity {
-    public Player() {
-        super();
-    }
 
     public Player(Vector2d pos) {
         super(pos);

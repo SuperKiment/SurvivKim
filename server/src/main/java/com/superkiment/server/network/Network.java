@@ -5,6 +5,7 @@ import com.superkiment.common.packets.*;
 import com.superkiment.common.packets.entity.PacketCreateEntity;
 import com.superkiment.common.packets.entity.PacketDeleteEntity;
 import com.superkiment.common.packets.entity.PacketEntityPosition;
+import com.superkiment.common.packets.entity.PacketUpdateEntity;
 import com.superkiment.server.GameServer;
 import com.superkiment.server.entities.ServerEntitiesManager;
 import com.superkiment.server.monitor.ServerMonitor;
@@ -36,7 +37,7 @@ public class Network {
     /**
      * Gérer les packets TCP reçus
      */
-    public static void handleTCPPacket(Packet packet, ClientConnection client) {
+    public static void handleTCPPacket(Packet packet, ClientConnection originClient) {
         System.out.println("TCP reçu: " + packet);
 
         try {
@@ -45,24 +46,18 @@ public class Network {
         }
 
         switch (packet.getType()) {
-            case CREATE_ENTITY:
-                EntityHandle.handleCreateEntity((PacketCreateEntity) packet, client);
-                break;
+            case CREATE_ENTITY -> EntityHandle.handleCreateEntity((PacketCreateEntity) packet, originClient);
 
-            case DELETE_ENTITY:
-                EntityHandle.handleDeleteEntity((PacketDeleteEntity) packet);
-                break;
+            case DELETE_ENTITY -> EntityHandle.handleDeleteEntity((PacketDeleteEntity) packet);
 
-            case PLAYER_JOIN:
-                PlayerHandle.handlePlayerJoin((PacketPlayerJoin) packet, client);
-                break;
+            case UPDATE_ENTITY -> EntityHandle.handleUpdateEntity((PacketUpdateEntity) packet, originClient);
 
-            case CREATE_BLOCK:
-                BlockHandle.handleCreateBlock((PacketCreateBlock) packet, client);
-                break;
+            case PLAYER_JOIN -> PlayerHandle.handlePlayerJoin((PacketPlayerJoin) packet, originClient);
 
-            default:
-                System.out.println("Type de packet TCP non géré: " + packet.getType());
+            case CREATE_BLOCK -> BlockHandle.handleCreateBlock((PacketCreateBlock) packet, originClient);
+
+            default -> System.out.println("Type de packet TCP non géré: " + packet.getType());
+
         }
     }
 

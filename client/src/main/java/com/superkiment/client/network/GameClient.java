@@ -12,10 +12,7 @@ import com.superkiment.common.packets.Packet;
 import com.superkiment.common.packets.PacketCreateBlock;
 import com.superkiment.common.packets.PacketPlayerJoin;
 import com.superkiment.common.packets.PacketPositionsBulk;
-import com.superkiment.common.packets.entity.PacketCreateEntity;
-import com.superkiment.common.packets.entity.PacketCreateEntityPlayer;
-import com.superkiment.common.packets.entity.PacketDeleteEntity;
-import com.superkiment.common.packets.entity.PacketEntityPosition;
+import com.superkiment.common.packets.entity.*;
 import org.joml.Vector2d;
 
 import java.util.UUID;
@@ -126,24 +123,18 @@ public class GameClient {
      */
     public void handleTCPPacket(Packet packet) {
         switch (packet.getType()) {
-            case CREATE_ENTITY:
-                EntityHandle.handleCreateEntity((PacketCreateEntity) packet);
-                break;
+            case CREATE_ENTITY -> EntityHandle.handleCreateEntity((PacketCreateEntity) packet);
 
-            case DELETE_ENTITY:
-                EntityHandle.handleDeleteEntity((PacketDeleteEntity) packet);
-                break;
+            case DELETE_ENTITY -> EntityHandle.handleDeleteEntity((PacketDeleteEntity) packet);
 
-            case PLAYER_JOIN:
-                PlayerHandle.handlePlayerJoin((PacketPlayerJoin) packet);
-                break;
+            case UPDATE_ENTITY -> EntityHandle.handleUpdateEntity((PacketUpdateEntity) packet);
 
-            case CREATE_BLOCK:
-                BlockHandle.handleCreateBlock((PacketCreateBlock) packet);
-                break;
+            case PLAYER_JOIN -> PlayerHandle.handlePlayerJoin((PacketPlayerJoin) packet);
 
-            default:
-                System.out.println("Type de packet TCP non géré: " + packet.getType());
+            case CREATE_BLOCK -> BlockHandle.handleCreateBlock((PacketCreateBlock) packet);
+
+            default -> System.out.println("Type de packet TCP non géré: " + packet.getType());
+
         }
     }
 

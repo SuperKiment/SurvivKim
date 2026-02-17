@@ -26,23 +26,15 @@ public class EntityFactory {
         creators = new HashMap<>();
 
         creators.put(PacketCreateEntity.class, packet -> {
-            PacketCreateEntity pe = (PacketCreateEntity) packet;
-
-            Entity entity = new Entity(new Vector2d(pe.posX, pe.posY));
-            entity.id = pe.entityId;
-            entity.name = pe.entityName;
-
-            System.out.println("USED ENTITY CREATOR");
-
-            return entity;
+            Entity e = new Entity();
+            return ApplyBasePacketToEntity((PacketCreateEntity) packet, e);
         });
 
         creators.put(PacketCreateEntityProjectile.class, p -> {
             PacketCreateEntityProjectile pp = (PacketCreateEntityProjectile) p;
             Projectile projectile = new Projectile(new Vector2d(pp.posX, pp.posY), new Vector2d(pp.trajX, pp.trajY));
 
-            projectile.id = pp.entityId;
-            projectile.name = pp.entityName;
+            ApplyBasePacketToEntity(pp, projectile);
 
             // trouver les exceptions
             for (String id : pp.exceptions) {
@@ -58,8 +50,7 @@ public class EntityFactory {
             PacketCreateEntityPlayer pp = (PacketCreateEntityPlayer) p;
             Player player = new Player(new Vector2d(pp.posX, pp.posY));
 
-            player.id = pp.entityId;
-            player.name = pp.entityName;
+            ApplyBasePacketToEntity(pp, player);
 
             System.out.println("USED PLAYER CREATOR");
 
@@ -69,6 +60,7 @@ public class EntityFactory {
 
     /**
      * Utilisé une seule fois en début de client/serveur
+     *
      * @param entitiesManager
      */
     public static void CreateInstance(EntitiesManager entitiesManager) {
@@ -90,5 +82,22 @@ public class EntityFactory {
             return creator.apply(packet);
         }
         throw new IllegalArgumentException("Unknown packet type: " + packet.getClass());
+    }
+
+    public static Entity ApplyBasePacketToEntity(PacketCreateEntity pe, Entity entity) {
+
+        entity.id = pe.entityId;
+        entity.name = pe.entityName;
+        entity.pos = new Vector2d(pe.posX, pe.posY);
+
+        if (entity.shapeModel.shapes.size() != pe.shapesTexts.length)
+            throw new RuntimeException("While applying packet to entity : Entity shapes size != Packet shapes size !!");
+
+        for (int i = 0; i < entity.shapeModel.shapes.size(); i++) {
+            entity.shapeModel.shapes.get(i).text = pe.shapesTexts[i];
+        }
+        System.out.println("USED ENTITY APPLY BASE");
+
+        return entity;
     }
 }
