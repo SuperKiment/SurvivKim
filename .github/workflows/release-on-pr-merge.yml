@@ -1,0 +1,135 @@
+name: Release on merged PR
+
+on:
+  pull_request:
+    types:
+      - closed
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  release:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout base branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: Bump patch version
+        id: bump
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          current_version="$(grep '^version=' gradle.properties | cut -d'=' -f2)"
+          IFS='.' read -r major minor patch <<< "$current_version"
+          new_patch=$((patch + 1))
+          new_version="${major}.${minor}.${new_patch}"
+
+          sed -i "s/^version=.*/version=${new_version}/" gradle.properties
+
+          echo "old_version=${current_version}" >> "$GITHUB_OUTPUT"
+          echo "new_version=${new_version}" >> "$GITHUB_OUTPUT"
+
+      - name: Commit version bump
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add gradle.properties
+          git commit -m "chore(release): bump version to ${{ steps.bump.outputs.new_version }}"
+          git push origin "HEAD:${{ github.event.pull_request.base.ref }}"
+
+      # Les tests seront activés quand une suite de tests sera en place.
+      # - name: Run tests
+      #   run: ./gradlew --no-daemon test
+
+      - name: Build release artifacts
+        run: ./gradlew --no-daemon clean :client:shadowJar :server:shadowJar
+
+      - name: Prepare artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${{ steps.bump.outputs.new_version }}"
+
+          client_jar="$(find client/build/libs -maxdepth 1 -type f -name '*all.jar' | head -n 1)"
+          server_jar="$(find server/build/libs -maxdepth 1 -type f -name '*all.jar' | head -n 1)"
+
+          cp "$client_jar" "client-${version}.jar"
+          cp "$server_jar" "server-${version}.jar"
+
+      - name: Create release notes
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${{ steps.bump.outputs.new_version }}"
+          previous="${{ steps.bump.outputs.old_version }}"
+          repo_url="${{ github.server_url }}/${{ github.repository }}"
+
+          cat > release-notes.md <<EOF_NOTES
+          # SurvivKim v${version}
+
+          Release automatique après fusion de la PR **#${{ github.event.pull_request.number }}**.
+
+          ## Détails de la PR fusionnée
+          - **Titre** : ${{ github.event.pull_request.title }}
+          - **Source** : \`${{ github.event.pull_request.head.ref }}\`
+          - **Cible** : \`${{ github.event.pull_request.base.ref }}\`
+          - **Auteur** : @${{ github.event.pull_request.user.login }}
+
+          ## Exécution des binaires
+
+          ### Client
+          Sur **Windows** :
+          \`java -Dorg.lwjgl.librarypath=natives/windows -jar client-${version}.jar\`
+
+          Sur **Linux** :
+          \`java -jar client-${version}.jar\`
+
+          ### Server
+          Sur **Windows** et **Linux** :
+          \`java -jar server-${version}.jar\`
+
+          ## Ports de debug
+          Vérifiez que ces ports sont disponibles :
+
+          - TCP : \`56201\`
+          - UDP : \`56202\`
+          - HTTP (monitoring server) : \`56204\`
+
+          ## Livrables inclus
+          - \`client-${version}.jar\`
+          - \`server-${version}.jar\`
+
+          **Changelog complet** : ${repo_url}/compare/v${previous}...v${version}
+          EOF_NOTES
+
+      - name: Create tag
+        run: |
+          git tag "v${{ steps.bump.outputs.new_version }}"
+          git push origin "v${{ steps.bump.outputs.new_version }}"
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.bump.outputs.new_version }}
+          name: SurvivKim v${{ steps.bump.outputs.new_version }}
+          body_path: release-notes.md
+          files: |
+            client-${{ steps.bump.outputs.new_version }}.jar
+            server-${{ steps.bump.outputs.new_version }}.jar
