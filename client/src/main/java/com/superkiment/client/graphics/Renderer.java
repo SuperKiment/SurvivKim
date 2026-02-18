@@ -2,6 +2,7 @@ package com.superkiment.client.graphics;
 
 import com.superkiment.client.graphics.ui.UIElement;
 import com.superkiment.common.blocks.Block;
+import com.superkiment.common.collisions.Collisionable;
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.shapes.Shape;
 import com.superkiment.common.shapes.ShapeModel;
@@ -59,6 +60,9 @@ public class Renderer {
 
             glPushMatrix();
             glTranslated(entity.posLerp.x, entity.posLerp.y, 0);
+
+            renderUpdateAroundCollisionableUI(entity);
+
             double angleInRad = entity.dirLookLerp.angle(new Vector2d(1, 0)) * 57.2957795131d;
             glRotated(angleInRad, 0, 0, -1);
             renderModel(entity.shapeModel);
@@ -67,10 +71,20 @@ public class Renderer {
         }
     }
 
+    public void renderUpdateAroundCollisionableUI(Collisionable collisionable) {
+        for (ShapeModel shapeModel : collisionable.uiShapeModels) {
+            if (shapeModel == null) continue;
+            shapeModel.update(collisionable);
+            renderModel(shapeModel);
+        }
+
+    }
+
     public void renderBlocks(List<Block> blocks) {
         for (Block block : blocks) {
             glPushMatrix();
             glTranslated(block.pos.x * 50, block.pos.y * 50, 0);
+            renderUpdateAroundCollisionableUI(block);
             renderModel(block.shapeModel);
 
             glPopMatrix();

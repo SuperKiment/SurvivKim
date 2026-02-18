@@ -1,6 +1,7 @@
 package com.superkiment.client.network.handles;
 
 import com.superkiment.client.Main;
+import com.superkiment.client.graphics.ui.shapemodels.SMHealthBar;
 import com.superkiment.client.network.TCPClient;
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.entities.EntityFactory;
@@ -40,6 +41,7 @@ public class EntityHandle {
         }
 
         Entity entity = EntityFactory.getInstance().create(packet);
+        entity.uiShapeModels.add(new SMHealthBar());
 
         entitiesManager.addEntity(entity);
         System.out.println("Entité distante créée: " + entity.name + " (" + entity.id + ") à la position " + entity.pos);

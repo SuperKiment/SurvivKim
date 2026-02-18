@@ -14,12 +14,14 @@ public abstract class PacketCreateEntity extends Packet {
     public double posY;
     public String[] exceptions;
     public String[] shapesTexts;
+    public float hp;
 
     public PacketCreateEntity(Entity entity) {
         this.entityId = entity.id;
         this.entityName = entity.name;
         this.posX = entity.pos.x;
         this.posY = entity.pos.y;
+        this.hp = entity.hp;
 
         this.exceptions = new String[entity.numberOfCollisionExceptions()];
         for (int i = 0; i < entity.numberOfCollisionExceptions(); i++) {

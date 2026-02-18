@@ -55,6 +55,8 @@ public class Projectile extends Entity {
     @Override
     public void onCollision(Collisionable other) {
         System.out.println("KABOOM");
+        other.hp -= 10;
+        other.dirtyOtherAttribute = true;
         deleteSelf();
     }
 }

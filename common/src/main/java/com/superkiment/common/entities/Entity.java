@@ -8,6 +8,7 @@ import com.superkiment.common.shapes.ShapeModel;
 import com.superkiment.common.collisions.CollisionsManager;
 import org.joml.Vector2d;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,6 +40,7 @@ public class Entity extends Collisionable {
         this.dirDepl = new Vector2d(0, 0);
 
         shapeModel = new ShapeModel();
+        uiShapeModels = new ArrayList<>();
 
         collisionsManager = new CollisionsManager(this);
     }
@@ -50,7 +52,6 @@ public class Entity extends Collisionable {
      * @param blocksManager
      */
     public void updateLogic(EntitiesManager entitiesManager, BlocksManager blocksManager) {
-        dirtyPosition = false;
         updateMovement();
         {
             List<CollisionData> collisions = collisionsManager.findCollisionsWithData(entitiesManager, blocksManager);
