@@ -33,6 +33,7 @@ public class UIHealthBar extends UIElement {
 
     @Override
     public void update() {
+        // TODO: remove these conditions each frames
         if (Main.gameClient == null) return;
 
         if (player == null) {
