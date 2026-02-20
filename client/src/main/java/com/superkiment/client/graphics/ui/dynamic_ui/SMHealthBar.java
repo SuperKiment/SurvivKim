@@ -35,7 +35,7 @@ public class SMHealthBar extends ShapeModel_UI {
     public void update(Collisionable collisionable) {
         // TODO: remove this condition each frames
         if (invMaxHP == 0) invMaxHP = 1f / collisionable.maxHP;
-
+      
         bar.dimensions.x = baseWidth * collisionable.hp * invMaxHP;
         bar.position.x = -(baseWidth - bar.dimensions.x) * 0.5;
 
