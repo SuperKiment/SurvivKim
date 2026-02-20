@@ -43,11 +43,12 @@ public class Renderer {
         return fontManager;
     }
 
-    public void renderUI(List<UIElement> elements) {
+    public void renderUpdateUI(List<UIElement> elements) {
         for (UIElement element : elements) {
             glPushMatrix();
             glTranslated(element.pos.x, element.pos.y, 0);
             renderModel(element.shapeModel);
+            element.update();
             glPopMatrix();
         }
     }

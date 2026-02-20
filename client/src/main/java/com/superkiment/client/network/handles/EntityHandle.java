@@ -11,7 +11,7 @@ import com.superkiment.common.packets.entity.PacketDeleteEntity;
 import com.superkiment.common.packets.entity.PacketUpdateEntity;
 
 import static com.superkiment.client.Main.entitiesManager;
-import static com.superkiment.client.graphics.ui.shapemodels.ShapeModel_UI.AddDynamicUIElementsToEntity;
+import static com.superkiment.client.graphics.ui.dynamic_ui.ShapeModel_UI.AddDynamicUIElementsToEntity;
 
 /**
  * Le handle qui contient les fonctions nécessaires à la création et suppression d'entités et la récéption de données concernant la création et suppression d'entités.

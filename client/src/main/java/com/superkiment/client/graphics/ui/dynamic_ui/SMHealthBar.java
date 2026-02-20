@@ -1,4 +1,4 @@
-package com.superkiment.client.graphics.ui.shapemodels;
+package com.superkiment.client.graphics.ui.dynamic_ui;
 
 import com.superkiment.common.collisions.Collisionable;
 import com.superkiment.common.entities.Entity;
@@ -35,5 +35,11 @@ public class SMHealthBar extends ShapeModel_UI {
     public void update(Collisionable collisionable) {
         if (invMaxHP == 0) invMaxHP = 1f / collisionable.maxHP;
         bar.dimensions.x = baseWidth * collisionable.hp * invMaxHP;
+        bar.position.x = -(baseWidth - bar.dimensions.x) * 0.5;
+
+        if (bar.dimensions.x <= 0) {
+            bar.dimensions.x = 0;
+            bar.position.x = 0;
+        }
     }
 }

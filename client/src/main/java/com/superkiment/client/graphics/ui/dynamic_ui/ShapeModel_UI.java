@@ -1,4 +1,4 @@
-package com.superkiment.client.graphics.ui.shapemodels;
+package com.superkiment.client.graphics.ui.dynamic_ui;
 
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.shapes.ShapeModel;
