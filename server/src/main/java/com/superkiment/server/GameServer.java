@@ -95,12 +95,18 @@ public class GameServer {
         Time.updateDeltaTime();
 
         for (Entity entity : entitiesManager.getEntities().values()) {
+            entity.dirtyOtherAttribute = false;
+            entity.dirtyPosition = false;
+        }
+
+        for (Entity entity : entitiesManager.getEntities().values()) {
             entity.updateLogic(entitiesManager, blocksManager);
         }
 
         entitiesManager.deleteAllEntitiesToBeDeleted();
 
         Network.broadcastBulkPositionUDP(udpServer);
+        Network.broadcastChangesInCollisionablesTCP(tcpServer);
     }
 
     public void stop() {

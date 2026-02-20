@@ -89,6 +89,7 @@ public class EntityFactory {
         entity.id = pe.entityId;
         entity.name = pe.entityName;
         entity.pos = new Vector2d(pe.posX, pe.posY);
+        entity.hp = pe.hp;
 
         if (entity.shapeModel.shapes.size() != pe.shapesTexts.length)
             throw new RuntimeException("While applying packet to entity : Entity shapes size != Packet shapes size !!");

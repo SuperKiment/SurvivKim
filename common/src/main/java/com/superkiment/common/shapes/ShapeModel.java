@@ -1,5 +1,7 @@
 package com.superkiment.common.shapes;
 
+import com.superkiment.common.collisions.Collisionable;
+
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -19,5 +21,8 @@ public class ShapeModel {
 
     public void addShapes(List<Shape> newShapes) {
         shapes.addAll(newShapes);
+    }
+
+    public void update(Collisionable collisionable) {
     }
 }

@@ -72,7 +72,7 @@ public class Main {
                 gameTick(dt);
             }
 
-            renderer.renderUI(uiManager.getUIElementsSortedByZ());
+            renderer.renderUpdateUI(uiManager.getUIElementsSortedByZ());
 
             // Quitter avec ESC
             if (input.isActionJustPressed("quitter")) {

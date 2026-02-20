@@ -168,4 +168,24 @@ public class Network {
             }
         }
     }
+
+    /**
+     * Envoyer une position UDP à tous les clients sauf l'expéditeur (mise à jour de toutes les entités qui ont bougé).
+     */
+    public static void broadcastChangesInCollisionablesTCP(TCPServer tcpServer) {
+        List<Entity> changed = entitiesManager.getEntities()
+                .values()
+                .stream()
+                .filter(e -> e.dirtyOtherAttribute)
+                .toList();
+
+        if (changed.isEmpty()) return;
+
+        for (ClientConnection client : entitiesManager.getClients().values()) {
+
+            for (Entity entity : changed) {
+                client.sendTCP(new PacketUpdateEntity(entity));
+            }
+        }
+    }
 }

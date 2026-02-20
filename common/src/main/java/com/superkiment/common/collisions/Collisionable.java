@@ -17,9 +17,19 @@ public abstract class Collisionable {
     public Vector2d pos;
 
     /**
+     * Le nombre de points de vie du collisionable.
+     */
+    public float hp = 100, maxHP = 100;
+
+    /**
      * Le modèle qui permet de connaître les formes et de render le Collisionable.
      */
     public ShapeModel shapeModel;
+
+    /**
+     * Les modèle qui permettent de connaître l'UI autour du Collisionable (HP, ciblage, etc.).
+     */
+    public ArrayList<ShapeModel> uiShapeModels;
 
     public CollisionsManager collisionsManager;
 
@@ -27,6 +37,11 @@ public abstract class Collisionable {
      * Est-ce que le Collisionable a bougé depuis le dernier tick ?
      */
     public boolean dirtyPosition = false;
+
+    /**
+     * Est-ce qu'un attribut comme les hp ou le nom ont changé depuis le dernier tick ?
+     */
+    public boolean dirtyOtherAttribute = false;
 
     /**
      * Est-ce que le Collisionable réagit aux collisions de manière physique ?

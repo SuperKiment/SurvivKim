@@ -44,6 +44,9 @@ public class UIElement {
         System.out.printf("Blank & clickable UIElement on pos %f/%f was clicked !%n", (float) pos.x, (float) pos.y);
     }
 
+    public void update() {
+    }
+
     public void addYourselfAndChildrenToThisList(List<UIElement> list) {
         list.add(this);
         for (UIElement child : children) {
