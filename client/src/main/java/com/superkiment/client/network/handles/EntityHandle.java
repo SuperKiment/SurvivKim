@@ -1,7 +1,6 @@
 package com.superkiment.client.network.handles;
 
 import com.superkiment.client.Main;
-import com.superkiment.client.graphics.ui.shapemodels.SMHealthBar;
 import com.superkiment.client.network.TCPClient;
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.entities.EntityFactory;
@@ -12,9 +11,10 @@ import com.superkiment.common.packets.entity.PacketDeleteEntity;
 import com.superkiment.common.packets.entity.PacketUpdateEntity;
 
 import static com.superkiment.client.Main.entitiesManager;
+import static com.superkiment.client.graphics.ui.shapemodels.ShapeModel_UI.AddDynamicUIElementsToEntity;
 
 /**
- *  Le handle qui contient les fonctions nécessaires à la création et suppression d'entités et la récéption de données concernant la création et suppression d'entités.
+ * Le handle qui contient les fonctions nécessaires à la création et suppression d'entités et la récéption de données concernant la création et suppression d'entités.
  */
 public class EntityHandle {
 
@@ -41,7 +41,9 @@ public class EntityHandle {
         }
 
         Entity entity = EntityFactory.getInstance().create(packet);
-        entity.uiShapeModels.add(new SMHealthBar());
+
+        // Ajouter les UI dynamiques
+        AddDynamicUIElementsToEntity(entity);
 
         entitiesManager.addEntity(entity);
         System.out.println("Entité distante créée: " + entity.name + " (" + entity.id + ") à la position " + entity.pos);

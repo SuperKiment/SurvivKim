@@ -1,15 +1,27 @@
 package com.superkiment.client.graphics.ui.shapemodels;
 
 import com.superkiment.common.collisions.Collisionable;
+import com.superkiment.common.entities.Entity;
+import com.superkiment.common.entities.Projectile;
 import com.superkiment.common.shapes.Shape;
-import com.superkiment.common.shapes.ShapeModel;
 import org.joml.Vector2d;
 import org.joml.Vector3d;
 
-public class SMHealthBar extends ShapeModel {
+import java.util.ArrayList;
+import java.util.List;
+
+public class SMHealthBar extends ShapeModel_UI {
+    public static List<Class<?>> applyToClass = new ArrayList<>();
+    public static List<Class<?>> doNotApplyToClass = new ArrayList<>();
+
     private final Shape bar;
     private final int baseWidth = 45;
     private float invMaxHP = 0;
+
+    static {
+        applyToClass.add(Entity.class);
+        doNotApplyToClass.add(Projectile.class);
+    }
 
     public SMHealthBar() {
         super();
