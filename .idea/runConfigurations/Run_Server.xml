@@ -1,0 +1,15 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run Server" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="com.superkiment.server.GameServer" />
+    <module name="SurvivKim.server.main" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="com.superkiment.server.network.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

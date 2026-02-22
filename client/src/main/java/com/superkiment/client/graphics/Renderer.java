@@ -181,8 +181,8 @@ public class Renderer {
 
         // Calculer la position pour centrer le texte
         float textWidth = font.getTextWidth(shape.text, scale);
-        float x = -textWidth / 2;
-        float y = -shape.fontSize / 2;
+        float x = -textWidth / 2 + (float) shape.textOffset.x;
+        float y = shape.fontSize / 4 + (float) shape.textOffset.y;
 
         font.drawText(
                 shape.text,

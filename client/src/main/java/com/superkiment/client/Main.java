@@ -105,13 +105,17 @@ public class Main {
         new Main().run();
     }
 
-    public static void connect() {
+    public static boolean connect() {
         if (gameClient == null || !gameClient.isConnected()) {
-            gameClient = GameClient.tryConnectToServer(window);
+            GameClient gc = GameClient.tryConnectToServer(window);
 
-            if (gameClient != null) {
+            if (gc != null) {
+                gameClient = gc;
                 InputManager.setupGameInputs(window, InputManager.getInstance(), gameClient.getLocalPlayer());
+                return true;
             }
         }
+
+        return false;
     }
 }

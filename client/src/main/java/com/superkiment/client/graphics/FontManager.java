@@ -19,7 +19,7 @@ public class FontManager {
         fonts.put("default", defaultFont);
 
         // Charger depuis un fichier externe
-        loadCustomFontFromResources("minecraft", "/assets/fonts/Minecraft.ttf", 48);
+        loadCustomFontFromResources("minecraft", "/assets/fonts/minecraft.ttf", 48);
     }
 
     /**

@@ -60,7 +60,8 @@ public class UIManager {
         UIButton connectButton = new UIButton(new Vector2d(winSize.x / 2, winSize.y / 2), new Vector2d(400, 100), 50) {
             @Override
             public void onClick() {
-                Main.connect();
+                if (!Main.connect()) return;
+
                 uiGroups.get("title-menu").disable();
                 uiGroups.get("credits-menu").disable();
                 uiGroups.get("options-menu").disable();
@@ -68,7 +69,6 @@ public class UIManager {
                 uiGroups.get("standard-gameplay").enable();
             }
         };
-        connectButton.shapeModel.shapes.getFirst().text = "Connect local";
 
         UIButton playButton = new UIButton(new Vector2d(winSize.x / 2, winSize.y / 2), new Vector2d(400, 100), 50) {
             @Override
@@ -79,7 +79,6 @@ public class UIManager {
                 uiGroups.get("connect-menu").enable();
             }
         };
-        playButton.shapeModel.shapes.getFirst().text = "Play";
 
         UIHealthBar uiHealthBar = new UIHealthBar(new Vector2d(160, 25), 100);
 

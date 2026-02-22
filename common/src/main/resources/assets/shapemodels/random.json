@@ -1,0 +1,50 @@
+{
+  "shapes": [
+    {
+      "type": "RECT",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "dimensions": {
+        "x": 500,
+        "y": 50
+      },
+      "color": {
+        "r": 0.5059,
+        "g": 0.2392,
+        "b": 0.6118
+      },
+      "text": {
+        "content": "coucou",
+        "fontSize": 32,
+        "color": {
+          "r": 0,
+          "g": 0,
+          "b": 0
+        },
+        "offset": {
+          "x": 200,
+          "y": 0
+        },
+        "fontName": "minecraft"
+      }
+    },
+    {
+      "type": "RECT",
+      "position": {
+        "x": 65,
+        "y": 36
+      },
+      "dimensions": {
+        "x": 80,
+        "y": 50
+      },
+      "color": {
+        "r": 1,
+        "g": 0,
+        "b": 0
+      }
+    }
+  ]
+}
