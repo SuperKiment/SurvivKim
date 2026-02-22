@@ -60,7 +60,8 @@ public class UIManager {
         UIButton connectButton = new UIButton(new Vector2d(winSize.x / 2, winSize.y / 2), new Vector2d(400, 100), 50) {
             @Override
             public void onClick() {
-                Main.connect();
+                if (!Main.connect()) return;
+
                 uiGroups.get("title-menu").disable();
                 uiGroups.get("credits-menu").disable();
                 uiGroups.get("options-menu").disable();
