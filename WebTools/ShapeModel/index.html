@@ -8,6 +8,9 @@
 </head>
 <body>
 
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
 <header>
     <div class="logo">SM<small>/ ShapeModel Editor</small></div>
     <div class="toolbar">
@@ -16,16 +19,24 @@
     </div>
     <div class="hdr-right">
         <span class="mode-badge" id="modeBadge">SELECT</span>
-        <button class="btn primary" id="btnExport">Export Java</button>
+        <button class="btn primary" id="btnExport">Export ↗</button>
     </div>
 </header>
 
+<!-- ============================================================
+     WORKSPACE
+     ============================================================ -->
 <div class="workspace">
 
-    <!-- ── LEFT PANEL ── -->
+    <!-- LEFT: shapes + fonts tabs -->
     <div class="panel">
-        <!-- Shapes -->
-        <div class="panel-section grow">
+        <div class="left-tabs">
+            <button class="tab-btn active" data-tab="shapes">Shapes</button>
+            <button class="tab-btn" data-tab="fonts">Fonts</button>
+        </div>
+
+        <!-- SHAPES TAB -->
+        <div class="tab-pane active" id="tab-shapes">
             <div class="panel-hdr">Shapes <em id="shapeCount">0</em></div>
             <div class="panel-body">
                 <div class="shape-list" id="shapeList">
@@ -33,29 +44,40 @@
                 </div>
             </div>
         </div>
-        <!-- Fonts -->
-        <div class="panel-section fixed" style="flex-shrink:0;">
-            <div class="panel-hdr">Fonts <em id="fontCount">0</em></div>
-            <div class="panel-body" style="max-height:180px;">
-                <div class="font-drop-zone" id="fontDropZone">
-                    <input type="file" id="fontFilePicker" accept=".ttf,.otf,.woff,.woff2" multiple>
-                    <div class="font-icon">A</div>
-                    <div>Drop font files here<br><span style="color:var(--text-dim);font-size:9px;">.ttf .otf .woff .woff2</span>
-                    </div>
+
+        <!-- FONTS TAB -->
+        <div class="tab-pane" id="tab-fonts">
+            <div class="panel-hdr">Font Manager <em id="fontCount">0</em></div>
+            <div class="panel-body">
+                <div class="font-hint">
+                    Place font files (<strong>.ttf/.otf/.woff</strong>) next to this HTML file,<br>
+                    then register them here by name + filename.
                 </div>
                 <div class="font-list" id="fontList"></div>
+                <div class="add-font-form">
+                    <span class="add-font-form-title">Register font</span>
+                    <div class="prop-field">
+                        <span class="prop-field-label">Font name (used in Java)</span>
+                        <input type="text" id="newFontName" placeholder="e.g. minecraft">
+                    </div>
+                    <div class="prop-field">
+                        <span class="prop-field-label">Filename (relative to HTML)</span>
+                        <input type="text" id="newFontFile" placeholder="e.g. minecraft.ttf">
+                    </div>
+                    <button class="btn sm active" id="btnAddFont">Load Font</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- ── CENTER: Canvas ── -->
+    <!-- CENTER: canvas -->
     <div class="canvas-area" id="canvasArea">
         <canvas id="canvas"></canvas>
-        <div class="canvas-hint">Click to place · Drag to move · Alt+drag to pan · Arrows to nudge · Del to remove</div>
+        <div class="canvas-hint">Click to place · Drag to move · Alt+drag to pan · Arrows to nudge · Del to delete</div>
         <div class="canvas-coords" id="coords">0, 0</div>
     </div>
 
-    <!-- ── RIGHT: Properties ── -->
+    <!-- RIGHT: properties -->
     <div class="panel right">
         <div class="panel-hdr">Properties</div>
         <div class="panel-body" id="props">
@@ -65,21 +87,38 @@
 
 </div>
 
-<!-- EXPORT MODAL -->
+<!-- ============================================================
+     EXPORT MODAL
+     ============================================================ -->
 <div class="modal-bg" id="exportModal">
     <div class="modal">
         <div class="modal-hdr">
-            <div class="modal-title">Java Export</div>
+            <div class="modal-title">Export ShapeModel</div>
             <button class="modal-close" id="btnModalClose">x</button>
         </div>
-        <div class="modal-code" id="exportCode"></div>
+
+        <div class="export-tabs">
+            <button class="export-tab active" data-etab="java">Java</button>
+            <button class="export-tab" data-etab="json">JSON</button>
+            <button class="export-tab" data-etab="loader">Java JSON Loader</button>
+        </div>
+
+        <div class="export-pane active" id="epane-java">
+            <div class="modal-code" id="exportJava"></div>
+        </div>
+        <div class="export-pane" id="epane-json">
+            <div class="modal-code" id="exportJson"></div>
+        </div>
+        <div class="export-pane" id="epane-loader">
+            <div class="modal-code" id="exportLoader"></div>
+        </div>
+
         <div class="modal-foot">
             <button class="btn" id="btnCopy">Copy to clipboard</button>
             <button class="btn primary" id="btnModalDone">Done</button>
         </div>
     </div>
 </div>
-
 <script src="scripts.js"></script>
 </body>
 </html>

@@ -1,34 +1,28 @@
-// ================================================================
-//  CONSTANTS
-// ================================================================
-var TYPES = ['RECT', 'CIRCLE', 'TRIANGLE', 'RECT_OUTLINE', 'CIRCLE_OUTLINE', 'TRIANGLE_OUTLINE'];
-var ICONS = {RECT: '[_]', CIRCLE: '( )', TRIANGLE: '/\\/'};
-
-// 3x3 anchor grid: [anchorId, label, fractional offsets relative to shape (fx, fy)]
-// fx/fy are multipliers on half-width / half-height
-var ANCHORS = [
-    {id: 'TL', label: '↖', fx: -1, fy: -1},
-    {id: 'TC', label: '↑', fx: 0, fy: -1},
-    {id: 'TR', label: '↗', fx: 1, fy: -1},
-    {id: 'ML', label: '←', fx: -1, fy: 0},
-    {id: 'MC', label: '·', fx: 0, fy: 0},
-    {id: 'MR', label: '→', fx: 1, fy: 0},
-    {id: 'BL', label: '↙', fx: -1, fy: 1},
-    {id: 'BC', label: '↓', fx: 0, fy: 1},
-    {id: 'BR', label: '↘', fx: 1, fy: 1},
+/* ============================================================
+   CONSTANTS
+   ============================================================ */
+var TYPES = [
+    'RECT', 'CIRCLE', 'TRIANGLE',
+    'RECT_OUTLINE', 'CIRCLE_OUTLINE', 'TRIANGLE_OUTLINE'
 ];
-var ANCHOR_PADDING = 6; // pixels inset from edge
+var ICONS = {RECT: '[_]', CIRCLE: '( )', TRIANGLE: '/ \\'};
 
-// ================================================================
-//  STATE
-// ================================================================
+function baseType(t) {
+    return t.replace('_OUTLINE', '');
+}
+
+function isOutline(t) {
+    return t.indexOf('_OUTLINE') !== -1;
+}
+
+/* ============================================================
+   STATE
+   ============================================================ */
 var shapes = [];
+var fonts = [];       // { name, file, status: 'ok'|'err'|'loading' }
 var selected = null;
 var uid = 1;
 var placing = false;
-
-// Font registry: [{name: 'minecraft', family: 'minecraft', loaded: true}]
-var fonts = [];
 
 var pan = {x: 0, y: 0};
 var panning = false;
@@ -40,118 +34,21 @@ var mouseWorld = {x: 0, y: 0};
 function mkShape(x, y) {
     return {
         id: uid++, type: 'RECT',
-        x: x || 0, y: y || 0, w: 80, h: 50,
+        x: x || 0, y: y || 0,
+        w: 80, h: 50,
+        /* fill color */
         r: 1, g: 0, b: 0,
+        /* text */
         text: '', fontSize: 32,
+        textOffsetX: 0, textOffsetY: 0,
         textR: 0, textG: 0, textB: 0,
-        fontName: 'minecraft',
-        // text offset relative to shape center (world units)
-        textOffsetX: 0,
-        textOffsetY: 0
+        fontName: 'minecraft'
     };
 }
 
-function baseType(t) {
-    return t.replace('_OUTLINE', '');
-}
-
-function isOutline(t) {
-    return t.indexOf('_OUTLINE') !== -1;
-}
-
-// ================================================================
-//  FONT LOADING
-// ================================================================
-function loadFontFiles(files) {
-    for (var i = 0; i < files.length; i++) {
-        (function (file) {
-            // Derive a clean family name from filename (strip extension, spaces→-)
-            var rawName = file.name.replace(/\.[^.]+$/, '');
-            var family = rawName.replace(/\s+/g, '-');
-
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                var ff = new FontFace(family, e.target.result);
-                ff.load().then(function (loaded) {
-                    document.fonts.add(loaded);
-                    // Avoid duplicates
-                    for (var k = 0; k < fonts.length; k++) {
-                        if (fonts[k].family === family) return;
-                    }
-                    fonts.push({name: rawName, family: family});
-                    refreshFontList();
-                    refreshProps(); // update the select if props open
-                }).catch(function (err) {
-                    alert('Failed to load font "' + rawName + '":\n' + err);
-                });
-            };
-            reader.readAsArrayBuffer(file);
-        })(files[i]);
-    }
-}
-
-function refreshFontList() {
-    document.getElementById('fontCount').textContent = fonts.length;
-    var list = document.getElementById('fontList');
-    list.innerHTML = '';
-    for (var i = 0; i < fonts.length; i++) {
-        (function (idx) {
-            var f = fonts[idx];
-            var item = document.createElement('div');
-            item.className = 'font-item';
-
-            var swatch = document.createElement('div');
-            swatch.className = 'font-swatch';
-            // Preview the font
-            var preview = document.createElement('span');
-            preview.style.fontFamily = "'" + f.family + "', monospace";
-            preview.style.fontSize = '13px';
-            preview.textContent = 'Aa';
-            var nameLabel = document.createElement('div');
-            nameLabel.className = 'font-name-label';
-            nameLabel.textContent = f.name;
-            swatch.appendChild(preview);
-            swatch.appendChild(nameLabel);
-
-            var del = document.createElement('button');
-            del.className = 'font-del';
-            del.textContent = 'x';
-            del.title = 'Remove font';
-            del.onclick = function () {
-                fonts.splice(idx, 1);
-                refreshFontList();
-                refreshProps();
-            };
-
-            item.appendChild(swatch);
-            item.appendChild(del);
-            list.appendChild(item);
-        })(i);
-    }
-}
-
-// Drop zone wiring
-var dropZone = document.getElementById('fontDropZone');
-dropZone.addEventListener('dragover', function (e) {
-    e.preventDefault();
-    dropZone.classList.add('over');
-});
-dropZone.addEventListener('dragleave', function () {
-    dropZone.classList.remove('over');
-});
-dropZone.addEventListener('drop', function (e) {
-    e.preventDefault();
-    dropZone.classList.remove('over');
-    loadFontFiles(e.dataTransfer.files);
-});
-document.getElementById('fontFilePicker').addEventListener('change', function (e) {
-    loadFontFiles(e.target.files);
-    e.target.value = ''; // reset so same file can be re-added
-});
-
-// ================================================================
-//  CANVAS
-// ================================================================
+/* ============================================================
+   CANVAS SETUP
+   ============================================================ */
 var cv = document.getElementById('canvas');
 var ctx = cv.getContext('2d');
 var area = document.getElementById('canvasArea');
@@ -172,9 +69,9 @@ function s2w(sx, sy) {
     return {x: sx - cv.width / 2 - pan.x, y: sy - cv.height / 2 - pan.y};
 }
 
-// ----------------------------------------------------------------
-//  Draw loop
-// ----------------------------------------------------------------
+/* ============================================================
+   DRAWING
+   ============================================================ */
 function draw() {
     var W = cv.width, H = cv.height;
     ctx.clearRect(0, 0, W, H);
@@ -185,13 +82,11 @@ function draw() {
 }
 
 function drawGrid(W, H) {
-    var step = 40;
-    ctx.strokeStyle = 'rgba(255,255,255,0.028)';
-    ctx.lineWidth = 1;
-    var ox = (pan.x + W / 2) % step;
+    var step = 40, ox = (pan.x + W / 2) % step, oy = (pan.y + H / 2) % step;
     if (ox < 0) ox += step;
-    var oy = (pan.y + H / 2) % step;
     if (oy < 0) oy += step;
+    ctx.strokeStyle = 'rgba(255,255,255,.028)';
+    ctx.lineWidth = 1;
     for (var x = ox; x < W; x += step) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
@@ -210,7 +105,7 @@ function drawAxes(W, H) {
     var o = w2s(0, 0);
     ctx.setLineDash([4, 5]);
     ctx.lineWidth = 1;
-    ctx.strokeStyle = 'rgba(232,255,71,0.18)';
+    ctx.strokeStyle = 'rgba(232,255,71,.18)';
     ctx.beginPath();
     ctx.moveTo(o.x, 0);
     ctx.lineTo(o.x, H);
@@ -224,7 +119,7 @@ function drawAxes(W, H) {
 
 function drawGhost() {
     var p = w2s(mouseWorld.x, mouseWorld.y);
-    ctx.strokeStyle = 'rgba(232,255,71,0.4)';
+    ctx.strokeStyle = 'rgba(232,255,71,.4)';
     ctx.lineWidth = 1;
     ctx.setLineDash([3, 4]);
     ctx.strokeRect(p.x - 40, p.y - 25, 80, 50);
@@ -236,7 +131,8 @@ function rgba01(r, g, b, a) {
     return 'rgba(' + Math.round(r * 255) + ',' + Math.round(g * 255) + ',' + Math.round(b * 255) + ',' + a + ')';
 }
 
-function shapePathFn(s) {
+/* Trace the shape path at origin (0,0) */
+function tracePath(s) {
     var bt = baseType(s.type);
     if (bt === 'RECT') {
         ctx.rect(-s.w / 2, -s.h / 2, s.w, s.h);
@@ -262,9 +158,8 @@ function drawShape(s, sel) {
         ctx.shadowBlur = 14;
     }
 
-    // Shape body
     ctx.beginPath();
-    shapePathFn(s);
+    tracePath(s);
     if (out) {
         ctx.strokeStyle = fill;
         ctx.lineWidth = 2.5;
@@ -274,55 +169,52 @@ function drawShape(s, sel) {
         ctx.fill();
     }
 
-    // Selection outline
     if (sel) {
         ctx.shadowBlur = 0;
         ctx.beginPath();
-        shapePathFn(s);
+        tracePath(s);
         ctx.strokeStyle = '#e8ff47';
         ctx.lineWidth = 1.5;
         ctx.stroke();
     }
 
-    // Text
+    /* text with offset */
     if (s.text) {
         ctx.shadowBlur = 0;
-        var fontFamily = "'" + s.fontName + "', monospace";
-        ctx.font = 'bold ' + Math.round(s.fontSize * 0.35) + 'px ' + fontFamily;
+        var fontEntry = null;
+        for (var fi = 0; fi < fonts.length; fi++) {
+            if (fonts[fi].name === s.fontName && fonts[fi].status === 'ok') {
+                fontEntry = fonts[fi];
+                break;
+            }
+        }
+        ctx.font = 'bold 11px ' + (fontEntry ? '"' + s.fontName + '"' : 'monospace');
         ctx.fillStyle = rgba01(s.textR, s.textG, s.textB);
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        var label = s.text.length > 16 ? s.text.slice(0, 15) + '…' : s.text;
+        var label = s.text.length > 16 ? s.text.slice(0, 15) + '...' : s.text;
         ctx.fillText(label, s.textOffsetX, s.textOffsetY);
 
-        // Draw a small crosshair at text anchor when selected
+        /* offset crosshair when selected */
         if (sel && (s.textOffsetX !== 0 || s.textOffsetY !== 0)) {
-            ctx.strokeStyle = 'rgba(255,158,100,0.7)';
+            ctx.strokeStyle = 'rgba(232,255,71,.5)';
             ctx.lineWidth = 1;
-            ctx.setLineDash([2, 2]);
-            var tx = s.textOffsetX, ty = s.textOffsetY;
-            ctx.beginPath();
-            ctx.moveTo(tx - 5, ty);
-            ctx.lineTo(tx + 5, ty);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(tx, ty - 5);
-            ctx.lineTo(tx, ty + 5);
-            ctx.stroke();
-            ctx.setLineDash([]);
-            // line from center to text anchor
-            ctx.strokeStyle = 'rgba(255,158,100,0.3)';
-            ctx.lineWidth = 1;
+            ctx.setLineDash([2, 3]);
             ctx.beginPath();
             ctx.moveTo(0, 0);
-            ctx.lineTo(tx, ty);
+            ctx.lineTo(s.textOffsetX, s.textOffsetY);
             ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = 'rgba(232,255,71,.8)';
+            ctx.beginPath();
+            ctx.arc(s.textOffsetX, s.textOffsetY, 3, 0, Math.PI * 2);
+            ctx.fill();
         }
     }
 
     ctx.restore();
 
-    // ID tag above shape
+    /* id tag */
     var bt = baseType(s.type);
     var tagY = (bt === 'CIRCLE') ? p.y - s.w - 8 : p.y - s.h / 2 - 8;
     var tagX = (bt === 'CIRCLE') ? p.x - s.w : p.x - s.w / 2;
@@ -332,7 +224,7 @@ function drawShape(s, sel) {
     ctx.fillText('#' + s.id + ' ' + s.type, tagX, tagY);
 }
 
-// Mini icon for shape list
+/* mini icon for shape list */
 function drawMini(mc, s, W, H) {
     mc.clearRect(0, 0, W, H);
     mc.strokeStyle = mc.fillStyle = rgba01(s.r, s.g, s.b);
@@ -352,9 +244,9 @@ function drawMini(mc, s, W, H) {
     if (isOutline(s.type)) mc.stroke(); else mc.fill();
 }
 
-// ================================================================
-//  CANVAS EVENTS
-// ================================================================
+/* ============================================================
+   CANVAS EVENTS
+   ============================================================ */
 function evXY(e) {
     var r = cv.getBoundingClientRect();
     return {sx: e.clientX - r.left, sy: e.clientY - r.top};
@@ -386,6 +278,7 @@ cv.addEventListener('mousemove', function (e) {
 cv.addEventListener('mousedown', function (e) {
     var xy = evXY(e);
     var w = s2w(xy.sx, xy.sy);
+
     if (e.button === 1 || (e.button === 0 && e.altKey)) {
         e.preventDefault();
         panning = true;
@@ -393,6 +286,7 @@ cv.addEventListener('mousedown', function (e) {
         return;
     }
     if (e.button !== 0) return;
+
     if (placing) {
         var s = mkShape(Math.round(w.x), Math.round(w.y));
         shapes.push(s);
@@ -405,6 +299,7 @@ cv.addEventListener('mousedown', function (e) {
         draw();
         return;
     }
+
     var hit = hitTest(w.x, w.y);
     if (hit !== null) {
         selected = hit;
@@ -420,6 +315,7 @@ cv.addEventListener('mousedown', function (e) {
         draw();
     }
 });
+
 window.addEventListener('mouseup', function () {
     panning = false;
     dragging = false;
@@ -440,9 +336,9 @@ function hitTest(wx, wy) {
     return null;
 }
 
-// ================================================================
-//  SHAPE LIST
-// ================================================================
+/* ============================================================
+   SHAPE LIST
+   ============================================================ */
 function refreshList() {
     var list = document.getElementById('shapeList');
     document.getElementById('shapeCount').textContent = shapes.length;
@@ -457,17 +353,17 @@ function refreshList() {
             var item = document.createElement('div');
             item.className = 'shape-item' + (idx === selected ? ' selected' : '');
 
-            var iconWrap = document.createElement('div');
-            iconWrap.className = 'shape-icon';
+            var iw = document.createElement('div');
+            iw.className = 'shape-icon';
             var ic = document.createElement('canvas');
             ic.width = ic.height = 26;
             drawMini(ic.getContext('2d'), s, 26, 26);
-            iconWrap.appendChild(ic);
+            iw.appendChild(ic);
 
             var meta = document.createElement('div');
             meta.className = 'shape-meta';
             meta.innerHTML = '<div class="shape-type">' + s.type + '</div>' +
-                '<div class="shape-sub">(' + s.x + ', ' + s.y + ') &middot; ' + s.w + '&times;' + s.h + '</div>';
+                '<div class="shape-sub">(' + s.x + ', ' + s.y + ') &middot; ' + s.w + 'x' + s.h + '</div>';
 
             var del = document.createElement('button');
             del.className = 'shape-del';
@@ -478,7 +374,7 @@ function refreshList() {
                 removeShape(idx);
             };
 
-            item.appendChild(iconWrap);
+            item.appendChild(iw);
             item.appendChild(meta);
             item.appendChild(del);
             item.onclick = function () {
@@ -492,54 +388,87 @@ function refreshList() {
     }
 }
 
-// ================================================================
-//  PROPERTIES
-// ================================================================
-
-// Returns the font <select> options HTML
-function fontSelectOptions(current) {
-    var html = '<option value="">-- type font name --</option>';
+/* ============================================================
+   FONT MANAGER
+   ============================================================ */
+function refreshFontList() {
+    document.getElementById('fontCount').textContent = fonts.length;
+    var list = document.getElementById('fontList');
+    list.innerHTML = '';
     for (var i = 0; i < fonts.length; i++) {
-        var f = fonts[i];
-        html += '<option value="' + htmlesc(f.family) + '"' + (current === f.family ? ' selected' : '') + '>' + htmlesc(f.name) + '</option>';
-    }
-    return html;
-}
+        (function (idx) {
+            var f = fonts[idx];
+            var item = document.createElement('div');
+            item.className = 'font-item';
 
-// Detect which anchor is currently closest to the offset
-function detectAnchor(s) {
-    var hw = baseType(s.type) === 'CIRCLE' ? s.w : s.w / 2;
-    var hh = baseType(s.type) === 'CIRCLE' ? s.w : s.h / 2;
-    var p = ANCHOR_PADDING;
-    var best = null, bestDist = Infinity;
-    for (var i = 0; i < ANCHORS.length; i++) {
-        var a = ANCHORS[i];
-        var tx = a.fx * (hw - p);
-        var ty = a.fy * (hh - p);
-        var d = (s.textOffsetX - tx) * (s.textOffsetX - tx) + (s.textOffsetY - ty) * (s.textOffsetY - ty);
-        if (d < bestDist) {
-            bestDist = d;
-            best = a.id;
-        }
-    }
-    return bestDist < 100 ? best : null;
-}
+            var nm = document.createElement('div');
+            nm.className = 'font-item-name';
+            nm.innerHTML = '<div class="font-name-label">' + htmlesc(f.name) + '</div>' +
+                '<div class="font-file-label">' + htmlesc(f.file) + '</div>';
 
-function anchorOffsets(s, anchor) {
-    var hw = baseType(s.type) === 'CIRCLE' ? s.w : s.w / 2;
-    var hh = baseType(s.type) === 'CIRCLE' ? s.w : s.h / 2;
-    var p = ANCHOR_PADDING;
-    for (var i = 0; i < ANCHORS.length; i++) {
-        if (ANCHORS[i].id === anchor) {
-            return {
-                x: Math.round(ANCHORS[i].fx * (hw - p)),
-                y: Math.round(ANCHORS[i].fy * (hh - p))
+            var st = document.createElement('span');
+            st.className = 'font-status ' + (f.status === 'ok' ? 'ok' : f.status === 'loading' ? 'loading' : 'err');
+            st.textContent = f.status === 'ok' ? 'loaded' : f.status === 'loading' ? '...' : 'error';
+
+            var del = document.createElement('button');
+            del.className = 'shape-del';
+            del.textContent = 'x';
+            del.title = 'Remove font';
+            del.onclick = function () {
+                fonts.splice(idx, 1);
+                refreshFontList();
+                draw();
             };
-        }
+
+            item.appendChild(nm);
+            item.appendChild(st);
+            item.appendChild(del);
+            list.appendChild(item);
+        })(i);
     }
-    return {x: 0, y: 0};
 }
 
+document.getElementById('btnAddFont').addEventListener('click', function () {
+    var nameEl = document.getElementById('newFontName');
+    var fileEl = document.getElementById('newFontFile');
+    var name = nameEl.value.trim(), file = fileEl.value.trim();
+    if (!name || !file) return;
+
+    /* check duplicate */
+    for (var i = 0; i < fonts.length; i++) {
+        if (fonts[i].name === name) {
+            alert('Font name "' + name + '" already registered.');
+            return;
+        }
+    }
+
+    var entry = {name: name, file: file, status: 'loading'};
+    fonts.push(entry);
+    refreshFontList();
+
+    /* inject @font-face and check load */
+    var styleEl = document.createElement('style');
+    styleEl.textContent = '@font-face{font-family:"' + name + '";src:url("' + file + '");}';
+    document.head.appendChild(styleEl);
+
+    var ff = new FontFace(name, 'url("' + file + '")');
+    ff.load().then(function (loaded) {
+        document.fonts.add(loaded);
+        entry.status = 'ok';
+        refreshFontList();
+        draw();
+    }).catch(function () {
+        entry.status = 'err';
+        refreshFontList();
+    });
+
+    nameEl.value = '';
+    fileEl.value = '';
+});
+
+/* ============================================================
+   PROPERTIES PANEL
+   ============================================================ */
 function refreshProps() {
     var panel = document.getElementById('props');
     if (selected === null || !shapes[selected]) {
@@ -548,32 +477,33 @@ function refreshProps() {
     }
     var s = shapes[selected];
     var bt = baseType(s.type);
-    var isCirc = bt === 'CIRCLE';
+    var isCirc = (bt === 'CIRCLE');
 
-    var typeButtons = TYPES.map(function (t) {
-        var bt2 = baseType(t);
-        var icon = ICONS[bt2] || bt2;
-        var label = isOutline(t) ? bt2.slice(0, 3) + '_OL' : bt2.slice(0, 5);
-        return '<button class="type-btn' + (s.type === t ? ' sel' : '') + '" data-t="' + t + '">' + icon + '<br>' + label + '</button>';
+    var typeBtns = TYPES.map(function (t) {
+        var b = baseType(t);
+        var icon = ICONS[b] || b;
+        var lbl = isOutline(t) ? b.slice(0, 3) + '_OL' : b.slice(0, 5);
+        return '<button class="type-btn' + (s.type === t ? ' sel' : '') + '" data-t="' + t + '">' + icon + '<br>' + lbl + '</button>';
     }).join('');
 
     var hField = isCirc ? '' : '<div class="prop-field"><span class="prop-field-label">H</span>' +
         '<input type="number" id="ph" value="' + s.h + '" step="1" min="1"></div>';
 
-    // Anchor widget
-    var activeAnchor = detectAnchor(s);
-    var anchorCells = ANCHORS.map(function (a) {
-        var isMC = (a.id === 'MC');
-        return '<div class="anchor-cell' + (isMC ? ' center-cell' : '') + (activeAnchor === a.id ? ' active' : '') +
-            '" data-anchor="' + a.id + '" title="' + a.id + '">' + a.label + '</div>';
-    }).join('');
+    /* font select options */
+    var fontOpts = '<option value="">monospace (default)</option>';
+    for (var fi = 0; fi < fonts.length; fi++) {
+        fontOpts += '<option value="' + htmlesc(fonts[fi].name) + '"' + (s.fontName === fonts[fi].name ? ' selected' : '') + '>' +
+            htmlesc(fonts[fi].name) + (fonts[fi].status !== 'ok' ? ' (' + fonts[fi].status + ')' : '') + '</option>';
+    }
 
     panel.innerHTML =
+        /* type */
         '<div class="prop-group">' +
         '<span class="prop-label">Shape Type</span>' +
-        '<div class="type-grid">' + typeButtons + '</div>' +
+        '<div class="type-grid">' + typeBtns + '</div>' +
         '</div>' +
         '<hr class="divider">' +
+        /* position */
         '<div class="prop-group">' +
         '<span class="prop-label">Position (world units)</span>' +
         '<div class="prop-row">' +
@@ -581,6 +511,7 @@ function refreshProps() {
         '<div class="prop-field"><span class="prop-field-label">Y</span><input type="number" id="py" value="' + s.y + '" step="1"></div>' +
         '</div>' +
         '</div>' +
+        /* dimensions */
         '<div class="prop-group">' +
         '<span class="prop-label">' + (isCirc ? 'Radius' : 'Dimensions') + '</span>' +
         '<div class="prop-row">' +
@@ -588,11 +519,12 @@ function refreshProps() {
         hField +
         '</div>' +
         '</div>' +
+        /* fill color */
         '<div class="prop-group">' +
         '<span class="prop-label">Fill color (RGB 0-1)</span>' +
         '<div class="color-row">' +
         '<input type="color" id="cpick" value="' + r1hex(s.r, s.g, s.b) + '">' +
-        '<input type="text" id="chex" value="' + r1hex(s.r, s.g, s.b) + '" maxlength="7">' +
+        '<input type="text"  id="chex"  value="' + r1hex(s.r, s.g, s.b) + '" maxlength="7">' +
         '</div>' +
         '<div class="prop-row">' +
         '<div class="prop-field"><span class="prop-field-label">R</span><input type="number" id="cr" value="' + s.r.toFixed(4) + '" step="0.001" min="0" max="1"></div>' +
@@ -601,40 +533,38 @@ function refreshProps() {
         '</div>' +
         '</div>' +
         '<hr class="divider">' +
+        /* text */
         '<div class="prop-group">' +
-        '<span class="prop-label">Text</span>' +
+        '<span class="prop-label">Text (optional)</span>' +
         '<div class="prop-field" style="margin-bottom:5px">' +
         '<span class="prop-field-label">Content</span>' +
         '<input type="text" id="txt" value="' + htmlesc(s.text) + '" placeholder="Label...">' +
         '</div>' +
         '<div class="prop-row">' +
-        '<div class="prop-field"><span class="prop-field-label">Size</span><input type="number" id="tfs" value="' + s.fontSize + '" step="1" min="6"></div>' +
-        '<div class="prop-field"><span class="prop-field-label">Color</span>' +
-        '<div class="color-row" style="margin-bottom:0">' +
-        '<input type="color" id="tcpick" value="' + r1hex(s.textR, s.textG, s.textB) + '">' +
-        '<input type="text" id="tchex" value="' + r1hex(s.textR, s.textG, s.textB) + '" maxlength="7">' +
+        '<div class="prop-field"><span class="prop-field-label">Font size</span><input type="number" id="tfs" value="' + s.fontSize + '" step="1" min="6"></div>' +
+        '<div class="prop-field"><span class="prop-field-label">Font</span>' +
+        '<select id="tfn">' + fontOpts + '</select>' +
         '</div>' +
         '</div>' +
-        '</div>' +
-        '<div class="prop-field" style="margin-bottom:7px">' +
-        '<span class="prop-field-label">Font</span>' +
-        '<select id="tfsel">' + fontSelectOptions(s.fontName) + '</select>' +
-        '<input type="text" id="tfn" value="' + htmlesc(s.fontName) + '" placeholder="font-name" style="margin-top:3px">' +
-        '</div>' +
-        '</div>' +
-        '<hr class="divider">' +
-        '<div class="prop-group">' +
-        '<span class="anchor-label">Text position</span>' +
-        '<div class="anchor-widget" id="anchorWidget">' + anchorCells + '</div>' +
+        /* text offset */
+        '<span class="prop-label" style="margin-top:8px">Text offset (relative to shape center)</span>' +
         '<div class="prop-row">' +
         '<div class="prop-field"><span class="prop-field-label">Offset X</span><input type="number" id="tox" value="' + s.textOffsetX + '" step="1"></div>' +
         '<div class="prop-field"><span class="prop-field-label">Offset Y</span><input type="number" id="toy" value="' + s.textOffsetY + '" step="1"></div>' +
         '</div>' +
+        /* text color */
+        '<div class="prop-field" style="margin-top:4px">' +
+        '<span class="prop-field-label">Text color</span>' +
+        '<div class="color-row">' +
+        '<input type="color" id="tcpick" value="' + r1hex(s.textR, s.textG, s.textB) + '">' +
+        '<input type="text"  id="tchex"  value="' + r1hex(s.textR, s.textG, s.textB) + '" maxlength="7">' +
+        '</div>' +
+        '</div>' +
         '</div>';
 
-    // ── Type buttons
-    var typeBtns = panel.querySelectorAll('.type-btn');
-    for (var ti = 0; ti < typeBtns.length; ti++) {
+    /* wire type buttons */
+    var btns = panel.querySelectorAll('.type-btn');
+    for (var ti = 0; ti < btns.length; ti++) {
         (function (btn) {
             btn.addEventListener('click', function () {
                 s.type = btn.getAttribute('data-t');
@@ -642,20 +572,21 @@ function refreshProps() {
                 refreshProps();
                 draw();
             });
-        })(typeBtns[ti]);
+        })(btns[ti]);
     }
 
-    // ── Number bindings
-    function bindNum(id, key) {
+    /* num bindings */
+    function bindNum(id, key, extra) {
         var el = panel.querySelector('#' + id);
         if (!el) return;
         el.addEventListener('input', function () {
             var v = parseFloat(el.value);
             if (!isNaN(v)) {
                 s[key] = v;
-                refreshList();
-                draw();
+                if (extra) extra();
             }
+            refreshList();
+            draw();
         });
     }
 
@@ -670,20 +601,7 @@ function refreshProps() {
     bindNum('tox', 'textOffsetX');
     bindNum('toy', 'textOffsetY');
 
-    // Refresh anchor highlight when offset fields change manually
-    ['tox', 'toy'].forEach(function (id) {
-        var el = panel.querySelector('#' + id);
-        if (!el) return;
-        el.addEventListener('input', function () {
-            // Re-highlight anchor cells
-            var ac = detectAnchor(s);
-            panel.querySelectorAll('.anchor-cell').forEach(function (cell) {
-                cell.classList.toggle('active', cell.getAttribute('data-anchor') === ac);
-            });
-        });
-    });
-
-    // ── Fill color sync
+    /* fill color pickers */
     var cpick = panel.querySelector('#cpick'), chex = panel.querySelector('#chex');
     var crI = panel.querySelector('#cr'), cgI = panel.querySelector('#cg'), cbI = panel.querySelector('#cb');
 
@@ -724,36 +642,21 @@ function refreshProps() {
         });
     });
 
-    // ── Text content
+    /* text */
     var txtEl = panel.querySelector('#txt');
     txtEl.addEventListener('input', function () {
         s.text = txtEl.value;
         draw();
     });
 
-    // ── Font select + manual name input (synced)
-    var tfsel = panel.querySelector('#tfsel');
+    /* font select */
     var tfnEl = panel.querySelector('#tfn');
-    tfsel.addEventListener('change', function () {
-        if (tfsel.value) {
-            s.fontName = tfsel.value;
-            tfnEl.value = tfsel.value;
-            draw();
-        }
-    });
-    tfnEl.addEventListener('input', function () {
+    tfnEl.addEventListener('change', function () {
         s.fontName = tfnEl.value;
         draw();
-        // Keep select in sync if value matches a loaded font
-        for (var k = 0; k < tfsel.options.length; k++) {
-            if (tfsel.options[k].value === tfnEl.value) {
-                tfsel.selectedIndex = k;
-                break;
-            }
-        }
     });
 
-    // ── Text color
+    /* text color */
     var tcpick = panel.querySelector('#tcpick'), tchex = panel.querySelector('#tchex');
     tcpick.addEventListener('input', function () {
         tchex.value = tcpick.value;
@@ -775,30 +678,11 @@ function refreshProps() {
             draw();
         }
     });
-
-    // ── Anchor widget
-    panel.querySelectorAll('.anchor-cell').forEach(function (cell) {
-        cell.addEventListener('click', function () {
-            var anchorId = cell.getAttribute('data-anchor');
-            var off = anchorOffsets(s, anchorId);
-            s.textOffsetX = off.x;
-            s.textOffsetY = off.y;
-            // update inputs
-            var toxEl = panel.querySelector('#tox'), toyEl = panel.querySelector('#toy');
-            if (toxEl) toxEl.value = off.x;
-            if (toyEl) toyEl.value = off.y;
-            // update active class
-            panel.querySelectorAll('.anchor-cell').forEach(function (c) {
-                c.classList.toggle('active', c.getAttribute('data-anchor') === anchorId);
-            });
-            draw();
-        });
-    });
 }
 
-// ================================================================
-//  ACTIONS
-// ================================================================
+/* ============================================================
+   ACTIONS
+   ============================================================ */
 function removeShape(i) {
     shapes.splice(i, 1);
     if (selected >= shapes.length) selected = shapes.length - 1;
@@ -832,32 +716,53 @@ document.getElementById('btnClear').addEventListener('click', function () {
     draw();
 });
 
-// ================================================================
-//  JAVA EXPORT
-// ================================================================
+/* ============================================================
+   LEFT TABS
+   ============================================================ */
+document.querySelectorAll('.tab-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+        document.querySelectorAll('.tab-btn').forEach(function (b) {
+            b.classList.remove('active');
+        });
+        document.querySelectorAll('.tab-pane').forEach(function (p) {
+            p.classList.remove('active');
+        });
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+});
+
+/* ============================================================
+   EXPORT TABS
+   ============================================================ */
+document.querySelectorAll('.export-tab').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+        document.querySelectorAll('.export-tab').forEach(function (b) {
+            b.classList.remove('active');
+        });
+        document.querySelectorAll('.export-pane').forEach(function (p) {
+            p.classList.remove('active');
+        });
+        btn.classList.add('active');
+        document.getElementById('epane-' + btn.dataset.etab).classList.add('active');
+    });
+});
+
+/* ============================================================
+   JAVA EXPORT
+   ============================================================ */
 function genJava() {
     if (!shapes.length) return '<span class="cm">// No shapes to export.</span>';
-
-    var hasOffset = shapes.some(function (s) {
-        return s.textOffsetX !== 0 || s.textOffsetY !== 0;
-    });
-
     var L = [];
     L.push('<span class="cm">// Generated by ShapeModel Editor</span>');
-    if (hasOffset) {
-        L.push('<span class="cm">// NOTE: textOffsetX / textOffsetY require adding these public fields</span>');
-        L.push('<span class="cm">//   to Shape.java:  public double textOffsetX = 0, textOffsetY = 0;</span>');
-        L.push('');
-    }
     L.push('<span class="kw">public</span> <span class="cl">ShapeModel</span> <span class="fn">buildShapeModel</span>() {');
     L.push('    <span class="cl">ShapeModel</span> model = <span class="kw">new</span> <span class="cl">ShapeModel</span>();');
     L.push('    <span class="cl">Shape</span> s;');
     L.push('');
 
     for (var i = 0; i < shapes.length; i++) {
-        var s = shapes[i];
-        var bt = baseType(s.type);
-        var dim = bt === 'CIRCLE'
+        var s = shapes[i], bt = baseType(s.type);
+        var dim = (bt === 'CIRCLE')
             ? '<span class="kw">new</span> <span class="cl">Vector2d</span>(<span class="nm">' + s.w + '</span>, <span class="nm">' + s.w + '</span>)'
             : '<span class="kw">new</span> <span class="cl">Vector2d</span>(<span class="nm">' + s.w + '</span>, <span class="nm">' + s.h + '</span>)';
 
@@ -877,26 +782,152 @@ function genJava() {
             L.push('        <span class="st">"' + jesc(s.fontName) + '"</span>');
             L.push('    );');
         }
-
         if (s.textOffsetX !== 0 || s.textOffsetY !== 0) {
-            L.push('    s.textOffsetX = <span class="nm">' + s.textOffsetX.toFixed(1) + '</span>;');
-            L.push('    s.textOffsetY = <span class="nm">' + s.textOffsetY.toFixed(1) + '</span>;');
+            L.push('    s.setTextOffset(<span class="nm">' + s.textOffsetX + '</span>, <span class="nm">' + s.textOffsetY + '</span>);');
         }
 
         L.push('    model.addShape(s);');
         if (i < shapes.length - 1) L.push('');
     }
-
     L.push('');
     L.push('    <span class="kw">return</span> model;');
     L.push('}');
     return L.join('\n');
 }
 
+/* ============================================================
+   JSON EXPORT
+   ============================================================ */
+function buildJsonObj() {
+    return {
+        shapes: shapes.map(function (s) {
+            var bt = baseType(s.type);
+            var obj = {
+                type: s.type,
+                position: {x: s.x, y: s.y},
+                dimensions: bt === 'CIRCLE' ? {x: s.w, y: s.w} : {x: s.w, y: s.h},
+                color: {r: parseFloat(s.r.toFixed(4)), g: parseFloat(s.g.toFixed(4)), b: parseFloat(s.b.toFixed(4))}
+            };
+            if (s.text) {
+                obj.text = {
+                    content: s.text,
+                    fontSize: s.fontSize,
+                    color: {
+                        r: parseFloat(s.textR.toFixed(4)),
+                        g: parseFloat(s.textG.toFixed(4)),
+                        b: parseFloat(s.textB.toFixed(4))
+                    },
+                    offset: {x: s.textOffsetX, y: s.textOffsetY},
+                    fontName: s.fontName
+                };
+            }
+            return obj;
+        })
+    };
+}
+
+function syntaxJsonHtml(obj) {
+    var raw = JSON.stringify(obj, null, 2);
+    /* minimal syntax coloring */
+    raw = raw
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"([^"]+)"(\s*:)/g, '<span class="jk">"$1"</span>$2')
+        .replace(/:\s*"([^"]*)"/g, ': <span class="js">"$1"</span>')
+        .replace(/:\s*(-?\d+(\.\d+)?)/g, function (m, n) {
+            return ': <span class="jv">' + n + '</span>';
+        });
+    return raw;
+}
+
+/* ============================================================
+   JAVA LOADER CODE (static, shown in 3rd tab)
+   ============================================================ */
+function genLoader() {
+    var L = [];
+    L.push('<span class="cm">// Add this method to ShapeModel.java</span>');
+    L.push('<span class="cm">// Requires: com.google.gson (Gson) or org.json</span>');
+    L.push('<span class="cm">// Shown here with Gson (add to build.gradle: implementation \'com.google.code.gson:gson:2.10.1\')</span>');
+    L.push('');
+    L.push('<span class="kw">import</span> com.google.gson.<span class="cl">JsonArray</span>;');
+    L.push('<span class="kw">import</span> com.google.gson.<span class="cl">JsonElement</span>;');
+    L.push('<span class="kw">import</span> com.google.gson.<span class="cl">JsonObject</span>;');
+    L.push('<span class="kw">import</span> com.google.gson.<span class="cl">JsonParser</span>;');
+    L.push('<span class="kw">import</span> org.joml.<span class="cl">Vector2d</span>;');
+    L.push('<span class="kw">import</span> org.joml.<span class="cl">Vector3d</span>;');
+    L.push('');
+    L.push('<span class="cm">/**');
+    L.push(' * Loads a ShapeModel from a JSON string exported by the ShapeModel Editor.');
+    L.push(' * @param json  Raw JSON string');
+    L.push(' * @return      Populated ShapeModel');
+    L.push(' */</span>');
+    L.push('<span class="kw">public static</span> <span class="cl">ShapeModel</span> <span class="fn">fromJson</span>(<span class="cl">String</span> json) {');
+    L.push('    <span class="cl">ShapeModel</span> model = <span class="kw">new</span> <span class="cl">ShapeModel</span>();');
+    L.push('    <span class="cl">JsonObject</span> root    = <span class="cl">JsonParser</span>.<span class="fn">parseString</span>(json).<span class="fn">getAsJsonObject</span>();');
+    L.push('    <span class="cl">JsonArray</span>  arr     = root.<span class="fn">getAsJsonArray</span>(<span class="st">"shapes"</span>);');
+    L.push('');
+    L.push('    <span class="kw">for</span> (<span class="cl">JsonElement</span> el : arr) {');
+    L.push('        <span class="cl">JsonObject</span> jo = el.<span class="fn">getAsJsonObject</span>();');
+    L.push('');
+    L.push('        <span class="cl">Shape.ShapeType</span> type = <span class="cl">Shape.ShapeType</span>.<span class="fn">valueOf</span>(jo.<span class="fn">get</span>(<span class="st">"type"</span>).<span class="fn">getAsString</span>());');
+    L.push('');
+    L.push('        <span class="cl">JsonObject</span> pos = jo.<span class="fn">getAsJsonObject</span>(<span class="st">"position"</span>);');
+    L.push('        <span class="cl">JsonObject</span> dim = jo.<span class="fn">getAsJsonObject</span>(<span class="st">"dimensions"</span>);');
+    L.push('        <span class="cl">JsonObject</span> col = jo.<span class="fn">getAsJsonObject</span>(<span class="st">"color"</span>);');
+    L.push('');
+    L.push('        <span class="cl">Shape</span> s = <span class="kw">new</span> <span class="cl">Shape</span>(');
+    L.push('            <span class="kw">new</span> <span class="cl">Vector2d</span>(pos.<span class="fn">get</span>(<span class="st">"x"</span>).<span class="fn">getAsDouble</span>(), pos.<span class="fn">get</span>(<span class="st">"y"</span>).<span class="fn">getAsDouble</span>()),');
+    L.push('            <span class="kw">new</span> <span class="cl">Vector2d</span>(dim.<span class="fn">get</span>(<span class="st">"x"</span>).<span class="fn">getAsDouble</span>(), dim.<span class="fn">get</span>(<span class="st">"y"</span>).<span class="fn">getAsDouble</span>()),');
+    L.push('            type');
+    L.push('        );');
+    L.push('        s.<span class="fn">setColor</span>(');
+    L.push('            col.<span class="fn">get</span>(<span class="st">"r"</span>).<span class="fn">getAsFloat</span>(),');
+    L.push('            col.<span class="fn">get</span>(<span class="st">"g"</span>).<span class="fn">getAsFloat</span>(),');
+    L.push('            col.<span class="fn">get</span>(<span class="st">"b"</span>).<span class="fn">getAsFloat</span>()');
+    L.push('        );');
+    L.push('');
+    L.push('        <span class="kw">if</span> (jo.<span class="fn">has</span>(<span class="st">"text"</span>)) {');
+    L.push('            <span class="cl">JsonObject</span> txt    = jo.<span class="fn">getAsJsonObject</span>(<span class="st">"text"</span>);');
+    L.push('            <span class="cl">JsonObject</span> tcol   = txt.<span class="fn">getAsJsonObject</span>(<span class="st">"color"</span>);');
+    L.push('            <span class="cl">JsonObject</span> offset = txt.<span class="fn">getAsJsonObject</span>(<span class="st">"offset"</span>);');
+    L.push('            s.<span class="fn">setText</span>(');
+    L.push('                txt.<span class="fn">get</span>(<span class="st">"content"</span>).<span class="fn">getAsString</span>(),');
+    L.push('                txt.<span class="fn">get</span>(<span class="st">"fontSize"</span>).<span class="fn">getAsFloat</span>(),');
+    L.push('                <span class="kw">new</span> <span class="cl">Vector3d</span>(tcol.<span class="fn">get</span>(<span class="st">"r"</span>).<span class="fn">getAsDouble</span>(), tcol.<span class="fn">get</span>(<span class="st">"g"</span>).<span class="fn">getAsDouble</span>(), tcol.<span class="fn">get</span>(<span class="st">"b"</span>).<span class="fn">getAsDouble</span>()),');
+    L.push('                txt.<span class="fn">get</span>(<span class="st">"fontName"</span>).<span class="fn">getAsString</span>()');
+    L.push('            );');
+    L.push('            <span class="kw">double</span> ox = offset.<span class="fn">get</span>(<span class="st">"x"</span>).<span class="fn">getAsDouble</span>();');
+    L.push('            <span class="kw">double</span> oy = offset.<span class="fn">get</span>(<span class="st">"y"</span>).<span class="fn">getAsDouble</span>();');
+    L.push('            <span class="kw">if</span> (ox != <span class="nm">0</span> || oy != <span class="nm">0</span>) s.<span class="fn">setTextOffset</span>(ox, oy);');
+    L.push('        }');
+    L.push('');
+    L.push('        model.<span class="fn">addShape</span>(s);');
+    L.push('    }');
+    L.push('');
+    L.push('    <span class="kw">return</span> model;');
+    L.push('}');
+    L.push('');
+    L.push('<span class="cm">// Convenience: load from a file on the classpath</span>');
+    L.push('<span class="kw">public static</span> <span class="cl">ShapeModel</span> <span class="fn">fromJsonFile</span>(<span class="cl">String</span> resourcePath) <span class="kw">throws</span> <span class="cl">Exception</span> {');
+    L.push('    <span class="kw">try</span> (<span class="cl">InputStream</span> is = <span class="cl">ShapeModel</span>.<span class="kw">class</span>.<span class="fn">getResourceAsStream</span>(resourcePath)) {');
+    L.push('        <span class="kw">assert</span> is != <span class="kw">null</span>;');
+    L.push('        <span class="kw">return</span> <span class="fn">fromJson</span>(<span class="kw">new</span> <span class="cl">String</span>(is.<span class="fn">readAllBytes</span>(), java.nio.charset.<span class="cl">StandardCharsets</span>.UTF_8));');
+    L.push('    }');
+    L.push('}');
+    return L.join('\n');
+}
+
+/* ============================================================
+   MODAL WIRING
+   ============================================================ */
 document.getElementById('btnExport').addEventListener('click', function () {
-    document.getElementById('exportCode').innerHTML = genJava();
+    /* refresh all panes */
+    document.getElementById('exportJava').innerHTML = genJava();
+    var jsonObj = buildJsonObj();
+    document.getElementById('exportJson').innerHTML = syntaxJsonHtml(jsonObj);
+    document.getElementById('exportLoader').innerHTML = genLoader();
     document.getElementById('exportModal').classList.add('open');
 });
+
 document.getElementById('btnModalClose').addEventListener('click', function () {
     document.getElementById('exportModal').classList.remove('open');
 });
@@ -907,8 +938,11 @@ document.getElementById('exportModal').addEventListener('click', function (e) {
     if (e.target === document.getElementById('exportModal'))
         document.getElementById('exportModal').classList.remove('open');
 });
+
 document.getElementById('btnCopy').addEventListener('click', function () {
-    var code = document.getElementById('exportCode').innerText;
+    /* copy whichever pane is active */
+    var active = document.querySelector('.export-pane.active .modal-code');
+    var code = active ? active.innerText : '';
     navigator.clipboard.writeText(code).then(function () {
         var b = document.getElementById('btnCopy');
         b.textContent = 'Copied!';
@@ -918,9 +952,9 @@ document.getElementById('btnCopy').addEventListener('click', function () {
     });
 });
 
-// ================================================================
-//  KEYBOARD
-// ================================================================
+/* ============================================================
+   KEYBOARD
+   ============================================================ */
 window.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {
         placing = false;
@@ -947,9 +981,9 @@ window.addEventListener('keydown', function (e) {
     }
 });
 
-// ================================================================
-//  UTILS
-// ================================================================
+/* ============================================================
+   UTILS
+   ============================================================ */
 function r1hex(r, g, b) {
     function h(v) {
         return Math.round(v * 255).toString(16).padStart(2, '0');
@@ -977,5 +1011,7 @@ function htmlesc(s) {
     return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 }
 
-// Init
+/* ============================================================
+   INIT
+   ============================================================ */
 resize();

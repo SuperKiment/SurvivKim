@@ -12,6 +12,7 @@ public class Shape {
     public Vector3d color = new Vector3d(1f, 0f, 0f);
     public Vector2d position;
     public ShapeType shapeType = ShapeType.CIRCLE;
+    public Vector2d textOffset = new Vector2d(0, 0);
 
     public Vector2d dimensions = null;
     public final int segments = 10;
@@ -67,6 +68,10 @@ public class Shape {
 
     public void setFont(String fontName) {
         this.fontName = fontName;
+    }
+
+    public void setTextOffset(double x, double y) {
+        this.textOffset = new Vector2d(x, y);
     }
 
     public boolean hasText() {
