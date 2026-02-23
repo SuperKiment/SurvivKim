@@ -61,32 +61,34 @@ public class ShapeModel {
      */
     public static ShapeModel fromJson(String json) {
         ShapeModel model = new ShapeModel();
-        JsonObject root = JsonParser.parseString(json).getAsJsonObject();
-        JsonArray arr = root.getAsJsonArray("shapes");
+        JsonArray arr = JsonParser.parseString(json)
+                .getAsJsonObject()
+                .getAsJsonArray("shapes");
 
         for (JsonElement el : arr) {
             JsonObject jo = el.getAsJsonObject();
-
-            Shape.ShapeType type = Shape.ShapeType.valueOf(
-                    jo.get("type").getAsString());
-
             JsonObject pos = jo.getAsJsonObject("position");
             JsonObject dim = jo.getAsJsonObject("dimensions");
             JsonObject col = jo.getAsJsonObject("color");
 
             Shape s = new Shape(
-                    new Vector2d(pos.get("x").getAsDouble(),
-                            pos.get("y").getAsDouble()),
-                    new Vector2d(dim.get("x").getAsDouble(),
-                            dim.get("y").getAsDouble()),
-                    type
+                    new Vector2d(pos.get("x").getAsDouble(), pos.get("y").getAsDouble()),
+                    new Vector2d(dim.get("x").getAsDouble(), dim.get("y").getAsDouble()),
+                    Shape.ShapeType.valueOf(jo.get("type").getAsString())
             );
+
             s.setColor(
                     col.get("r").getAsFloat(),
                     col.get("g").getAsFloat(),
                     col.get("b").getAsFloat()
             );
 
+            // Nom optionnel
+            if (jo.has("name") && !jo.get("name").isJsonNull()) {
+                s.setName(jo.get("name").getAsString());
+            }
+
+            // Texte optionnel
             if (jo.has("text")) {
                 JsonObject txt = jo.getAsJsonObject("text");
                 JsonObject tcol = txt.getAsJsonObject("color");
@@ -95,9 +97,11 @@ public class ShapeModel {
                 s.setText(
                         txt.get("content").getAsString(),
                         txt.get("fontSize").getAsFloat(),
-                        new Vector3d(tcol.get("r").getAsDouble(),
+                        new Vector3d(
+                                tcol.get("r").getAsDouble(),
                                 tcol.get("g").getAsDouble(),
-                                tcol.get("b").getAsDouble()),
+                                tcol.get("b").getAsDouble()
+                        ),
                         txt.get("fontName").getAsString()
                 );
 
@@ -132,5 +136,26 @@ public class ShapeModel {
             }
             return fromJson(new String(is.readAllBytes(), StandardCharsets.UTF_8));
         }
+    }
+
+    public boolean isPointInShape(Vector2d point) {
+        for (Shape shape : shapes) {
+            if (shape.isPointInShape(point)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Retourne la première shape dont le nom correspond exactement.
+     * Utile pour animer ou modifier une shape depuis le code de jeu.
+     *
+     * @param name Nom défini dans l'éditeur
+     * @return La Shape correspondante, ou {@code null} si introuvable
+     */
+    public Shape getShapeByName(String name) {
+        for (Shape s : shapes) {
+            if (name.equals(s.name)) return s;
+        }
+        return null;
     }
 }

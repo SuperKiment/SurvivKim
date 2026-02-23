@@ -5,11 +5,13 @@
     --bg: #0e0f11;
     --surface: #16181c;
     --surface2: #1e2026;
+    --surface3: #252830;
     --border: #2a2d35;
     --accent: #e8ff47;
     --accent2: #47c4ff;
-    --accent3: #ff9e64;
     --danger: #ff4f4f;
+    --green: #9ece6a;
+    --orange: #ff9e64;
     --text: #c8cad0;
     --text-dim: #5a6070;
     --text-bright: #eef0f5;
@@ -84,6 +86,7 @@ header {
     padding: 3px 8px;
     border: 1px solid var(--border);
     border-radius: 99px;
+    letter-spacing: .5px;
 }
 
 /* ============================================================
@@ -136,12 +139,18 @@ header {
     font-size: 10px;
 }
 
+.btn.icon {
+    padding: 4px 8px;
+    font-size: 13px;
+    line-height: 1;
+}
+
 /* ============================================================
    LAYOUT
    ============================================================ */
 .workspace {
     display: grid;
-    grid-template-columns: 220px 1fr 260px;
+    grid-template-columns: 230px 1fr 268px;
     flex: 1;
     overflow: hidden;
 }
@@ -181,7 +190,7 @@ header {
     font-style: normal;
 }
 
-/* Left panel: tabs */
+/* Left panel tabs */
 .left-tabs {
     display: flex;
     border-bottom: 1px solid var(--border);
@@ -250,13 +259,13 @@ header {
 .shape-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 7px 9px;
+    gap: 7px;
+    padding: 7px 7px 7px 4px;
     border: 1px solid var(--border);
     border-radius: var(--r);
     cursor: pointer;
     background: var(--surface2);
-    transition: border-color .1s;
+    transition: border-color .1s, background .1s;
     user-select: none;
 }
 
@@ -267,6 +276,28 @@ header {
 .shape-item.selected {
     border-color: var(--accent);
     background: rgba(232, 255, 71, .05);
+}
+
+.shape-item.drag-over {
+    border-color: var(--accent2);
+    background: rgba(71, 196, 255, .06);
+}
+
+.shape-item.dragging {
+    opacity: .4;
+}
+
+.drag-handle {
+    color: var(--text-dim);
+    font-size: 13px;
+    cursor: grab;
+    padding: 0 4px;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
 }
 
 .shape-icon {
@@ -284,30 +315,47 @@ header {
     min-width: 0;
 }
 
-.shape-type {
+.shape-name {
     color: var(--text-bright);
     font-size: 11px;
     font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .shape-sub {
     color: var(--text-dim);
     font-size: 10px;
     margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.shape-del {
+.shape-actions {
+    display: flex;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.shape-act-btn {
     background: none;
     border: none;
     color: var(--text-dim);
     cursor: pointer;
-    font-size: 15px;
+    font-size: 12px;
     line-height: 1;
-    padding: 1px 5px;
+    padding: 2px 5px;
     border-radius: 3px;
+    transition: color .1s;
 }
 
-.shape-del:hover {
+.shape-act-btn:hover {
+    color: var(--text-bright);
+}
+
+.shape-act-btn.del:hover {
     color: var(--danger);
 }
 
@@ -324,6 +372,20 @@ header {
 /* ============================================================
    FONT MANAGER
    ============================================================ */
+.font-hint {
+    font-size: 10px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    padding: 8px;
+    border: 1px dashed var(--border);
+    border-radius: var(--r);
+    margin-bottom: 8px;
+}
+
+.font-hint strong {
+    color: var(--accent2);
+}
+
 .font-list {
     display: flex;
     flex-direction: column;
@@ -368,8 +430,8 @@ header {
 }
 
 .font-status.ok {
-    color: #9ece6a;
-    border-color: #9ece6a;
+    color: var(--green);
+    border-color: var(--green);
 }
 
 .font-status.err {
@@ -378,8 +440,8 @@ header {
 }
 
 .font-status.loading {
-    color: var(--accent3);
-    border-color: var(--accent3);
+    color: var(--orange);
+    border-color: var(--orange);
 }
 
 .add-font-form {
@@ -397,20 +459,6 @@ header {
     letter-spacing: 1px;
     text-transform: uppercase;
     color: var(--text-dim);
-}
-
-.font-hint {
-    font-size: 10px;
-    color: var(--text-dim);
-    line-height: 1.6;
-    padding: 8px;
-    border: 1px dashed var(--border);
-    border-radius: var(--r);
-    margin-bottom: 8px;
-}
-
-.font-hint strong {
-    color: var(--accent2);
 }
 
 /* ============================================================
@@ -458,7 +506,7 @@ header {
 }
 
 /* ============================================================
-   PROPERTIES
+   PROPERTIES PANEL
    ============================================================ */
 .prop-group {
     margin-bottom: 14px;
@@ -491,7 +539,9 @@ header {
     color: var(--text-dim);
 }
 
-input[type="number"], input[type="text"], select {
+input[type="number"],
+input[type="text"],
+select {
     font-family: var(--mono);
     font-size: 11px;
     background: var(--bg);
@@ -504,7 +554,8 @@ input[type="number"], input[type="text"], select {
     transition: border-color .1s;
 }
 
-input:focus, select:focus {
+input:focus,
+select:focus {
     border-color: var(--accent2);
 }
 
@@ -549,11 +600,11 @@ input[type="color"] {
 }
 
 /* ============================================================
-   TYPE GRID
+   SHAPE TYPE GRID
    ============================================================ */
 .type-grid {
     display: grid;
-    grid-template-columns:1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 4px;
 }
 
@@ -583,6 +634,68 @@ input[type="color"] {
 }
 
 /* ============================================================
+   TEXT OFFSET PRESET GRID (3x3)
+   ============================================================ */
+.offset-presets {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px;
+    margin-bottom: 8px;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 5px;
+}
+
+.offset-preset-btn {
+    aspect-ratio: 1;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--bg);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color .1s, background .1s;
+    position: relative;
+}
+
+.offset-preset-btn:hover {
+    border-color: var(--accent2);
+    background: rgba(71, 196, 255, .08);
+}
+
+.offset-preset-btn.sel {
+    border-color: var(--accent);
+    background: rgba(232, 255, 71, .08);
+}
+
+/* The dot inside each preset button */
+.offset-preset-btn::after {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    transition: background .1s;
+}
+
+.offset-preset-btn:hover::after {
+    background: var(--accent2);
+}
+
+.offset-preset-btn.sel::after {
+    background: var(--accent);
+}
+
+.offset-preset-label {
+    font-size: 9px;
+    color: var(--text-dim);
+    text-align: center;
+    margin-bottom: 4px;
+}
+
+/* ============================================================
    EXPORT MODAL
    ============================================================ */
 .modal-bg {
@@ -605,7 +718,7 @@ input[type="color"] {
     border-radius: 8px;
     width: 720px;
     max-width: 94vw;
-    max-height: 82vh;
+    max-height: 84vh;
     display: flex;
     flex-direction: column;
     box-shadow: 0 30px 70px rgba(0, 0, 0, .7);
@@ -640,13 +753,11 @@ input[type="color"] {
     color: var(--text-bright);
 }
 
-/* Export tabs */
 .export-tabs {
     display: flex;
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
     padding: 0 17px;
-    gap: 0;
 }
 
 .export-tab {
@@ -712,7 +823,9 @@ input[type="color"] {
     flex-shrink: 0;
 }
 
-/* Syntax highlight */
+/* ============================================================
+   SYNTAX HIGHLIGHT
+   ============================================================ */
 .kw {
     color: #bb9af7;
 }
@@ -737,22 +850,14 @@ input[type="color"] {
     color: #73daca;
 }
 
-.op {
-    color: #89ddff;
-}
-
 .jk {
-    color: #bb9af7;
+    color: #7aa2f7;
 }
 
-/* json key   */
 .jv {
     color: #ff9e64;
 }
 
-/* json value */
 .js {
     color: #9ece6a;
 }
-
-/* json string */

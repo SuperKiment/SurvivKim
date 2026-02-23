@@ -42,12 +42,10 @@ public class UIElement {
     }
 
     public boolean isClicked(float x, float y) {
-        if (!isClickable) return false;
+        Vector2d point = new Vector2d(x, y);
+        point.sub(pos);
 
-        Vector2d topLeft = new Vector2d(pos.x - dim.x / 2, pos.y - dim.y / 2);
-        Vector2d bottomRight = new Vector2d(pos.x + dim.x / 2, pos.y + dim.y / 2);
-
-        return (x > topLeft.x && x < bottomRight.x && y > topLeft.y && y < bottomRight.y);
+        return isClickable && shapeModel.isPointInShape(point);
     }
 
     public void onClick() {
