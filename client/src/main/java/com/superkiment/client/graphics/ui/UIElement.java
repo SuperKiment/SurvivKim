@@ -31,6 +31,16 @@ public class UIElement {
         this.children = new ArrayList<>();
     }
 
+    /**
+     *
+     * @param pos
+     * @param z   doit être positif
+     */
+    public UIElement(Vector2d pos, int z, ShapeModel shapeModel) {
+        this(pos, z);
+        this.shapeModel = shapeModel;
+    }
+
     public boolean isClicked(float x, float y) {
         if (!isClickable) return false;
 
