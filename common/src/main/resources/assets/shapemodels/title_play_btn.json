@@ -28,7 +28,9 @@
           "y": 0
         },
         "fontName": "minecraft"
-      }
+      },
+      "name": "RECT 1"
     }
-  ]
+  ],
+  "version": 2
 }

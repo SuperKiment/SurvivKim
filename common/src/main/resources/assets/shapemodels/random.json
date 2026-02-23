@@ -1,6 +1,7 @@
 {
   "shapes": [
     {
+      "name": "Shape 2",
       "type": "RECT",
       "position": {
         "x": 0,
@@ -31,6 +32,7 @@
       }
     },
     {
+      "name": "Shape 3",
       "type": "RECT",
       "position": {
         "x": 65,
@@ -45,6 +47,24 @@
         "g": 0,
         "b": 0
       }
+    },
+    {
+      "name": "Shape 4",
+      "type": "RECT",
+      "position": {
+        "x": -254,
+        "y": 31
+      },
+      "dimensions": {
+        "x": 80,
+        "y": 50
+      },
+      "color": {
+        "r": 1,
+        "g": 0,
+        "b": 0
+      }
     }
-  ]
+  ],
+  "version": 2
 }
