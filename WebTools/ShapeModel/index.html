@@ -4,40 +4,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShapeModel Editor</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="shapemodel-editor.css">
 </head>
 <body>
 
-<!-- ============================================================
+<!-- ═══════════════════════════════════════════════════════════
      HEADER
-     ============================================================ -->
+     ═══════════════════════════════════════════════════════════ -->
 <header>
     <div class="logo">SM<small>/ ShapeModel Editor</small></div>
+
     <div class="toolbar">
         <button class="btn" id="btnAdd">+ Add Shape</button>
-        <button class="btn danger" id="btnClear">Clear</button>
+        <button class="btn ghost-danger" id="btnClear">Clear</button>
     </div>
+
+    <div class="toolbar-sep"></div>
+
+    <div class="toolbar">
+        <button class="btn" id="btnImportJson" title="Paste JSON to import">Import JSON</button>
+        <button class="btn secondary" id="btnSave" title="Save (Ctrl+S)">Save</button>
+        <button class="btn" id="btnSaveAs" title="Save as new workspace file">Save As…</button>
+    </div>
+
     <div class="hdr-right">
+        <!-- Upgrade banner (shown when outdated files are found) -->
+        <div id="upgradeBanner" style="display:none;align-items:center;gap:7px;
+         padding:3px 10px;border:1px solid var(--accent3);border-radius:var(--r);
+         background:rgba(255,158,100,.08);">
+            <span id="upgradeBannerLabel" style="font-size:10px;color:var(--accent3)"></span>
+            <button class="btn xs" id="btnUpgradeAll"
+                    style="border-color:var(--accent3);color:var(--accent3);">
+                Upgrade all
+            </button>
+        </div>
+
+        <span id="currentFileBadge" class="mode-badge"
+              style="display:none;color:var(--green);border-color:var(--green)"></span>
         <span class="mode-badge" id="modeBadge">SELECT</span>
         <button class="btn primary" id="btnExport">Export ↗</button>
     </div>
 </header>
 
-<!-- ============================================================
-     WORKSPACE
-     ============================================================ -->
-<div class="workspace">
+<!-- ═══════════════════════════════════════════════════════════
+     WORKSPACE  (left panel | handle | canvas | handle | right panel)
+     ═══════════════════════════════════════════════════════════ -->
+<div id="workspaceLayout" style="display:flex;flex:1;overflow:hidden;">
 
-    <!-- LEFT: shapes + fonts tabs -->
-    <div class="panel">
+    <!-- ── LEFT PANEL ── -->
+    <div class="panel" id="panelLeft">
         <div class="left-tabs">
             <button class="tab-btn active" data-tab="shapes">Shapes</button>
             <button class="tab-btn" data-tab="fonts">Fonts</button>
+            <!-- shown only when server is online -->
+            <button class="tab-btn" id="tabBtnFiles" data-tab="files" style="display:none">Files</button>
         </div>
 
-        <!-- SHAPES TAB -->
+        <!-- ── SHAPES TAB ── -->
         <div class="tab-pane active" id="tab-shapes">
             <div class="panel-hdr">Shapes <em id="shapeCount">0</em></div>
+
+            <div class="multi-toolbar" id="multiToolbar">
+                <span class="multi-toolbar-label" id="multiLabel">0 selected</span>
+                <button class="btn xs secondary" id="multiBtnDup">⎘ Dup</button>
+                <button class="btn xs danger-outline" id="multiBtnDel">× Del</button>
+            </div>
+
             <div class="panel-body">
                 <div class="shape-list" id="shapeList">
                     <div class="empty-state">No shapes yet.<br>Click "+ Add Shape"<br>to begin.</div>
@@ -45,64 +77,108 @@
             </div>
         </div>
 
-        <!-- FONTS TAB -->
+        <!-- ── FONTS TAB ── -->
         <div class="tab-pane" id="tab-fonts">
             <div class="panel-hdr">Font Manager <em id="fontCount">0</em></div>
             <div class="panel-body">
-                <div class="font-hint">
-                    Place font files (<strong>.ttf/.otf/.woff</strong>) next to this HTML file,<br>
-                    then register them here by name + filename.
+
+                <!-- Auto-discovered fonts from server font paths -->
+                <div class="font-section-title">Discovered from paths</div>
+                <div id="discoveredFonts">
+                    <!-- populated by JS when server is online -->
+                    <div class="font-hint" style="margin-bottom:0">
+                        Start the server (<strong>npm start</strong>) to auto-discover
+                        fonts from configured <strong>FONT_PATHS</strong>.
+                    </div>
                 </div>
+
+                <div class="font-section-title" style="margin-top:12px">Registered fonts</div>
                 <div class="font-list" id="fontList"></div>
+
                 <div class="add-font-form">
-                    <span class="add-font-form-title">Register font</span>
+                    <span class="add-font-form-title">Register manually</span>
                     <div class="prop-field">
                         <span class="prop-field-label">Font name (used in Java)</span>
                         <input type="text" id="newFontName" placeholder="e.g. minecraft">
                     </div>
                     <div class="prop-field">
-                        <span class="prop-field-label">Filename (relative to HTML)</span>
+                        <span class="prop-field-label">File path or URL</span>
                         <input type="text" id="newFontFile" placeholder="e.g. minecraft.ttf">
                     </div>
-                    <button class="btn sm active" id="btnAddFont">Load Font</button>
+                    <button class="btn sm secondary" id="btnAddFont">Load Font</button>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- CENTER: canvas -->
+        <!-- ── FILES TAB ── -->
+        <div class="tab-pane" id="tab-files">
+            <div class="panel-hdr">
+                Workspace Files
+                <button class="btn xs" id="btnRefreshFiles" onclick="refreshWorkspaceTab()"
+                        title="Refresh file list">↺
+                </button>
+            </div>
+            <div class="panel-body">
+                <div id="wsFileList">
+                    <div style="color:var(--text-dim);font-size:11px;padding:8px">Loading…</div>
+                </div>
+
+                <!-- Quick save from the Files tab -->
+                <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:12px;
+                    display:flex;flex-direction:column;gap:7px;">
+                    <span class="font-section-title" style="margin:0">Save here</span>
+                    <select id="saveWsSelect" style="width:100%"></select>
+                    <div style="display:flex;gap:5px;">
+                        <input type="text" id="saveFilename" placeholder="filename" style="flex:1">
+                        <button class="btn sm primary" id="btnSaveFromFiles">Save</button>
+                    </div>
+                    <div class="feedback-error" id="saveFeedbackFiles"></div>
+                </div>
+            </div>
+        </div>
+    </div><!-- /panelLeft -->
+
+    <!-- ── RESIZE HANDLE (left) ── -->
+    <div class="resize-handle" id="handleLeft"></div>
+
+    <!-- ── CANVAS ── -->
     <div class="canvas-area" id="canvasArea">
         <canvas id="canvas"></canvas>
-        <div class="canvas-hint">Click to place · Drag to move · Alt+drag to pan · Arrows to nudge · Del to delete</div>
+        <div class="canvas-hint">
+            Click · Shift+click range · Ctrl+click toggle · Drag move · Alt+drag pan ·
+            Arrows nudge · A select all · D dup · Del remove · Ctrl+S save
+        </div>
         <div class="canvas-coords" id="coords">0, 0</div>
     </div>
 
-    <!-- RIGHT: properties -->
-    <div class="panel right">
+    <!-- ── RESIZE HANDLE (right) ── -->
+    <div class="resize-handle" id="handleRight"></div>
+
+    <!-- ── RIGHT PANEL ── -->
+    <div class="panel right" id="panelRight">
         <div class="panel-hdr">Properties</div>
         <div class="panel-body" id="props">
             <div class="no-sel">Select a shape<br>to edit its properties.</div>
         </div>
     </div>
 
-</div>
+</div><!-- /workspaceLayout -->
 
-<!-- ============================================================
+
+<!-- ═══════════════════════════════════════════════════════════
      EXPORT MODAL
-     ============================================================ -->
+     ═══════════════════════════════════════════════════════════ -->
 <div class="modal-bg" id="exportModal">
-    <div class="modal">
+    <div class="modal" style="width:720px">
         <div class="modal-hdr">
             <div class="modal-title">Export ShapeModel</div>
-            <button class="modal-close" id="btnModalClose">x</button>
+            <button class="modal-close" id="btnModalClose">✕</button>
         </div>
-
         <div class="export-tabs">
             <button class="export-tab active" data-etab="java">Java</button>
             <button class="export-tab" data-etab="json">JSON</button>
             <button class="export-tab" data-etab="loader">Java JSON Loader</button>
         </div>
-
         <div class="export-pane active" id="epane-java">
             <div class="modal-code" id="exportJava"></div>
         </div>
@@ -112,13 +188,80 @@
         <div class="export-pane" id="epane-loader">
             <div class="modal-code" id="exportLoader"></div>
         </div>
-
         <div class="modal-foot">
             <button class="btn" id="btnCopy">Copy to clipboard</button>
             <button class="btn primary" id="btnModalDone">Done</button>
         </div>
     </div>
 </div>
-<script src="scripts.js"></script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     IMPORT JSON MODAL
+     ═══════════════════════════════════════════════════════════ -->
+<div class="modal-bg" id="importModal">
+    <div class="modal" style="width:540px">
+        <div class="modal-hdr">
+            <div class="modal-title">Import JSON</div>
+            <button class="modal-close" id="btnImportModalClose">✕</button>
+        </div>
+        <div class="modal-body">
+            <span class="prop-label">Paste ShapeModel JSON</span>
+            <textarea class="import-textarea" id="importTextarea"
+                      placeholder='{ "version": 2, "shapes": [ ... ] }'></textarea>
+            <div class="feedback-error" id="importError"></div>
+        </div>
+        <div class="modal-foot">
+            <button class="btn" id="btnImportCancel">Cancel</button>
+            <button class="btn primary" id="btnImportConfirm">Load</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SAVE AS MODAL
+     ═══════════════════════════════════════════════════════════ -->
+<div class="modal-bg" id="saveModal">
+    <div class="modal" style="width:400px">
+        <div class="modal-hdr">
+            <div class="modal-title">Save to Workspace</div>
+            <button class="modal-close" id="btnSaveModalClose">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="prop-field">
+                <span class="prop-field-label">Workspace</span>
+                <select id="saveWsSelectModal"></select>
+            </div>
+            <div class="prop-field">
+                <span class="prop-field-label">Filename</span>
+                <input type="text" id="saveFilenameModal" placeholder="model-name">
+            </div>
+            <div class="feedback-error" id="saveFeedback"></div>
+        </div>
+        <div class="modal-foot">
+            <button class="btn" id="btnSaveCancel">Cancel</button>
+            <button class="btn primary" id="btnSaveConfirm">Save</button>
+        </div>
+    </div>
+</div>
+
+<script src="shapemodel-editor.js"></script>
+
+<script>
+    // Quick-save button in the Files tab sidebar
+    document.getElementById('btnSaveFromFiles').addEventListener('click', () => {
+        const wsId = document.getElementById('saveWsSelect').value;
+        const nameRaw = document.getElementById('saveFilename').value.trim();
+        const fb = document.getElementById('saveFeedbackFiles');
+        if (!nameRaw) {
+            fb.textContent = 'Enter a filename.';
+            return;
+        }
+        const filename = nameRaw.endsWith('.json') ? nameRaw : nameRaw + '.json';
+        fb.textContent = '';
+        doSave(wsId, filename).catch(e => {
+            fb.textContent = 'Error: ' + e.message;
+        });
+    });
+</script>
 </body>
 </html>

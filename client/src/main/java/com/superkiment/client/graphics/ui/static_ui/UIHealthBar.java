@@ -1,4 +1,4 @@
-package com.superkiment.client.graphics.ui.elements;
+package com.superkiment.client.graphics.ui.static_ui;
 
 import com.superkiment.client.Main;
 import com.superkiment.client.graphics.ui.UIElement;

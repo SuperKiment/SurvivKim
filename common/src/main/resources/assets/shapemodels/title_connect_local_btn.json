@@ -1,0 +1,240 @@
+{
+  "version": 2,
+  "shapes": [
+    {
+      "name": "Shape 19",
+      "type": "RECT",
+      "position": {
+        "x": 300,
+        "y": 133
+      },
+      "dimensions": {
+        "x": 500,
+        "y": 50
+      },
+      "color": {
+        "r": 0.902,
+        "g": 0.6235,
+        "b": 0.502
+      },
+      "text": {
+        "content": "queue",
+        "fontSize": 32,
+        "color": {
+          "r": 0,
+          "g": 0,
+          "b": 0
+        },
+        "offset": {
+          "x": 0,
+          "y": 0
+        },
+        "fontName": "minecraft"
+      }
+    },
+    {
+      "name": "Shape 13",
+      "type": "CIRCLE",
+      "position": {
+        "x": -6,
+        "y": 22
+      },
+      "dimensions": {
+        "x": 151,
+        "y": 151
+      },
+      "color": {
+        "r": 0.4667,
+        "g": 0.4627,
+        "b": 0.4824
+      }
+    },
+    {
+      "name": "Shape 14",
+      "type": "CIRCLE",
+      "position": {
+        "x": -38,
+        "y": -41
+      },
+      "dimensions": {
+        "x": 20,
+        "y": 20
+      },
+      "color": {
+        "r": 0,
+        "g": 0,
+        "b": 0
+      }
+    },
+    {
+      "name": "Shape 15",
+      "type": "CIRCLE",
+      "position": {
+        "x": 22,
+        "y": -41
+      },
+      "dimensions": {
+        "x": 20,
+        "y": 20
+      },
+      "color": {
+        "r": 0,
+        "g": 0,
+        "b": 0
+      }
+    },
+    {
+      "name": "Shape 16",
+      "type": "TRIANGLE",
+      "position": {
+        "x": -10,
+        "y": 14
+      },
+      "dimensions": {
+        "x": 41,
+        "y": -30
+      },
+      "color": {
+        "r": 0.902,
+        "g": 0.3176,
+        "b": 0.4941
+      }
+    },
+    {
+      "name": "Shape 17",
+      "type": "RECT",
+      "position": {
+        "x": 178,
+        "y": -5
+      },
+      "dimensions": {
+        "x": 300,
+        "y": 3
+      },
+      "color": {
+        "r": 0.9647,
+        "g": 0.9608,
+        "b": 0.9569
+      }
+    },
+    {
+      "name": "Shape 17 copy",
+      "type": "RECT",
+      "position": {
+        "x": 179,
+        "y": 9
+      },
+      "dimensions": {
+        "x": 300,
+        "y": 3
+      },
+      "color": {
+        "r": 0.9647,
+        "g": 0.9608,
+        "b": 0.9569
+      }
+    },
+    {
+      "name": "Shape 17 copy copy",
+      "type": "RECT",
+      "position": {
+        "x": 199,
+        "y": -21
+      },
+      "dimensions": {
+        "x": 300,
+        "y": 3
+      },
+      "color": {
+        "r": 0.9647,
+        "g": 0.9608,
+        "b": 0.9569
+      }
+    },
+    {
+      "name": "Shape 18",
+      "type": "RECT",
+      "position": {
+        "x": -203,
+        "y": -11
+      },
+      "dimensions": {
+        "x": 300,
+        "y": 3
+      },
+      "color": {
+        "r": 1,
+        "g": 1,
+        "b": 1
+      }
+    },
+    {
+      "name": "Shape 18 copy",
+      "type": "RECT",
+      "position": {
+        "x": -204,
+        "y": 7
+      },
+      "dimensions": {
+        "x": 300,
+        "y": 3
+      },
+      "color": {
+        "r": 1,
+        "g": 1,
+        "b": 1
+      }
+    },
+    {
+      "name": "Shape 18 copy copy",
+      "type": "RECT",
+      "position": {
+        "x": -215,
+        "y": -27
+      },
+      "dimensions": {
+        "x": 300,
+        "y": 3
+      },
+      "color": {
+        "r": 1,
+        "g": 1,
+        "b": 1
+      }
+    },
+    {
+      "name": "Shape 20",
+      "type": "CIRCLE",
+      "position": {
+        "x": 127,
+        "y": -128
+      },
+      "dimensions": {
+        "x": 80,
+        "y": 80
+      },
+      "color": {
+        "r": 0.902,
+        "g": 0.6235,
+        "b": 0.502
+      }
+    },
+    {
+      "name": "Shape 21",
+      "type": "CIRCLE",
+      "position": {
+        "x": -128,
+        "y": -128
+      },
+      "dimensions": {
+        "x": 80,
+        "y": 80
+      },
+      "color": {
+        "r": 0.902,
+        "g": 0.6235,
+        "b": 0.502
+      }
+    }
+  ]
+}

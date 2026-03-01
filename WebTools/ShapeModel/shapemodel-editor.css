@@ -5,11 +5,14 @@
     --bg: #0e0f11;
     --surface: #16181c;
     --surface2: #1e2026;
+    --surface3: #252830;
     --border: #2a2d35;
     --accent: #e8ff47;
     --accent2: #47c4ff;
     --accent3: #ff9e64;
     --danger: #ff4f4f;
+    --green: #9ece6a;
+    --purple: #bb9af7;
     --text: #c8cad0;
     --text-dim: #5a6070;
     --text-bright: #eef0f5;
@@ -35,6 +38,7 @@ body {
     height: 100vh;
     overflow: hidden;
     font-size: 12px;
+    -webkit-font-smoothing: antialiased;
 }
 
 /* ============================================================
@@ -43,7 +47,7 @@ body {
 header {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
     padding: 0 16px;
     height: 44px;
     background: var(--surface);
@@ -56,6 +60,7 @@ header {
     font-weight: 700;
     font-size: 14px;
     color: var(--accent);
+    flex-shrink: 0;
 }
 
 .logo small {
@@ -65,16 +70,22 @@ header {
     margin-left: 6px;
 }
 
+.toolbar-sep {
+    width: 1px;
+    height: 22px;
+    background: var(--border);
+    flex-shrink: 0;
+}
+
 .toolbar {
     display: flex;
     gap: 5px;
-    margin-left: 6px;
 }
 
 .hdr-right {
     margin-left: auto;
     display: flex;
-    gap: 7px;
+    gap: 6px;
     align-items: center;
 }
 
@@ -84,6 +95,7 @@ header {
     padding: 3px 8px;
     border: 1px solid var(--border);
     border-radius: 99px;
+    white-space: nowrap;
 }
 
 /* ============================================================
@@ -120,15 +132,28 @@ header {
     border-color: #fff;
 }
 
-.btn.danger:hover {
+.btn.secondary {
+    border-color: var(--accent2);
+    color: var(--accent2);
+}
+
+.btn.secondary:hover {
+    background: rgba(71, 196, 255, .1);
+}
+
+.btn.ghost-danger:hover {
     border-color: var(--danger);
     color: var(--danger);
 }
 
-.btn.active {
-    border-color: var(--accent2);
-    color: var(--accent2);
-    background: rgba(71, 196, 255, .08);
+.btn.danger-outline {
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.btn.danger-outline:hover {
+    background: var(--danger);
+    color: #fff;
 }
 
 .btn.sm {
@@ -136,14 +161,50 @@ header {
     font-size: 10px;
 }
 
+.btn.xs {
+    padding: 2px 6px;
+    font-size: 10px;
+}
+
+.btn:disabled {
+    opacity: .35;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 /* ============================================================
-   LAYOUT
+   LAYOUT  — flex with resizable handles
    ============================================================ */
-.workspace {
-    display: grid;
-    grid-template-columns: 220px 1fr 260px;
+.workspace-layout {
+    display: flex;
     flex: 1;
     overflow: hidden;
+}
+
+/* Drag resize handle between panels */
+.resize-handle {
+    width: 5px;
+    flex-shrink: 0;
+    background: var(--border);
+    cursor: col-resize;
+    position: relative;
+    z-index: 10;
+    transition: background .15s;
+}
+
+/* Expand the hit-area without growing visually */
+.resize-handle::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -4px;
+    right: -4px;
+}
+
+.resize-handle:hover,
+.resize-handle.resizing {
+    background: var(--accent2);
 }
 
 /* ============================================================
@@ -155,11 +216,16 @@ header {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    flex-shrink: 0;
+    width: 230px; /* initial; overridden by JS / user */
+    min-width: 150px;
 }
 
 .panel.right {
     border-right: none;
     border-left: 1px solid var(--border);
+    width: 268px;
+    min-width: 180px;
 }
 
 .panel-hdr {
@@ -168,12 +234,13 @@ header {
     letter-spacing: 1.5px;
     text-transform: uppercase;
     color: var(--text-dim);
-    padding: 10px 13px 8px;
+    padding: 9px 12px 7px;
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
+    gap: 6px;
 }
 
 .panel-hdr em {
@@ -181,7 +248,7 @@ header {
     font-style: normal;
 }
 
-/* Left panel: tabs */
+/* Left panel tabs */
 .left-tabs {
     display: flex;
     border-bottom: 1px solid var(--border);
@@ -201,6 +268,7 @@ header {
     color: var(--text-dim);
     cursor: pointer;
     transition: color .1s, border-color .1s;
+    white-space: nowrap;
 }
 
 .tab-btn:hover {
@@ -250,13 +318,13 @@ header {
 .shape-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 7px 9px;
+    gap: 7px;
+    padding: 6px 7px 6px 4px;
     border: 1px solid var(--border);
     border-radius: var(--r);
     cursor: pointer;
     background: var(--surface2);
-    transition: border-color .1s;
+    transition: border-color .1s, background .1s;
     user-select: none;
 }
 
@@ -264,9 +332,36 @@ header {
     border-color: var(--text-dim);
 }
 
-.shape-item.selected {
+.shape-item.focused {
     border-color: var(--accent);
     background: rgba(232, 255, 71, .05);
+}
+
+.shape-item.in-selection {
+    border-color: var(--accent2);
+    background: rgba(71, 196, 255, .05);
+}
+
+.shape-item.drag-over {
+    border-color: var(--accent2);
+    background: rgba(71, 196, 255, .1);
+}
+
+.shape-item.reorder-drag {
+    opacity: .35;
+}
+
+.drag-handle {
+    color: var(--text-dim);
+    font-size: 13px;
+    cursor: grab;
+    padding: 0 4px;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
 }
 
 .shape-icon {
@@ -284,30 +379,47 @@ header {
     min-width: 0;
 }
 
-.shape-type {
+.shape-name {
     color: var(--text-bright);
     font-size: 11px;
     font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .shape-sub {
     color: var(--text-dim);
     font-size: 10px;
     margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.shape-del {
+.shape-actions {
+    display: flex;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.act-btn {
     background: none;
     border: none;
     color: var(--text-dim);
     cursor: pointer;
-    font-size: 15px;
+    font-size: 12px;
     line-height: 1;
-    padding: 1px 5px;
+    padding: 2px 5px;
     border-radius: 3px;
+    transition: color .1s;
 }
 
-.shape-del:hover {
+.act-btn:hover {
+    color: var(--text-bright);
+}
+
+.act-btn.del:hover {
     color: var(--danger);
 }
 
@@ -321,21 +433,111 @@ header {
     border-radius: var(--r);
 }
 
+/* Multi-select toolbar */
+.multi-toolbar {
+    display: none;
+    gap: 5px;
+    padding: 6px 9px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(71, 196, 255, .05);
+    flex-shrink: 0;
+    align-items: center;
+}
+
+.multi-toolbar.visible {
+    display: flex;
+}
+
+.multi-toolbar-label {
+    font-size: 10px;
+    color: var(--accent2);
+    flex: 1;
+}
+
 /* ============================================================
-   FONT MANAGER
+   FONTS TAB
    ============================================================ */
+.font-section-title {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 8px 0 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.font-section-title:first-child {
+    padding-top: 0;
+}
+
+.font-hint {
+    font-size: 10px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    padding: 7px 9px;
+    border: 1px dashed var(--border);
+    border-radius: var(--r);
+    margin-bottom: 8px;
+}
+
+.font-hint strong {
+    color: var(--accent2);
+}
+
+/* Discovered font path groups */
+.font-path-group {
+    margin-bottom: 10px;
+}
+
+.font-path-name {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--accent2);
+    margin-bottom: 4px;
+}
+
+.font-discovered-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 9px;
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    background: var(--surface2);
+    margin-bottom: 3px;
+}
+
+.font-disc-name {
+    flex: 1;
+    font-size: 11px;
+    color: var(--text);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.font-disc-size {
+    font-size: 9px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+}
+
+/* Registered fonts list */
 .font-list {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .font-item {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 9px;
+    padding: 5px 9px;
     border: 1px solid var(--border);
     border-radius: var(--r);
     background: var(--surface2);
@@ -368,8 +570,8 @@ header {
 }
 
 .font-status.ok {
-    color: #9ece6a;
-    border-color: #9ece6a;
+    color: var(--green);
+    border-color: var(--green);
 }
 
 .font-status.err {
@@ -399,17 +601,143 @@ header {
     color: var(--text-dim);
 }
 
-.font-hint {
+/* ============================================================
+   FILES TAB / WORKSPACE BROWSER
+   ============================================================ */
+.ws-group {
+    margin-bottom: 14px;
+}
+
+.ws-group-name {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--accent2);
+    margin-bottom: 2px;
+}
+
+.ws-group-path {
+    font-size: 9px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ws-files {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.ws-file {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    background: var(--surface2);
+    transition: border-color .1s;
+}
+
+.ws-file:hover {
+    border-color: var(--text-dim);
+}
+
+.ws-file-name {
+    flex: 1;
+    font-size: 11px;
+    color: var(--text-bright);
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ws-file-right {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+}
+
+.ws-file-date {
+    font-size: 9px;
+    color: var(--text-dim);
+}
+
+.ws-file-actions {
+    display: flex;
+    gap: 3px;
+}
+
+.ws-no-files {
     font-size: 10px;
     color: var(--text-dim);
-    line-height: 1.6;
     padding: 8px;
+    text-align: center;
+}
+
+/* Version badge on ws-file */
+.version-badge {
+    font-size: 9px;
+    padding: 1px 5px;
+    border-radius: 99px;
+    border: 1px solid;
+    flex-shrink: 0;
+    font-weight: 600;
+}
+
+.version-badge.current {
+    color: var(--green);
+    border-color: var(--green);
+}
+
+.version-badge.outdated {
+    color: var(--accent3);
+    border-color: var(--accent3);
+}
+
+.version-badge.unknown {
+    color: var(--text-dim);
+    border-color: var(--border);
+}
+
+/* Upgrade banner */
+.upgrade-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border: 1px solid var(--accent3);
+    border-radius: var(--r);
+    background: rgba(255, 158, 100, .07);
+    margin-bottom: 10px;
+}
+
+.upgrade-banner-text {
+    flex: 1;
+    font-size: 10px;
+    color: var(--accent3);
+    line-height: 1.5;
+}
+
+.ws-offline-notice {
+    font-size: 10px;
+    color: var(--text-dim);
+    padding: 10px;
     border: 1px dashed var(--border);
     border-radius: var(--r);
+    line-height: 1.7;
     margin-bottom: 8px;
 }
 
-.font-hint strong {
+.ws-offline-notice strong {
+    color: var(--accent3);
+}
+
+.ws-offline-notice code {
     color: var(--accent2);
 }
 
@@ -419,10 +747,10 @@ header {
 .canvas-area {
     background: var(--bg);
     display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
+    flex: 1;
     overflow: hidden;
+    position: relative;
+    min-width: 200px;
 }
 
 #canvas {
@@ -458,7 +786,7 @@ header {
 }
 
 /* ============================================================
-   PROPERTIES
+   PROPERTIES PANEL
    ============================================================ */
 .prop-group {
     margin-bottom: 14px;
@@ -491,7 +819,9 @@ header {
     color: var(--text-dim);
 }
 
-input[type="number"], input[type="text"], select {
+input[type="number"],
+input[type="text"],
+select {
     font-family: var(--mono);
     font-size: 11px;
     background: var(--bg);
@@ -548,12 +878,37 @@ input[type="color"] {
     line-height: 1.9;
 }
 
-/* ============================================================
-   TYPE GRID
-   ============================================================ */
+.multi-sel-info {
+    text-align: center;
+    padding: 24px 12px;
+}
+
+.multi-sel-count {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent2);
+    display: block;
+    margin-bottom: 5px;
+}
+
+.multi-sel-label {
+    color: var(--text-dim);
+    font-size: 11px;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.multi-sel-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* TYPE GRID */
 .type-grid {
     display: grid;
-    grid-template-columns:1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 4px;
 }
 
@@ -582,8 +937,59 @@ input[type="color"] {
     background: rgba(71, 196, 255, .08);
 }
 
+/* TEXT OFFSET PRESETS (3×3) */
+.offset-presets {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px;
+    margin-bottom: 8px;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 5px;
+}
+
+.op-btn {
+    aspect-ratio: 1;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--bg);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color .1s, background .1s;
+}
+
+.op-btn:hover {
+    border-color: var(--accent2);
+    background: rgba(71, 196, 255, .08);
+}
+
+.op-btn.sel {
+    border-color: var(--accent);
+    background: rgba(232, 255, 71, .08);
+}
+
+.op-btn::after {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    transition: background .1s;
+}
+
+.op-btn:hover::after {
+    background: var(--accent2);
+}
+
+.op-btn.sel::after {
+    background: var(--accent);
+}
+
 /* ============================================================
-   EXPORT MODAL
+   MODALS
    ============================================================ */
 .modal-bg {
     display: none;
@@ -603,9 +1009,8 @@ input[type="color"] {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 8px;
-    width: 720px;
     max-width: 94vw;
-    max-height: 82vh;
+    max-height: 86vh;
     display: flex;
     flex-direction: column;
     box-shadow: 0 30px 70px rgba(0, 0, 0, .7);
@@ -640,13 +1045,30 @@ input[type="color"] {
     color: var(--text-bright);
 }
 
-/* Export tabs */
+.modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 17px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal-foot {
+    padding: 9px 17px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 7px;
+    flex-shrink: 0;
+}
+
+/* Export modal */
 .export-tabs {
     display: flex;
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
     padding: 0 17px;
-    gap: 0;
 }
 
 .export-tab {
@@ -703,16 +1125,41 @@ input[type="color"] {
     border-radius: 3px;
 }
 
-.modal-foot {
-    padding: 9px 17px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: flex-end;
-    gap: 7px;
-    flex-shrink: 0;
+/* Import / generic textarea modal */
+.import-textarea {
+    width: 100%;
+    height: 220px;
+    resize: vertical;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.6;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    color: var(--text-bright);
+    padding: 10px;
+    outline: none;
 }
 
-/* Syntax highlight */
+.import-textarea:focus {
+    border-color: var(--accent2);
+}
+
+.feedback-error {
+    color: var(--danger);
+    font-size: 10px;
+    min-height: 14px;
+}
+
+.feedback-ok {
+    color: var(--green);
+    font-size: 10px;
+    min-height: 14px;
+}
+
+/* ============================================================
+   SYNTAX HIGHLIGHT
+   ============================================================ */
 .kw {
     color: #bb9af7;
 }
@@ -737,22 +1184,14 @@ input[type="color"] {
     color: #73daca;
 }
 
-.op {
-    color: #89ddff;
-}
-
 .jk {
-    color: #bb9af7;
+    color: #7aa2f7;
 }
 
-/* json key   */
 .jv {
     color: #ff9e64;
 }
 
-/* json value */
 .js {
     color: #9ece6a;
 }
-
-/* json string */

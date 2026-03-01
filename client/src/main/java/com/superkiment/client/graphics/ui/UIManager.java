@@ -2,7 +2,8 @@ package com.superkiment.client.graphics.ui;
 
 import com.superkiment.client.Main;
 import com.superkiment.client.graphics.Renderer;
-import com.superkiment.client.graphics.ui.elements.UIHealthBar;
+import com.superkiment.client.graphics.ui.static_ui.UIHealthBar;
+import com.superkiment.common.shapes.ShapeModel;
 import org.joml.Vector2d;
 
 import java.util.*;
@@ -56,29 +57,47 @@ public class UIManager {
         uiGroups.put("standard-gameplay", new UIGroup());
 
         //ELEMENTS
+        UIButton connectButton = null;
+        try {
+            connectButton = new UIButton(
+                    new Vector2d(winSize.x / 2, winSize.y / 2),
+                    new Vector2d(400, 100),
+                    50,
+                    ShapeModel.fromJsonFile("/assets/shapemodels/title_connect_local_btn.json")) {
+                @Override
+                public void onClick() {
+                    if (!Main.connect()) return;
 
-        UIButton connectButton = new UIButton(new Vector2d(winSize.x / 2, winSize.y / 2), new Vector2d(400, 100), 50) {
-            @Override
-            public void onClick() {
-                if (!Main.connect()) return;
+                    uiGroups.get("title-menu").disable();
+                    uiGroups.get("credits-menu").disable();
+                    uiGroups.get("options-menu").disable();
+                    uiGroups.get("connect-menu").disable();
+                    uiGroups.get("standard-gameplay").enable();
+                }
+            };
+        } catch (Exception e) {
+            System.err.println(e);
+        }
 
-                uiGroups.get("title-menu").disable();
-                uiGroups.get("credits-menu").disable();
-                uiGroups.get("options-menu").disable();
-                uiGroups.get("connect-menu").disable();
-                uiGroups.get("standard-gameplay").enable();
-            }
-        };
 
-        UIButton playButton = new UIButton(new Vector2d(winSize.x / 2, winSize.y / 2), new Vector2d(400, 100), 50) {
-            @Override
-            public void onClick() {
-                uiGroups.get("title-menu").disable();
-                uiGroups.get("credits-menu").disable();
-                uiGroups.get("options-menu").disable();
-                uiGroups.get("connect-menu").enable();
-            }
-        };
+        UIButton playButton = null;
+        try {
+            playButton = new UIButton(
+                    new Vector2d(winSize.x / 2, winSize.y / 2),
+                    new Vector2d(400, 100),
+                    50,
+                    ShapeModel.fromJsonFile("/assets/shapemodels/title_play_btn.json")) {
+                @Override
+                public void onClick() {
+                    uiGroups.get("title-menu").disable();
+                    uiGroups.get("credits-menu").disable();
+                    uiGroups.get("options-menu").disable();
+                    uiGroups.get("connect-menu").enable();
+                }
+            };
+        } catch (Exception e) {
+            System.err.println(e);
+        }
 
         UIHealthBar uiHealthBar = new UIHealthBar(new Vector2d(160, 25), 100);
 

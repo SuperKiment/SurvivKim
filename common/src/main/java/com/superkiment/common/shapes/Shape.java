@@ -13,6 +13,7 @@ public class Shape {
     public Vector2d position;
     public ShapeType shapeType = ShapeType.CIRCLE;
     public Vector2d textOffset = new Vector2d(0, 0);
+    public String name = "";
 
     public Vector2d dimensions = null;
     public final int segments = 10;
@@ -42,6 +43,10 @@ public class Shape {
 
     public void setColor(float r, float g, float b) {
         color = new Vector3d(r, g, b);
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void setText(String text) {
@@ -85,5 +90,43 @@ public class Shape {
             case TRIANGLE_OUTLINE -> ShapeType.TRIANGLE;
             default -> type;
         };
+    }
+
+    public boolean isPointInShape(Vector2d point) {
+        ShapeType base = getBaseType(this.shapeType);
+        return switch (base) {
+            case RECT -> {
+                double halfW = dimensions.x / 2.0;
+                double halfH = dimensions.y / 2.0;
+                yield point.x >= position.x - halfW && point.x <= position.x + halfW
+                        && point.y >= position.y - halfH && point.y <= position.y + halfH;
+            }
+            case CIRCLE -> point.distanceSquared(position) <= dimensions.x * dimensions.x;
+
+            case TRIANGLE -> {
+                // Triangle isocèle centré sur position, base = dimensions.x, hauteur = dimensions.y
+                double halfW = dimensions.x / 2.0;
+                double halfH = dimensions.y / 2.0;
+
+                // Sommets : haut-centre, bas-gauche, bas-droite
+                double x1 = position.x, y1 = position.y - halfH;
+                double x2 = position.x - halfW, y2 = position.y + halfH;
+                double x3 = position.x + halfW, y3 = position.y + halfH;
+
+                // Calcul via les signes des produits vectoriels
+                double d1 = sign(point.x, point.y, x1, y1, x2, y2);
+                double d2 = sign(point.x, point.y, x2, y2, x3, y3);
+                double d3 = sign(point.x, point.y, x3, y3, x1, y1);
+
+                boolean hasNeg = (d1 < 0) || (d2 < 0) || (d3 < 0);
+                boolean hasPos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+                yield !(hasNeg && hasPos);
+            }
+            default -> false;
+        };
+    }
+
+    private double sign(double px, double py, double ax, double ay, double bx, double by) {
+        return (px - bx) * (ay - by) - (ax - bx) * (py - by);
     }
 }

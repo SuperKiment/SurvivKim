@@ -19,7 +19,9 @@ abstract public class ShapeModel_UI extends ShapeModel {
     public static void AddDynamicUIElementsToEntity(Entity entity) {
         for (Class<?> shapeModelClass : uiShapeModels) {
             try {
+                @SuppressWarnings("unchecked")
                 List<Class<?>> applyTo = (List<Class<?>>) shapeModelClass.getField("applyToClass").get(null);
+                @SuppressWarnings("unchecked")
                 List<Class<?>> doNotApplyTo = (List<Class<?>>) shapeModelClass.getField("doNotApplyToClass").get(null);
 
                 boolean isApplied = false;
