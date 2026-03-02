@@ -46,7 +46,7 @@ public class Projectile extends Entity {
         mvt
                 .normalize()
                 .mul(speed)
-                .mul(Time.getDeltaTime());
+                .mul(Time.GetDeltaFrameTime());
         pos.add(mvt);
 
         dirtyPosition = true;

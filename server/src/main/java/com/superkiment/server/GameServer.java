@@ -92,7 +92,7 @@ public class GameServer {
      * Une loop du jeu en lui-même
      */
     private void tick() {
-        Time.updateDeltaTime();
+        Time.UpdateFrameTime();
 
         for (Entity entity : entitiesManager.getEntities().values()) {
             entity.dirtyOtherAttribute = false;

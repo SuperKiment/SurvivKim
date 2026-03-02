@@ -65,11 +65,11 @@ public class Main {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             input.update();
 
-            float dt = Time.getDeltaTime();
+            float deltaTime = Time.GetDeltaFrameTime();
 
             // ========== GESTION DU RÉSEAU ==========
             if (gameClient != null && gameClient.isConnected()) {
-                gameTick(dt);
+                gameTick(deltaTime);
             }
 
             renderer.renderUpdateUI(uiManager.getUIElementsSortedByZ());
@@ -81,7 +81,7 @@ public class Main {
 
             glfwSwapBuffers(window);
             glfwPollEvents();
-            Time.updateDeltaTime();
+            Time.UpdateFrameTime();
         }
     }
 
@@ -90,12 +90,15 @@ public class Main {
 
         localPlayer.updateLogic(entitiesManager, blocksManager);
 
+        gameClient.update();
+
         // Envoyer la position au serveur (UDP) régulièrement
         GameClient.positionSendTimer += deltaTime;
         if (GameClient.positionSendTimer >= GameClient.POSITION_SEND_RATE) {
             PlayerHandle.sendPosition();
             GameClient.positionSendTimer = 0;
         }
+
         renderer.renderFloor();
         renderer.renderEntities(entitiesManager.getEntities(), localPlayer);
         renderer.renderBlocks(blocksManager.getBlocks());

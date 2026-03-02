@@ -73,7 +73,7 @@ public class Entity extends Collisionable {
 
         Vector2d mvt = new Vector2d(dirDepl.x, dirDepl.y);
         if (mvt.lengthSquared() > 0) {
-            mvt.normalize().mul(speed).mul(Time.getDeltaTime());
+            mvt.normalize().mul(speed).mul(Time.GetDeltaFrameTime());
             collisionsManager.velocity.set(mvt);
             pos.add(mvt);
             dirtyPosition = true;
