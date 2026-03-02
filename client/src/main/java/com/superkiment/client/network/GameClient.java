@@ -38,7 +38,7 @@ public class GameClient {
     private TCPClient tcpClient;
     private UDPClient udpClient;
 
-    private final ClientHeartbeat clientHeartbeat;
+    private final Heartbeat heartbeat;
 
     //Références
     private final EntitiesManager entitiesManager;
@@ -55,7 +55,7 @@ public class GameClient {
         this.udpPort = udpPort;
         this.entitiesManager = Main.entitiesManager;
         this.blocksManager = Main.blocksManager;
-        this.clientHeartbeat = new ClientHeartbeat();
+        this.heartbeat = new Heartbeat();
     }
 
     private boolean connect(String playerName) {
@@ -189,7 +189,7 @@ public class GameClient {
     }
 
     public void update() {
-        clientHeartbeat.update();
+        heartbeat.update();
     }
 
     // Getters
