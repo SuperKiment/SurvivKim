@@ -2,6 +2,7 @@ package com.superkiment.server.network.handles;
 
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.entities.EntityFactory;
+import com.superkiment.common.packets.PacketHeartbeat;
 import com.superkiment.common.packets.entity.PacketCreateEntity;
 import com.superkiment.common.packets.entity.PacketDeleteEntity;
 import com.superkiment.common.packets.entity.PacketUpdateEntity;
@@ -46,5 +47,10 @@ public class EntityHandle {
 
         broadcastTCP(packet, client);
         ServerMonitor.getInstance().log("INFO", "Entité mise à jour: " + entity.id + " (" + entity.name + ")");
+    }
+
+    public static void handlePlayerHeartbeat(PacketHeartbeat packet, ClientConnection client) {
+        client.setLastHeartbeat(System.currentTimeMillis());
+        client.calculatePing(packet.timestamp);
     }
 }

@@ -56,6 +56,8 @@ public class Network {
 
             case CREATE_BLOCK -> BlockHandle.handleCreateBlock((PacketCreateBlock) packet, originClient);
 
+            case HEARTBEAT -> EntityHandle.handlePlayerHeartbeat((PacketHeartbeat) packet, originClient);
+
             default -> System.out.println("Type de packet TCP non géré: " + packet.getType());
 
         }

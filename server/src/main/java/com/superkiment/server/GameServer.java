@@ -7,6 +7,7 @@ import com.superkiment.common.entities.EntityFactory;
 import com.superkiment.server.entities.ServerEntitiesManager;
 import com.superkiment.server.monitor.MonitorWebServer;
 import com.superkiment.server.monitor.ServerMonitor;
+import com.superkiment.server.network.ClientConnection;
 import com.superkiment.server.network.Network;
 import com.superkiment.server.network.TCPServer;
 import com.superkiment.server.network.UDPServer;
@@ -92,7 +93,18 @@ public class GameServer {
      * Une loop du jeu en lui-même
      */
     private void tick() {
-        Time.updateDeltaTime();
+        Time.UpdateFrameTime();
+
+        // Gérer les timeouts
+        for (ClientConnection client : entitiesManager.getClients().values()) {
+            float timeSinceLastHeatbeat = client.timeSinceLastHeartbeat(System.currentTimeMillis());
+
+            // Timeout : 12 secondes (3 * heartbeat de 4s)
+            if (timeSinceLastHeatbeat > 12_000f) {
+                System.out.println("Client " + client.playerName + " was timed out.");
+                client.disconnect();
+            }
+        }
 
         for (Entity entity : entitiesManager.getEntities().values()) {
             entity.dirtyOtherAttribute = false;

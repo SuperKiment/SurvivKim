@@ -179,7 +179,7 @@ public class CollisionsManager {
             double velocityAlongTangent = velocity.dot(tangent);
 
             Vector2d frictionForce = new Vector2d(tangent)
-                    .mul(-velocityAlongTangent * friction * Time.getDeltaTime() * 50);
+                    .mul(-velocityAlongTangent * friction * Time.GetDeltaFrameTime() * 50);
             velocity.add(frictionForce);
         }
 

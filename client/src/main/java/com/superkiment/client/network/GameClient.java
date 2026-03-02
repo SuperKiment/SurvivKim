@@ -38,6 +38,8 @@ public class GameClient {
     private TCPClient tcpClient;
     private UDPClient udpClient;
 
+    private final Heartbeat heartbeat;
+
     //Références
     private final EntitiesManager entitiesManager;
     private final BlocksManager blocksManager;
@@ -53,6 +55,7 @@ public class GameClient {
         this.udpPort = udpPort;
         this.entitiesManager = Main.entitiesManager;
         this.blocksManager = Main.blocksManager;
+        this.heartbeat = new Heartbeat();
     }
 
     private boolean connect(String playerName) {
@@ -116,7 +119,6 @@ public class GameClient {
         glfwSetWindowTitle(window, "Mon Jeu Multijoueur - Déconnecté");
         return null;
     }
-
 
     /**
      * Gérer les packets TCP reçus
@@ -184,6 +186,10 @@ public class GameClient {
         if (udpClient != null) {
             udpClient.disconnect();
         }
+    }
+
+    public void update() {
+        heartbeat.update();
     }
 
     // Getters

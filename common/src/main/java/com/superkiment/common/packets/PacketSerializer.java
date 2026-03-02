@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.ArrayList;
 
-public class PacketSerializer {
+public abstract class PacketSerializer {
 
     /**
      * Sérialiser un packet en byte array (pour TCP)

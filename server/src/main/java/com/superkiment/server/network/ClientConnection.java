@@ -19,6 +19,9 @@ public class ClientConnection implements Runnable {
     public String playerName;
     private int udpPort;
 
+    private long lastHeartbeatTime = 999999999999999999L;
+    private long lastCalculatedPing = 0;
+
     public ClientConnection(Socket socket) {
         this.socket = socket;
     }
@@ -68,12 +71,25 @@ public class ClientConnection implements Runnable {
         return udpPort;
     }
 
-    private void disconnect() {
+    public void disconnect() {
         try {
             socket.close();
             GameServer.entitiesManager.removeClient(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void setLastHeartbeat(long time) {
+        this.lastHeartbeatTime = time;
+    }
+
+    public void calculatePing(long clientTimestamp) {
+        long clientToServerTime = System.currentTimeMillis() - clientTimestamp;
+        this.lastCalculatedPing = clientToServerTime * 2;
+    }
+
+    public float timeSinceLastHeartbeat(long now) {
+        return now - lastHeartbeatTime;
     }
 }
