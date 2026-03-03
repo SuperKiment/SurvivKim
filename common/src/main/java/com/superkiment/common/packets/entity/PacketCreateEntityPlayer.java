@@ -12,7 +12,7 @@ public class PacketCreateEntityPlayer extends PacketCreateEntity {
 
     @Override
     public String toString() {
-        return "PacketCreateEntityProjectile{id=" + entityId + ", name=" + entityName +
+        return "PacketCreateEntityPlayer{id=" + entityId + ", name=" + entityName +
                 ", pos=(" + posX + "," + posY + ")}";
     }
 

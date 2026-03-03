@@ -1,5 +1,6 @@
 package com.superkiment.client.network;
 
+import com.superkiment.common.Logger;
 import com.superkiment.common.packets.*;
 
 import java.io.*;
@@ -54,7 +55,7 @@ public class TCPClient {
 
     public void send(Packet packet) {
         try {
-            System.out.println("TCP SENT : " + packet);
+            Logger.log(Logger.LogLevel.TRACE, "TCP SENT : " + packet);
             out.writeObject(packet);
             out.flush();
         } catch (IOException e) {
