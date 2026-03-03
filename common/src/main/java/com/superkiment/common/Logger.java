@@ -29,10 +29,43 @@ public class Logger {
     private static final String BG_CYAN = "\u001B[46m";
     private static final String BG_WHITE = "\u001B[47m";
 
+    /**
+     * Enregistre un message de log avec le niveau spécifié.
+     *
+     * <p>Format de sortie :
+     * <pre>
+     * [LEVEL|ts:timestamp|thread:"name" n°id] message
+     * </pre>
+     *
+     * <p>Inclut automatiquement :
+     * <ul>
+     *     <li>Le niveau de log</li>
+     *     <li>Un timestamp formaté</li>
+     *     <li>Le nom du thread courant</li>
+     *     <li>L'identifiant du thread courant</li>
+     * </ul>
+     *
+     * @param level niveau de sévérité du log
+     * @param msg   message à afficher
+     */
     public static void log(LogLevel level, String msg) {
         log(level, msg, null);
     }
 
+    /**
+     * Enregistre un message de log avec le niveau spécifié et une exception optionnelle.
+     *
+     * <p>Le message est affiché avec métadonnées :
+     * niveau, timestamp, nom du thread et identifiant du thread.
+     *
+     * <p>Si une exception est fournie, elle est affichée après le message.
+     * (Implémentation actuelle : affiche uniquement {@code e.toString()},
+     * le stacktrace complet devra être ajouté ultérieurement.)
+     *
+     * @param level niveau de sévérité du log
+     * @param msg   message à afficher
+     * @param e     exception associée au log, peut être {@code null}
+     */
     public static void log(LogLevel level, String msg, Exception e) {
         String threadName = Thread.currentThread().getName();
         long threadID = Thread.currentThread().threadId();
@@ -44,18 +77,18 @@ public class Logger {
                         + "|thread:\"" + threadName + "\" n°" + threadID
                         + "]" + RESET
                         + " " + msg
-
         );
+        //TODO: Changer le print des erreurs pour voir le stacktrace
         if (e != null) System.out.println("Exception : " + e);
     }
 
     private static String styleFor(LogLevel level) {
         return switch (level) {
-            case TRACE -> "\u001B[46m\u001B[30m"; // fond cyan, texte noir
-            case DEBUG -> "\u001B[44m\u001B[37m"; // fond bleu, texte blanc
-            case INFO -> "\u001B[42m\u001B[30m"; // fond vert, texte noir
-            case WARN -> "\u001B[43m\u001B[30m"; // fond jaune, texte noir
-            case ERROR -> "\u001B[41m\u001B[37m"; // fond rouge, texte blanc
+            case TRACE -> BG_CYAN + BLACK;
+            case DEBUG -> BG_BLUE + WHITE;
+            case INFO -> BG_GREEN + BLACK;
+            case WARN -> BG_YELLOW + BLACK;
+            case ERROR -> BG_RED + WHITE;
         };
     }
 }
