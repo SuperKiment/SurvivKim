@@ -31,9 +31,9 @@ public class FontManager {
         try {
             BitmapFont font = new BitmapFont(fontPath, fontSize, true);
             fonts.put(name, font);
-            Logger.log(Logger.LogLevel.INFO, "Police '" + name + "' chargée avec succès");
+            Logger.info("Police '" + name + "' chargée avec succès");
         } catch (Exception e) {
-            Logger.log(Logger.LogLevel.WARN, "Erreur lors du chargement de la police: " + fontPath);
+            Logger.warn("Erreur lors du chargement de la police: " + fontPath);
             e.printStackTrace();
         }
     }
@@ -50,9 +50,9 @@ public class FontManager {
             }
             BitmapFont font = new BitmapFont(fontStream, fontSize, true);
             fonts.put(name, font);
-            Logger.log(Logger.LogLevel.INFO, "Police '" + name + "' chargée depuis les resources avec succès");
+            Logger.info("Police '" + name + "' chargée depuis les resources avec succès");
         } catch (Exception e) {
-            Logger.log(Logger.LogLevel.WARN, "Erreur lors du chargement de la police: " + resourcePath);
+            Logger.warn("Erreur lors du chargement de la police: " + resourcePath);
             e.printStackTrace();
         }
     }

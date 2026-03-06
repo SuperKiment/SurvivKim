@@ -23,7 +23,7 @@ public class PlayerHandle {
         client.playerName = packetPlayerJoin.playerName;
         GameServer.entitiesManager.getClients().put(packetPlayerJoin.playerId, client);
 
-        Logger.log(Logger.LogLevel.INFO, "Joueur connecté: " + packetPlayerJoin.playerName + " (" + packetPlayerJoin.playerId + ")");
+        Logger.info("Joueur connecté: " + packetPlayerJoin.playerName + " (" + packetPlayerJoin.playerId + ")");
 
         // Envoyer toutes les entités existantes au nouveau joueur
         for (Entity entity : GameServer.entitiesManager.getEntities().values()) {

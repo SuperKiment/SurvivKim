@@ -25,6 +25,6 @@ public class BlockHandle {
 
     public static void handleCreateBlock(PacketCreateBlock packet) {
         blocksManager.addBlock(new Vector2d(packet.posX, packet.posY));
-        Logger.log(Logger.LogLevel.INFO, "Block distant créé: (" + packet.posX + " " + packet.posY + ")");
+        Logger.info("Block distant créé: (" + packet.posX + " " + packet.posY + ")");
     }
 }

@@ -42,7 +42,7 @@ public class EntityFactory {
                 projectile.addCollisionException(entitiesManager.getEntityFromID(id));
             }
 
-            Logger.log(Logger.LogLevel.DEBUG, "USED PROJECTILE CREATOR, " + projectile.numberOfCollisionExceptions() + " collision exceptions.");
+            Logger.debug("USED PROJECTILE CREATOR, " + projectile.numberOfCollisionExceptions() + " collision exceptions.");
 
             return projectile;
         });
@@ -53,7 +53,7 @@ public class EntityFactory {
 
             ApplyBasePacketToEntity(pp, player);
 
-            Logger.log(Logger.LogLevel.DEBUG, "USED PLAYER CREATOR");
+            Logger.debug("USED PLAYER CREATOR");
 
             return player;
         });
@@ -68,7 +68,7 @@ public class EntityFactory {
         if (instance == null) {
             instance = new EntityFactory();
             instance.entitiesManager = entitiesManager;
-            Logger.log(Logger.LogLevel.DEBUG, "EntitiesManager entity created");
+            Logger.debug("EntitiesManager entity created");
         }
     }
 
@@ -98,7 +98,7 @@ public class EntityFactory {
         for (int i = 0; i < entity.shapeModel.shapes.size(); i++) {
             entity.shapeModel.shapes.get(i).text = pe.shapesTexts[i];
         }
-        Logger.log(Logger.LogLevel.DEBUG, "USED ENTITY APPLY BASE");
+        Logger.debug("USED ENTITY APPLY BASE");
 
         return entity;
     }

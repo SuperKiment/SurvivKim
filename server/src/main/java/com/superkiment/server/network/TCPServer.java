@@ -40,7 +40,7 @@ public class TCPServer {
         try {
             serverSocket = new ServerSocket(port);
             running = true;
-            Logger.log(Logger.LogLevel.INFO, "Serveur TCP démarré sur le port " + port);
+            Logger.info("Serveur TCP démarré sur le port " + port);
 
             while (running) {
                 try {
@@ -48,7 +48,7 @@ public class TCPServer {
                     ClientConnection client = new ClientConnection(clientSocket);
                     threadPool.execute(client);
 
-                    Logger.log(Logger.LogLevel.INFO, "Nouvelle connexion TCP: " + clientSocket.getInetAddress());
+                    Logger.info("Nouvelle connexion TCP: " + clientSocket.getInetAddress());
                 } catch (IOException e) {
                     if (running) {
                         e.printStackTrace();

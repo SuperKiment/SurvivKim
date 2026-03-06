@@ -45,7 +45,7 @@ abstract public class ShapeModel_UI extends ShapeModel {
                 }
 
             } catch (Exception e) {
-                Logger.log(Logger.LogLevel.ERROR, "Error while applying dynamic UIElements to entities.", e);
+                Logger.error("Error while applying dynamic UIElements to entities.", e);
             }
         }
     }

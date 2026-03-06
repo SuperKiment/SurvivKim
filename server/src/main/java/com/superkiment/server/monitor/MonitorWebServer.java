@@ -34,10 +34,10 @@ public class MonitorWebServer {
             server.setExecutor(null);
             server.start();
 
-            Logger.log(Logger.LogLevel.INFO, "╔════════════════════════════════════════╗");
-            Logger.log(Logger.LogLevel.INFO, "║  Dashboard disponible sur:             ║");
-            Logger.log(Logger.LogLevel.INFO, "║  http://localhost:" + PORT + "                ║");
-            Logger.log(Logger.LogLevel.INFO, "╚════════════════════════════════════════╝");
+            Logger.info("╔════════════════════════════════════════╗");
+            Logger.info("║  Dashboard disponible sur:             ║");
+            Logger.info("║  http://localhost:" + PORT + "                ║");
+            Logger.info("╚════════════════════════════════════════╝");
 
         } catch (IOException e) {
             e.printStackTrace();

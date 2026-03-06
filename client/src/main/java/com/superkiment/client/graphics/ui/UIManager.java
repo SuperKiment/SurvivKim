@@ -77,7 +77,7 @@ public class UIManager {
                 }
             };
         } catch (Exception e) {
-            Logger.log(Logger.LogLevel.ERROR, "Error while creating the \"connect\" button.", e);
+            Logger.error("Error while creating the \"connect\" button.", e);
         }
 
 
@@ -97,7 +97,7 @@ public class UIManager {
                 }
             };
         } catch (Exception e) {
-            Logger.log(Logger.LogLevel.ERROR, "Error while creating the \"play\" button.", e);
+            Logger.error("Error while creating the \"play\" button.", e);
         }
 
         UIHealthBar uiHealthBar = new UIHealthBar(new Vector2d(160, 25), 100);

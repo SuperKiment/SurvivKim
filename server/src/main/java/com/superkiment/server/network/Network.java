@@ -39,7 +39,7 @@ public class Network {
      * Gérer les packets TCP reçus
      */
     public static void handleTCPPacket(Packet packet, ClientConnection originClient) {
-        Logger.log(Logger.LogLevel.TRACE, "TCP reçu: " + packet);
+        Logger.trace("TCP reçu: " + packet);
 
         try {
             monitor.logTCPReceived(packet);
@@ -59,7 +59,7 @@ public class Network {
 
             case HEARTBEAT -> EntityHandle.handlePlayerHeartbeat((PacketHeartbeat) packet, originClient);
 
-            default -> Logger.log(Logger.LogLevel.WARN, "Type de packet TCP non géré: " + packet.getType());
+            default -> Logger.warn("Type de packet TCP non géré: " + packet.getType());
 
         }
     }

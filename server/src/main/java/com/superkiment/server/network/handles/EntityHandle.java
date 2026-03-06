@@ -35,7 +35,7 @@ public class EntityHandle {
 
     public static void handleDeleteEntity(PacketDeleteEntity packet) {
         GameServer.entitiesManager.getEntities().remove(packet.entityId);
-        Logger.log(Logger.LogLevel.DEBUG, "Entité supprimée: " + packet.entityId);
+        Logger.debug("Entité supprimée: " + packet.entityId);
 
         // Broadcaster à tous les clients
         broadcastTCP(packet, null);

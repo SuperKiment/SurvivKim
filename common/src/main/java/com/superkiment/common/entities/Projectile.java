@@ -55,7 +55,7 @@ public class Projectile extends Entity {
 
     @Override
     public void onCollision(Collisionable other) {
-        Logger.log(Logger.LogLevel.TRACE, this + " had a collision");
+        Logger.trace(this + " had a collision");
         other.hp -= 10;
         other.dirtyOtherAttribute = true;
         deleteSelf();

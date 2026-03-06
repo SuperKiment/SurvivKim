@@ -23,12 +23,12 @@ public class BlocksManager {
     public boolean addBlock(Vector2d pos) {
         for (Block block : blocks) {
             if (block.isBlockOnPos(pos)) {
-                Logger.log(Logger.LogLevel.DEBUG, "Cannot place block " + (int) pos.x + " " + (int) pos.y);
+                Logger.debug("Cannot place block " + (int) pos.x + " " + (int) pos.y);
                 return false;
             }
         }
 
-        Logger.log(Logger.LogLevel.DEBUG, "Added block to BlockManager " + (int) pos.x + " " + (int) pos.y);
+        Logger.debug("Added block to BlockManager " + (int) pos.x + " " + (int) pos.y);
         blocks.add(new Block((int) pos.x, (int) pos.y));
         return true;
     }

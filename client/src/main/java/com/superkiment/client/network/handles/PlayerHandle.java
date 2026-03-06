@@ -22,7 +22,7 @@ public class PlayerHandle {
             return;
         }
 
-        Logger.log(Logger.LogLevel.INFO, "Joueur rejoint: " + packet.playerName);
+        Logger.info("Joueur rejoint: " + packet.playerName);
     }
 
     /**

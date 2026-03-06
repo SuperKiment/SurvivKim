@@ -21,7 +21,7 @@ public class ServerEntitiesManager extends EntitiesManager {
     public void removeClient(ClientConnection client) {
         if (client.playerId != null) {
             getClients().remove(client.playerId);
-            Logger.log(Logger.LogLevel.INFO, "Client déconnecté: " + client.playerName);
+            Logger.info("Client déconnecté: " + client.playerName);
 
             // Supprimer l'entité du joueur
             if (getEntities().containsKey(client.playerId)) {

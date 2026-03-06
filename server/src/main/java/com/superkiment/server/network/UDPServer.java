@@ -26,7 +26,7 @@ public class UDPServer {
             socket = new DatagramSocket(port);
 
             running = true;
-            Logger.log(Logger.LogLevel.INFO, "Serveur UDP démarré sur le port " + socket.getLocalPort());
+            Logger.info("Serveur UDP démarré sur le port " + socket.getLocalPort());
 
 
             while (running) {

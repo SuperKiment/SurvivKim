@@ -117,7 +117,7 @@ public class BitmapFont {
 
             // Vérifier qu'on ne dépasse pas la hauteur
             if (y + charHeight >= textureHeight) {
-                Logger.log(Logger.LogLevel.WARN, "Warning: Texture trop petite pour tous les caractères");
+                Logger.warn("Warning: Texture trop petite pour tous les caractères");
                 break;
             }
 

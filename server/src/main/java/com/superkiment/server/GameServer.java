@@ -34,9 +34,9 @@ public class GameServer {
     }
 
     public void start() {
-        Logger.log(Logger.LogLevel.INFO, "=== Démarrage du serveur ===");
-        Logger.log(Logger.LogLevel.INFO, "TCP Port: " + TCP_PORT);
-        Logger.log(Logger.LogLevel.INFO, "UDP Port: " + UDP_PORT);
+        Logger.info("=== Démarrage du serveur ===");
+        Logger.info("TCP Port: " + TCP_PORT);
+        Logger.info("UDP Port: " + UDP_PORT);
 
         monitor = ServerMonitor.getInstance();
         MonitorWebServer monitorServer = new MonitorWebServer();
@@ -102,7 +102,7 @@ public class GameServer {
 
             // Timeout : 12 secondes (3 * heartbeat de 4s)
             if (timeSinceLastHeatbeat > 12_000f) {
-                Logger.log(Logger.LogLevel.INFO, "Client " + client.playerName + " was timed out.");
+                Logger.info("Client " + client.playerName + " was timed out.");
                 client.disconnect();
             }
         }

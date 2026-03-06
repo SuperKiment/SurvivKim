@@ -89,7 +89,7 @@ public class GameClient {
             entitiesManager.addEntity(localPlayer);
 
             connected = true;
-            Logger.log(Logger.LogLevel.INFO, "Connecté au serveur en tant que " + playerName);
+            Logger.info("Connecté au serveur en tant que " + playerName);
 
             return true;
         } catch (Exception e) {
@@ -105,18 +105,18 @@ public class GameClient {
      * @return
      */
     public static GameClient tryConnectToServer(long window) {
-        Logger.log(Logger.LogLevel.INFO, "Tentative de connexion au serveur...");
+        Logger.info("Tentative de connexion au serveur...");
         GameClient gameClient = new GameClient(SERVER_ADDRESS, TCP_PORT, UDP_PORT);
 
         boolean success = gameClient.connect("Player_" + System.currentTimeMillis() % 1000);
 
         if (success) {
-            Logger.log(Logger.LogLevel.INFO, ("✓ Connecté au serveur !"));
+            Logger.info(("✓ Connecté au serveur !"));
             glfwSetWindowTitle(window, "Mon Jeu Multijoueur - Connecté");
             return gameClient;
         }
 
-        Logger.log(Logger.LogLevel.WARN, "✗ Échec de connexion au serveur");
+        Logger.warn("✗ Échec de connexion au serveur");
         glfwSetWindowTitle(window, "Mon Jeu Multijoueur - Déconnecté");
         return null;
     }
@@ -136,7 +136,7 @@ public class GameClient {
 
             case CREATE_BLOCK -> BlockHandle.handleCreateBlock((PacketCreateBlock) packet);
 
-            default -> Logger.log(Logger.LogLevel.WARN, "Type de packet TCP non géré: " + packet.getType());
+            default -> Logger.warn("Type de packet TCP non géré: " + packet.getType());
 
         }
     }

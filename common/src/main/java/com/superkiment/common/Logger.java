@@ -1,5 +1,10 @@
 package com.superkiment.common;
 
+import java.io.*;
+import java.nio.file.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class Logger {
     public enum LogLevel {
         TRACE,
@@ -10,76 +15,108 @@ public class Logger {
     }
 
     public static final String RESET = "\u001B[0m";
-
     private static final String BLACK = "\u001B[30m";
     private static final String RED = "\u001B[31m";
-    private static final String GREEN = "\u001B[32m";
-    private static final String YELLOW = "\u001B[33m";
-    private static final String BLUE = "\u001B[34m";
-    private static final String PURPLE = "\u001B[35m";
-    private static final String CYAN = "\u001B[36m";
     private static final String WHITE = "\u001B[37m";
-
-    private static final String BG_BLACK = "\u001B[40m";
     private static final String BG_RED = "\u001B[41m";
     private static final String BG_GREEN = "\u001B[42m";
     private static final String BG_YELLOW = "\u001B[43m";
     private static final String BG_BLUE = "\u001B[44m";
-    private static final String BG_PURPLE = "\u001B[45m";
     private static final String BG_CYAN = "\u001B[46m";
-    private static final String BG_WHITE = "\u001B[47m";
+
+    private static final String LOG_DIR = "logs";
+    private static final String LOG_FILENAME = "app-" +
+            LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")) + ".log";
+    private static final Path LOG_PATH = Path.of(LOG_DIR, LOG_FILENAME);
+
+    private static LogLevel minimumLevel = LogLevel.TRACE;
+    private static PrintWriter fileWriter;
+
+    static {
+        try {
+            Files.createDirectories(Path.of(LOG_DIR));
+            fileWriter = new PrintWriter(new BufferedWriter(new FileWriter(LOG_PATH.toFile(), true)));
+
+            // Fermeture propre à l'arrêt de la JVM
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                if (fileWriter != null) {
+                    fileWriter.flush();
+                    fileWriter.close();
+                }
+            }));
+        } catch (IOException ex) {
+            System.err.println("[Logger] Impossible de créer le fichier de log : " + ex.getMessage());
+        }
+    }
 
     /**
-     * Enregistre un message de log avec le niveau spécifié.
-     *
-     * <p>Format de sortie :
-     * <pre>
-     * [LEVEL|ts:timestamp|thread:"name" n°id] message
-     * </pre>
-     *
-     * <p>Inclut automatiquement :
-     * <ul>
-     *     <li>Le niveau de log</li>
-     *     <li>Un timestamp formaté</li>
-     *     <li>Le nom du thread courant</li>
-     *     <li>L'identifiant du thread courant</li>
-     * </ul>
-     *
-     * @param level niveau de sévérité du log
-     * @param msg   message à afficher
+     * Définit le niveau minimum à partir duquel les logs sont émis.
      */
+    public static void setMinimumLevel(LogLevel level) {
+        minimumLevel = level;
+    }
+
     public static void log(LogLevel level, String msg) {
         log(level, msg, null);
     }
 
-    /**
-     * Enregistre un message de log avec le niveau spécifié et une exception optionnelle.
-     *
-     * <p>Le message est affiché avec métadonnées :
-     * niveau, timestamp, nom du thread et identifiant du thread.
-     *
-     * <p>Si une exception est fournie, elle est affichée après le message.
-     * (Implémentation actuelle : affiche uniquement {@code e.toString()},
-     * le stacktrace complet devra être ajouté ultérieurement.)
-     *
-     * @param level niveau de sévérité du log
-     * @param msg   message à afficher
-     * @param e     exception associée au log, peut être {@code null}
-     */
     public static void log(LogLevel level, String msg, Exception e) {
+        if (level.ordinal() < minimumLevel.ordinal()) return;
+
         String threadName = Thread.currentThread().getName();
         long threadID = Thread.currentThread().threadId();
+        String timestamp = Time.GetNowTimestampFormatted();
 
-        System.out.println(
-                styleFor(level) + "["
-                        + level
-                        + "|ts:" + Time.GetNowTimestampFormatted()
-                        + "|thread:\"" + threadName + "\" n°" + threadID
-                        + "]" + RESET
-                        + " " + msg
-        );
-        //TODO: Changer le print des erreurs pour voir le stacktrace
-        if (e != null) System.out.println("Exception : " + e);
+        String header = "[" + level + "|ts:" + timestamp
+                + "|thread:\"" + threadName + "\" n°" + threadID + "]";
+        System.out.println(styleFor(level) + header + RESET + " " + msg);
+        if (e != null) {
+            System.out.println(RED + "Exception : " + e + RESET);
+            printStackTrace(e, System.out::println);
+        }
+
+        if (fileWriter != null) {
+            synchronized (fileWriter) {
+                fileWriter.println(header + " " + msg);
+                if (e != null) {
+                    fileWriter.println("Exception : " + e);
+                    printStackTrace(e, fileWriter::println);
+                }
+                fileWriter.flush(); // garantit l'écriture même en cas de crash
+            }
+        }
+    }
+
+    public static void trace(String msg) {
+        log(LogLevel.TRACE, msg);
+    }
+
+    public static void debug(String msg) {
+        log(LogLevel.DEBUG, msg);
+    }
+
+    public static void info(String msg) {
+        log(LogLevel.INFO, msg);
+    }
+
+    public static void warn(String msg) {
+        log(LogLevel.WARN, msg);
+    }
+
+    public static void error(String msg) {
+        log(LogLevel.ERROR, msg);
+    }
+
+    public static void error(String msg, Exception e) {
+        log(LogLevel.ERROR, msg, e);
+    }
+
+    private static void printStackTrace(Exception e, java.util.function.Consumer<String> sink) {
+        StringWriter sw = new StringWriter();
+        e.printStackTrace(new PrintWriter(sw));
+        for (String line : sw.toString().split(System.lineSeparator())) {
+            sink.accept("    " + line);
+        }
     }
 
     private static String styleFor(LogLevel level) {

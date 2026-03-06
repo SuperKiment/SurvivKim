@@ -35,7 +35,7 @@ public class UDPClient {
         receiveThread = new Thread(this::receiveLoop, "udp-receive-loop");
         receiveThread.start();
 
-        Logger.log(Logger.LogLevel.INFO, "Connecté au serveur UDP: " + serverAddress + ":" + port);
+        Logger.info("Connecté au serveur UDP: " + serverAddress + ":" + port);
     }
 
     private void receiveLoop() {

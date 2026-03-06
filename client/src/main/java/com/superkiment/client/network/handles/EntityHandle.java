@@ -45,13 +45,13 @@ public class EntityHandle {
         AddDynamicUIElementsToEntity(entity);
 
         entitiesManager.addEntity(entity);
-        Logger.log(Logger.LogLevel.DEBUG, "Entité distante créée: " + entity.name + " (" + entity.id + ") à la position " + entity.pos);
+        Logger.debug("Entité distante créée: " + entity.name + " (" + entity.id + ") à la position " + entity.pos);
     }
 
     public static void handleDeleteEntity(PacketDeleteEntity packet) {
         Entity removed = entitiesManager.getEntities().remove(packet.entityId);
         if (removed != null) {
-            Logger.log(Logger.LogLevel.DEBUG, "Entité supprimée: " + removed.name);
+            Logger.debug("Entité supprimée: " + removed.name);
         }
     }
 
@@ -61,6 +61,6 @@ public class EntityHandle {
         Entity entity = entitiesManager.getEntityFromID(packet.entityId);
         EntityFactory.ApplyBasePacketToEntity(packet, entity);
 
-        Logger.log(Logger.LogLevel.DEBUG, "Entité distante mise à jour: " + entity.name + " (" + entity.id + ") à la position " + entity.pos);
+        Logger.debug("Entité distante mise à jour: " + entity.name + " (" + entity.id + ") à la position " + entity.pos);
     }
 }
