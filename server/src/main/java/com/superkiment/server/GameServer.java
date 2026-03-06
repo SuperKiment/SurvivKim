@@ -1,5 +1,6 @@
 package com.superkiment.server;
 
+import com.superkiment.common.Logger;
 import com.superkiment.common.Time;
 import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.entities.Entity;
@@ -33,9 +34,9 @@ public class GameServer {
     }
 
     public void start() {
-        System.out.println("=== Démarrage du serveur ===");
-        System.out.println("TCP Port: " + TCP_PORT);
-        System.out.println("UDP Port: " + UDP_PORT);
+        Logger.info("=== Démarrage du serveur ===");
+        Logger.info("TCP Port: " + TCP_PORT);
+        Logger.info("UDP Port: " + UDP_PORT);
 
         monitor = ServerMonitor.getInstance();
         MonitorWebServer monitorServer = new MonitorWebServer();
@@ -50,13 +51,13 @@ public class GameServer {
 
         // Démarrer les serveurs TCP et UDP
         tcpServer = new TCPServer(TCP_PORT, this);
-        new Thread(tcpServer::start).start();
+        new Thread(tcpServer::start, "tcp-server").start();
 
         udpServer = new UDPServer(UDP_PORT);
-        new Thread(udpServer::start).start();
+        new Thread(udpServer::start, "udp-server").start();
 
         //Mise à jour des stats
-        new Thread(() -> monitor.statsUpdateLoop(this)).start();
+        new Thread(() -> monitor.statsUpdateLoop(this), "monitor").start();
 
         loop();
     }
@@ -101,7 +102,7 @@ public class GameServer {
 
             // Timeout : 12 secondes (3 * heartbeat de 4s)
             if (timeSinceLastHeatbeat > 12_000f) {
-                System.out.println("Client " + client.playerName + " was timed out.");
+                Logger.info("Client " + client.playerName + " was timed out.");
                 client.disconnect();
             }
         }

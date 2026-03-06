@@ -7,6 +7,8 @@ import com.superkiment.common.collisions.CollisionsManager;
 import com.superkiment.common.collisions.CollisionShape;
 import org.joml.Vector2d;
 
+import java.util.ArrayList;
+
 import static com.superkiment.common.utils.StringUtils.GetLastTerm;
 
 /**
@@ -29,6 +31,8 @@ public class Block extends Collisionable {
                         this
                 )
         );
+
+        uiShapeModels = new ArrayList<>();
     }
 
     public boolean isBlockOnPos(Vector2d pos) {

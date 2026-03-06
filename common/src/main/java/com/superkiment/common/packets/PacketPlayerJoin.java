@@ -14,4 +14,9 @@ public class PacketPlayerJoin extends Packet {
     public PacketType getType() {
         return PacketType.PLAYER_JOIN;
     }
+
+    @Override
+    public String toString() {
+        return "PacketPlayerJoin{playerId=" + playerId + ", playerName=" + playerName + "}";
+    }
 }

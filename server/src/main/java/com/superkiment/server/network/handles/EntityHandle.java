@@ -1,5 +1,6 @@
 package com.superkiment.server.network.handles;
 
+import com.superkiment.common.Logger;
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.entities.EntityFactory;
 import com.superkiment.common.packets.PacketHeartbeat;
@@ -34,7 +35,7 @@ public class EntityHandle {
 
     public static void handleDeleteEntity(PacketDeleteEntity packet) {
         GameServer.entitiesManager.getEntities().remove(packet.entityId);
-        System.out.println("Entité supprimée: " + packet.entityId);
+        Logger.debug("Entité supprimée: " + packet.entityId);
 
         // Broadcaster à tous les clients
         broadcastTCP(packet, null);

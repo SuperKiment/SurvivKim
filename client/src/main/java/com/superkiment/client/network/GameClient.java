@@ -4,6 +4,7 @@ import com.superkiment.client.Main;
 import com.superkiment.client.network.handles.BlockHandle;
 import com.superkiment.client.network.handles.EntityHandle;
 import com.superkiment.client.network.handles.PlayerHandle;
+import com.superkiment.common.Logger;
 import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.entities.EntitiesManager;
 import com.superkiment.common.entities.Entity;
@@ -88,7 +89,7 @@ public class GameClient {
             entitiesManager.addEntity(localPlayer);
 
             connected = true;
-            System.out.println("Connecté au serveur en tant que " + playerName);
+            Logger.info("Connecté au serveur en tant que " + playerName);
 
             return true;
         } catch (Exception e) {
@@ -104,18 +105,18 @@ public class GameClient {
      * @return
      */
     public static GameClient tryConnectToServer(long window) {
-        System.out.println("Tentative de connexion au serveur...");
+        Logger.info("Tentative de connexion au serveur...");
         GameClient gameClient = new GameClient(SERVER_ADDRESS, TCP_PORT, UDP_PORT);
 
         boolean success = gameClient.connect("Player_" + System.currentTimeMillis() % 1000);
 
         if (success) {
-            System.out.println("✓ Connecté au serveur !");
+            Logger.info(("✓ Connecté au serveur !"));
             glfwSetWindowTitle(window, "Mon Jeu Multijoueur - Connecté");
             return gameClient;
         }
 
-        System.out.println("✗ Échec de connexion au serveur");
+        Logger.warn("✗ Échec de connexion au serveur");
         glfwSetWindowTitle(window, "Mon Jeu Multijoueur - Déconnecté");
         return null;
     }
@@ -135,7 +136,7 @@ public class GameClient {
 
             case CREATE_BLOCK -> BlockHandle.handleCreateBlock((PacketCreateBlock) packet);
 
-            default -> System.out.println("Type de packet TCP non géré: " + packet.getType());
+            default -> Logger.warn("Type de packet TCP non géré: " + packet.getType());
 
         }
     }

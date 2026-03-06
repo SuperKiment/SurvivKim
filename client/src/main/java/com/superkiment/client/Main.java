@@ -26,8 +26,6 @@ public class Main {
     public static final BlocksManager blocksManager = new BlocksManager();
 
     public void run() {
-        System.out.println("Hello LWJGL " + org.lwjgl.Version.getVersion() + "!");
-
         //Setup window
         window = renderer.SetupWindow();
 

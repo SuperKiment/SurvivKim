@@ -1,5 +1,6 @@
 package com.superkiment.client.graphics;
 
+import com.superkiment.common.Logger;
 import org.lwjgl.BufferUtils;
 
 import java.awt.*;
@@ -31,8 +32,9 @@ public class BitmapFont {
 
     /**
      * Crée une bitmap font à partir d'une police système
-     * @param fontName Nom de la police (ex: "Arial", "Verdana")
-     * @param fontSize Taille de la police
+     *
+     * @param fontName     Nom de la police (ex: "Arial", "Verdana")
+     * @param fontSize     Taille de la police
      * @param antialiasing Activer l'antialiasing
      */
     public BitmapFont(String fontName, int fontSize, boolean antialiasing) {
@@ -43,8 +45,9 @@ public class BitmapFont {
 
     /**
      * Crée une bitmap font à partir d'un InputStream (pour les polices dans les resources)
-     * @param fontStream InputStream du fichier de police
-     * @param fontSize Taille de la police
+     *
+     * @param fontStream   InputStream du fichier de police
+     * @param fontSize     Taille de la police
      * @param antialiasing Activer l'antialiasing
      */
     public BitmapFont(InputStream fontStream, int fontSize, boolean antialiasing) {
@@ -114,7 +117,7 @@ public class BitmapFont {
 
             // Vérifier qu'on ne dépasse pas la hauteur
             if (y + charHeight >= textureHeight) {
-                System.err.println("Warning: Texture trop petite pour tous les caractères");
+                Logger.warn("Warning: Texture trop petite pour tous les caractères");
                 break;
             }
 

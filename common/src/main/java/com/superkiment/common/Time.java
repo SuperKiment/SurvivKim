@@ -1,5 +1,8 @@
 package com.superkiment.common;
 
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+
 /**
  * Classe sans instance qui permet le calcul de temps entre deux loops.
  */
@@ -68,6 +71,23 @@ public class Time {
 
     public float getDeltaTime() {
         return deltaTime;
+    }
+
+    /**
+     * @return a formatted timstamp, example : "2026-03-03T18:05:37.281Z"
+     */
+    public static String GetNowTimestampFormatted() {
+        return TransformTimestampFormatted(System.currentTimeMillis());
+    }
+
+    /**
+     * @param timestamp from System.currentTimeMillis()
+     * @return a formatted timstamp, example : "2026-03-03T18:05:37.281Z"
+     */
+    public static String TransformTimestampFormatted(long timestamp) {
+        return DateTimeFormatter
+                .ISO_INSTANT
+                .format(Instant.ofEpochMilli(timestamp));
     }
 
 }

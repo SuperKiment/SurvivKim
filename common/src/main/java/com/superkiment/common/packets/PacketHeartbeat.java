@@ -13,4 +13,9 @@ public class PacketHeartbeat extends Packet {
     public PacketType getType() {
         return PacketType.HEARTBEAT;
     }
+
+    @Override
+    public String toString() {
+        return "PacketHeartbeat{playerId=" + playerId + "}";
+    }
 }

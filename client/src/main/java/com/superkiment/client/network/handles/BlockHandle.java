@@ -2,6 +2,7 @@ package com.superkiment.client.network.handles;
 
 import com.superkiment.client.Main;
 import com.superkiment.client.network.TCPClient;
+import com.superkiment.common.Logger;
 import com.superkiment.common.packets.PacketCreateBlock;
 import org.joml.Vector2d;
 
@@ -24,6 +25,6 @@ public class BlockHandle {
 
     public static void handleCreateBlock(PacketCreateBlock packet) {
         blocksManager.addBlock(new Vector2d(packet.posX, packet.posY));
-        System.out.println("Block distant créé: (" + packet.posX + " " + packet.posY + ")");
+        Logger.info("Block distant créé: (" + packet.posX + " " + packet.posY + ")");
     }
 }

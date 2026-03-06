@@ -18,4 +18,9 @@ public class PacketDeleteEntity extends Packet {
     public PacketType getType() {
         return PacketType.DELETE_ENTITY;
     }
+
+    @Override
+    public String toString() {
+        return "PacketDeleteEntity{id=" + entityId + "}";
+    }
 }

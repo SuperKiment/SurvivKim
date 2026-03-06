@@ -91,7 +91,6 @@ public class Entity extends Collisionable {
     }
 
     public void onDeleted() {
-        System.out.println("i was deleted : " + this);
     }
 
     public void deleteSelf() {
@@ -110,7 +109,6 @@ public class Entity extends Collisionable {
 
     @Override
     public void onCollision(Collisionable other) {
-        //System.out.println(this + " collided with " + other);
     }
 
     @Override

@@ -23,4 +23,10 @@ public abstract class Packet implements Serializable {
     }
 
     public abstract PacketType getType();
+
+    @Override
+    public String toString() {
+        return "Packet{}";
+    }
+
 }

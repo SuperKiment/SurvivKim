@@ -1,10 +1,14 @@
 package com.superkiment.server.network;
 
+import com.superkiment.common.Logger;
 import com.superkiment.server.GameServer;
 
-import java.io.*;
-import java.net.*;
-import java.util.concurrent.*;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 public class TCPServer {
 
@@ -17,14 +21,26 @@ public class TCPServer {
     public TCPServer(int port, GameServer gameServer) {
         this.port = port;
         this.gameServer = gameServer;
-        this.threadPool = Executors.newCachedThreadPool();
+        this.threadPool = Executors.newCachedThreadPool(
+                new ThreadFactory() {
+                    private int counter = 0;
+
+                    @Override
+                    public Thread newThread(Runnable r) {
+                        Thread t = new Thread(r);
+                        t.setName("tcp-client-" + (++counter));
+                        t.setDaemon(true);
+                        return t;
+                    }
+                }
+        );
     }
 
     public void start() {
         try {
             serverSocket = new ServerSocket(port);
             running = true;
-            System.out.println("Serveur TCP démarré sur le port " + port);
+            Logger.info("Serveur TCP démarré sur le port " + port);
 
             while (running) {
                 try {
@@ -32,7 +48,7 @@ public class TCPServer {
                     ClientConnection client = new ClientConnection(clientSocket);
                     threadPool.execute(client);
 
-                    System.out.println("Nouvelle connexion TCP: " + clientSocket.getInetAddress());
+                    Logger.info("Nouvelle connexion TCP: " + clientSocket.getInetAddress());
                 } catch (IOException e) {
                     if (running) {
                         e.printStackTrace();

@@ -1,5 +1,6 @@
 package com.superkiment.client.network;
 
+import com.superkiment.common.Logger;
 import com.superkiment.common.packets.*;
 
 import java.io.*;
@@ -28,10 +29,10 @@ public class TCPClient {
         in = new ObjectInputStream(socket.getInputStream());
 
         // Thread pour recevoir les packets
-        receiveThread = new Thread(this::receiveLoop);
+        receiveThread = new Thread(this::receiveLoop, "tcp-receive-loop");
         receiveThread.start();
 
-        System.out.println("Connecté au serveur TCP: " + serverAddress + ":" + port);
+        Logger.info("Connecté au serveur TCP: " + serverAddress + ":" + port);
     }
 
     private void receiveLoop() {
@@ -39,7 +40,7 @@ public class TCPClient {
             while (!socket.isClosed()) {
                 try {
                     Packet packet = (Packet) in.readObject();
-                    System.out.println("Packet arriving : " + packet.getClass().getName());
+                    Logger.trace("Packet arriving : " + packet.getClass().getName());
                     gameClient.handleTCPPacket(packet);
                 } catch (EOFException e) {
                     break;
@@ -48,13 +49,13 @@ public class TCPClient {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Connexion TCP fermée");
+            Logger.info("Connexion TCP fermée");
         }
     }
 
     public void send(Packet packet) {
         try {
-            System.out.println("TCP SENT : " + packet);
+            Logger.trace("TCP SENT : " + packet);
             out.writeObject(packet);
             out.flush();
         } catch (IOException e) {
