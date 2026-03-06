@@ -11,6 +11,11 @@ jobs:
     name: Build and validate
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,12 +30,11 @@ jobs:
       - name: Build project
         run: ./gradlew --no-daemon clean assemble
 
-      - name: Run tests
-        run: ./gradlew --no-daemon test
-
-      - name: Generate coverage report
+      - name: Run tests and generate coverage
+        # testCoverage dépend de 'test' : un seul appel suffit pour tout faire.
+        # continue-on-error permet de publier les rapports même si des tests échouent.
         run: ./gradlew --no-daemon testCoverage
-        if: always()
+        continue-on-error: true
 
       - name: Publish test results
         uses: mikepenz/action-junit-report@v4
@@ -38,19 +42,22 @@ jobs:
         with:
           report_paths: '**/build/test-results/test/TEST-*.xml'
           detailed_summary: true
+          fail_on_failure: true   # le job devient rouge si des tests échouent
 
-      - name: Upload test reports
+      - name: Upload test reports (HTML)
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-reports
           path: '**/build/reports/tests/test/'
           retention-days: 14
+          if-no-files-found: warn
 
-      - name: Upload coverage report
+      - name: Upload coverage report (HTML)
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: coverage-report
           path: 'build/reports/jacoco/testCoverage/html/'
           retention-days: 14
+          if-no-files-found: warn
