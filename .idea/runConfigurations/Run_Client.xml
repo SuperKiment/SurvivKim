@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Run Client" type="Application" factoryName="Application">
+  <configuration default="false" name="Run Client" type="Application" factoryName="Application" singleton="false">
     <option name="MAIN_CLASS_NAME" value="com.superkiment.client.Main" />
     <module name="SurvivKim.client.main" />
     <extension name="coverage">
