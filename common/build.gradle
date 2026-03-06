@@ -6,3 +6,8 @@ dependencies {
     api "org.joml:joml:1.10.5"
     implementation 'com.google.code.gson:gson:2.10.1'
 }
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.3'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
