@@ -34,12 +34,11 @@ task testCoverage(type: JacocoReport, group: 'verification') {
 
     dependsOn subprojects.collect { it.tasks.named('test') }
 
-    // Récupère les fichiers d'exécution .exec de chaque sous-projet
-    executionData.setFrom(
-            subprojects.collect { sub ->
-                sub.fileTree(dir: "${sub.buildDir}/jacoco", include: '*.exec')
-            }
-    )
+    executionData.setFrom(provider {
+        subprojects.collectMany { sub ->
+            sub.fileTree(dir: "${sub.buildDir}/jacoco", include: '*.exec').files
+        }
+    })
 
     // Sources et classes compilées de chaque sous-projet
     subprojects.each { sub ->
