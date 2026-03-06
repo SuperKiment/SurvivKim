@@ -85,7 +85,7 @@ public class Logger {
     private static String styleFor(LogLevel level) {
         return switch (level) {
             case TRACE -> BG_CYAN + BLACK;
-            case DEBUG -> BG_BLUE + WHITE;
+            case DEBUG -> BG_BLUE + BLACK;
             case INFO -> BG_GREEN + BLACK;
             case WARN -> BG_YELLOW + BLACK;
             case ERROR -> BG_RED + WHITE;

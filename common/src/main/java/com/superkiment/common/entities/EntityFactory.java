@@ -1,5 +1,6 @@
 package com.superkiment.common.entities;
 
+import com.superkiment.common.Logger;
 import com.superkiment.common.packets.Packet;
 import com.superkiment.common.packets.entity.PacketCreateEntity;
 import com.superkiment.common.packets.entity.PacketCreateEntityPlayer;
@@ -41,7 +42,7 @@ public class EntityFactory {
                 projectile.addCollisionException(entitiesManager.getEntityFromID(id));
             }
 
-            System.out.println("USED PROJECTILE CREATOR, " + projectile.numberOfCollisionExceptions() + " collision exceptions.");
+            Logger.log(Logger.LogLevel.DEBUG, "USED PROJECTILE CREATOR, " + projectile.numberOfCollisionExceptions() + " collision exceptions.");
 
             return projectile;
         });
@@ -52,7 +53,7 @@ public class EntityFactory {
 
             ApplyBasePacketToEntity(pp, player);
 
-            System.out.println("USED PLAYER CREATOR");
+            Logger.log(Logger.LogLevel.DEBUG, "USED PLAYER CREATOR");
 
             return player;
         });
@@ -67,7 +68,7 @@ public class EntityFactory {
         if (instance == null) {
             instance = new EntityFactory();
             instance.entitiesManager = entitiesManager;
-            System.out.println(instance.entitiesManager);
+            Logger.log(Logger.LogLevel.DEBUG, "EntitiesManager entity created");
         }
     }
 
@@ -97,7 +98,7 @@ public class EntityFactory {
         for (int i = 0; i < entity.shapeModel.shapes.size(); i++) {
             entity.shapeModel.shapes.get(i).text = pe.shapesTexts[i];
         }
-        System.out.println("USED ENTITY APPLY BASE");
+        Logger.log(Logger.LogLevel.DEBUG, "USED ENTITY APPLY BASE");
 
         return entity;
     }

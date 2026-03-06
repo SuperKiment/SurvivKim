@@ -1,5 +1,6 @@
 package com.superkiment.server.entities;
 
+import com.superkiment.common.Logger;
 import com.superkiment.common.entities.EntitiesManager;
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.packets.entity.PacketDeleteEntity;
@@ -20,7 +21,7 @@ public class ServerEntitiesManager extends EntitiesManager {
     public void removeClient(ClientConnection client) {
         if (client.playerId != null) {
             getClients().remove(client.playerId);
-            System.out.println("Client déconnecté: " + client.playerName);
+            Logger.log(Logger.LogLevel.INFO, "Client déconnecté: " + client.playerName);
 
             // Supprimer l'entité du joueur
             if (getEntities().containsKey(client.playerId)) {

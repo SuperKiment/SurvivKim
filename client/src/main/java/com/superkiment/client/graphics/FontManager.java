@@ -1,5 +1,7 @@
 package com.superkiment.client.graphics;
 
+import com.superkiment.common.Logger;
+
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,9 +31,9 @@ public class FontManager {
         try {
             BitmapFont font = new BitmapFont(fontPath, fontSize, true);
             fonts.put(name, font);
-            System.out.println("Police '" + name + "' chargée avec succès");
+            Logger.log(Logger.LogLevel.INFO, "Police '" + name + "' chargée avec succès");
         } catch (Exception e) {
-            System.err.println("Erreur lors du chargement de la police: " + fontPath);
+            Logger.log(Logger.LogLevel.WARN, "Erreur lors du chargement de la police: " + fontPath);
             e.printStackTrace();
         }
     }
@@ -48,9 +50,9 @@ public class FontManager {
             }
             BitmapFont font = new BitmapFont(fontStream, fontSize, true);
             fonts.put(name, font);
-            System.out.println("Police '" + name + "' chargée depuis les resources avec succès");
+            Logger.log(Logger.LogLevel.INFO, "Police '" + name + "' chargée depuis les resources avec succès");
         } catch (Exception e) {
-            System.err.println("Erreur lors du chargement de la police: " + resourcePath);
+            Logger.log(Logger.LogLevel.WARN, "Erreur lors du chargement de la police: " + resourcePath);
             e.printStackTrace();
         }
     }

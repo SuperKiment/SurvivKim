@@ -1,5 +1,6 @@
 package com.superkiment.server.network;
 
+import com.superkiment.common.Logger;
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.packets.*;
 import com.superkiment.common.packets.entity.PacketCreateEntity;
@@ -38,7 +39,7 @@ public class Network {
      * Gérer les packets TCP reçus
      */
     public static void handleTCPPacket(Packet packet, ClientConnection originClient) {
-        System.out.println("TCP reçu: " + packet);
+        Logger.log(Logger.LogLevel.TRACE, "TCP reçu: " + packet);
 
         try {
             monitor.logTCPReceived(packet);
@@ -58,7 +59,7 @@ public class Network {
 
             case HEARTBEAT -> EntityHandle.handlePlayerHeartbeat((PacketHeartbeat) packet, originClient);
 
-            default -> System.out.println("Type de packet TCP non géré: " + packet.getType());
+            default -> Logger.log(Logger.LogLevel.WARN, "Type de packet TCP non géré: " + packet.getType());
 
         }
     }

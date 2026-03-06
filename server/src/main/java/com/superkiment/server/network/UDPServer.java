@@ -1,5 +1,6 @@
 package com.superkiment.server.network;
 
+import com.superkiment.common.Logger;
 import com.superkiment.common.packets.PacketSerializer;
 import com.superkiment.common.packets.entity.PacketEntityPosition;
 
@@ -25,7 +26,7 @@ public class UDPServer {
             socket = new DatagramSocket(port);
 
             running = true;
-            System.out.println("Serveur UDP démarré sur le port " + socket.getLocalPort());
+            Logger.log(Logger.LogLevel.INFO, "Serveur UDP démarré sur le port " + socket.getLocalPort());
 
 
             while (running) {

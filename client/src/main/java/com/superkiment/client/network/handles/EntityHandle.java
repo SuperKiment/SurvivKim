@@ -2,6 +2,7 @@ package com.superkiment.client.network.handles;
 
 import com.superkiment.client.Main;
 import com.superkiment.client.network.TCPClient;
+import com.superkiment.common.Logger;
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.entities.EntityFactory;
 import com.superkiment.common.packets.Packet;
@@ -33,8 +34,6 @@ public class EntityHandle {
     public static void handleCreateEntity(PacketCreateEntity packet) {
         String playerId = Main.gameClient.getLocalPlayer().id;
 
-        System.out.println("Handling create entity : " + packet.getClass().getName());
-
         // Ne pas créer si c'est notre propre entité
         if (packet.entityId.equals(playerId)) {
             return;
@@ -46,23 +45,22 @@ public class EntityHandle {
         AddDynamicUIElementsToEntity(entity);
 
         entitiesManager.addEntity(entity);
-        System.out.println("Entité distante créée: " + entity.name + " (" + entity.id + ") à la position " + entity.pos);
+        Logger.log(Logger.LogLevel.DEBUG, "Entité distante créée: " + entity.name + " (" + entity.id + ") à la position " + entity.pos);
     }
 
     public static void handleDeleteEntity(PacketDeleteEntity packet) {
         Entity removed = entitiesManager.getEntities().remove(packet.entityId);
         if (removed != null) {
-            System.out.println("Entité supprimée: " + removed.name);
+            Logger.log(Logger.LogLevel.DEBUG, "Entité supprimée: " + removed.name);
         }
     }
 
     public static void handleUpdateEntity(PacketCreateEntity packet) {
 
-        System.out.println("Handling update entity : " + packet.getClass().getName());
 
         Entity entity = entitiesManager.getEntityFromID(packet.entityId);
         EntityFactory.ApplyBasePacketToEntity(packet, entity);
 
-        System.out.println("Entité distante mise à jour: " + entity.name + " (" + entity.id + ") à la position " + entity.pos);
+        Logger.log(Logger.LogLevel.DEBUG, "Entité distante mise à jour: " + entity.name + " (" + entity.id + ") à la position " + entity.pos);
     }
 }

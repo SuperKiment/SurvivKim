@@ -1,5 +1,6 @@
 package com.superkiment.common.entities;
 
+import com.superkiment.common.Logger;
 import com.superkiment.common.Time;
 import com.superkiment.common.collisions.Collisionable;
 import com.superkiment.common.shapes.Shape;
@@ -54,7 +55,7 @@ public class Projectile extends Entity {
 
     @Override
     public void onCollision(Collisionable other) {
-        System.out.println("KABOOM");
+        Logger.log(Logger.LogLevel.TRACE, this + " had a collision");
         other.hp -= 10;
         other.dirtyOtherAttribute = true;
         deleteSelf();

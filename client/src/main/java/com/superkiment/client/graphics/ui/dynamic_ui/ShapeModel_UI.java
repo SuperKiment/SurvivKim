@@ -1,5 +1,6 @@
 package com.superkiment.client.graphics.ui.dynamic_ui;
 
+import com.superkiment.common.Logger;
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.shapes.ShapeModel;
 
@@ -44,7 +45,7 @@ abstract public class ShapeModel_UI extends ShapeModel {
                 }
 
             } catch (Exception e) {
-                System.err.println(e);
+                Logger.log(Logger.LogLevel.ERROR, "Error while applying dynamic UIElements to entities.", e);
             }
         }
     }

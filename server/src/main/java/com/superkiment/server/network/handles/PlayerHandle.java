@@ -1,11 +1,12 @@
 package com.superkiment.server.network.handles;
 
+import com.superkiment.common.Logger;
 import com.superkiment.common.blocks.Block;
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.packets.Packet;
 import com.superkiment.common.packets.PacketCreateBlock;
-import com.superkiment.common.packets.entity.LinkEntityPacket;
 import com.superkiment.common.packets.PacketPlayerJoin;
+import com.superkiment.common.packets.entity.LinkEntityPacket;
 import com.superkiment.server.GameServer;
 import com.superkiment.server.monitor.ServerMonitor;
 import com.superkiment.server.network.ClientConnection;
@@ -22,7 +23,7 @@ public class PlayerHandle {
         client.playerName = packetPlayerJoin.playerName;
         GameServer.entitiesManager.getClients().put(packetPlayerJoin.playerId, client);
 
-        System.out.println("Joueur connecté: " + packetPlayerJoin.playerName + " (" + packetPlayerJoin.playerId + ")");
+        Logger.log(Logger.LogLevel.INFO, "Joueur connecté: " + packetPlayerJoin.playerName + " (" + packetPlayerJoin.playerId + ")");
 
         // Envoyer toutes les entités existantes au nouveau joueur
         for (Entity entity : GameServer.entitiesManager.getEntities().values()) {

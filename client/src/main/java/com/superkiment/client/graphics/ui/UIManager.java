@@ -3,6 +3,7 @@ package com.superkiment.client.graphics.ui;
 import com.superkiment.client.Main;
 import com.superkiment.client.graphics.Renderer;
 import com.superkiment.client.graphics.ui.static_ui.UIHealthBar;
+import com.superkiment.common.Logger;
 import com.superkiment.common.shapes.ShapeModel;
 import org.joml.Vector2d;
 
@@ -76,7 +77,7 @@ public class UIManager {
                 }
             };
         } catch (Exception e) {
-            System.err.println(e);
+            Logger.log(Logger.LogLevel.ERROR, "Error while creating the \"connect\" button.", e);
         }
 
 
@@ -96,7 +97,7 @@ public class UIManager {
                 }
             };
         } catch (Exception e) {
-            System.err.println(e);
+            Logger.log(Logger.LogLevel.ERROR, "Error while creating the \"play\" button.", e);
         }
 
         UIHealthBar uiHealthBar = new UIHealthBar(new Vector2d(160, 25), 100);

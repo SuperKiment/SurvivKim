@@ -29,10 +29,10 @@ public class TCPClient {
         in = new ObjectInputStream(socket.getInputStream());
 
         // Thread pour recevoir les packets
-        receiveThread = new Thread(this::receiveLoop);
+        receiveThread = new Thread(this::receiveLoop, "tcp-receive-loop");
         receiveThread.start();
 
-        System.out.println("Connecté au serveur TCP: " + serverAddress + ":" + port);
+        Logger.log(Logger.LogLevel.INFO, "Connecté au serveur TCP: " + serverAddress + ":" + port);
     }
 
     private void receiveLoop() {
@@ -40,7 +40,7 @@ public class TCPClient {
             while (!socket.isClosed()) {
                 try {
                     Packet packet = (Packet) in.readObject();
-                    System.out.println("Packet arriving : " + packet.getClass().getName());
+                    Logger.log(Logger.LogLevel.TRACE, "Packet arriving : " + packet.getClass().getName());
                     gameClient.handleTCPPacket(packet);
                 } catch (EOFException e) {
                     break;
@@ -49,7 +49,7 @@ public class TCPClient {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Connexion TCP fermée");
+            Logger.log(Logger.LogLevel.INFO, "Connexion TCP fermée");
         }
     }
 

@@ -1,10 +1,14 @@
 package com.superkiment.client.network;
 
-import com.superkiment.common.packets.*;
+import com.superkiment.common.Logger;
+import com.superkiment.common.packets.PacketPositionsBulk;
+import com.superkiment.common.packets.PacketSerializer;
 import com.superkiment.common.packets.entity.PacketEntityPosition;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.nio.ByteBuffer;
 
 public class UDPClient {
@@ -28,10 +32,10 @@ public class UDPClient {
         serverInetAddress = InetAddress.getByName(serverAddress);
 
         // Thread pour recevoir les packets
-        receiveThread = new Thread(this::receiveLoop);
+        receiveThread = new Thread(this::receiveLoop, "udp-receive-loop");
         receiveThread.start();
 
-        System.out.println("Connecté au serveur UDP: " + serverAddress + ":" + port);
+        Logger.log(Logger.LogLevel.INFO, "Connecté au serveur UDP: " + serverAddress + ":" + port);
     }
 
     private void receiveLoop() {

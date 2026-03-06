@@ -2,13 +2,14 @@ package com.superkiment.client.network.handles;
 
 import com.superkiment.client.Main;
 import com.superkiment.client.network.UDPClient;
+import com.superkiment.common.Logger;
 import com.superkiment.common.entities.Player;
-import com.superkiment.common.packets.entity.PacketEntityPosition;
 import com.superkiment.common.packets.PacketPlayerJoin;
+import com.superkiment.common.packets.entity.PacketEntityPosition;
 
 /**
- *  Le handle qui contient les fonctions nécessaires à la création de player et la récéption de données concernant la création de player.
- *  Contient également les fonctions sur la mise à jour de la position du joueur.
+ * Le handle qui contient les fonctions nécessaires à la création de player et la récéption de données concernant la création de player.
+ * Contient également les fonctions sur la mise à jour de la position du joueur.
  */
 public class PlayerHandle {
 
@@ -21,7 +22,7 @@ public class PlayerHandle {
             return;
         }
 
-        System.out.println("Joueur rejoint: " + packet.playerName);
+        Logger.log(Logger.LogLevel.INFO, "Joueur rejoint: " + packet.playerName);
     }
 
     /**
