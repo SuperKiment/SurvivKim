@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'jacoco'
 }
 
 allprojects {
@@ -22,5 +23,33 @@ subprojects {
 
     test {
         useJUnitPlatform()
+    }
+}
+
+// ─── Rapport de couverture agrégé pour tous les sous-projets ─────────────────
+// Lancer avec : ./gradlew testCoverage
+// Le rapport HTML est généré dans : build/reports/jacoco/testCoverage/html/index.html
+task testCoverage(type: JacocoReport, group: 'verification') {
+    description = 'Génère un rapport de couverture agrégé pour tous les sous-projets.'
+
+    dependsOn subprojects.collect { it.tasks.named('test') }
+
+    executionData.setFrom(provider {
+        subprojects.collectMany { sub ->
+            sub.fileTree(dir: "${sub.buildDir}/jacoco", include: '*.exec').files
+        }
+    })
+
+    // Sources et classes compilées de chaque sous-projet
+    subprojects.each { sub ->
+        sourceDirectories.from(sub.sourceSets.main.allJava.srcDirs)
+        classDirectories.from(sub.sourceSets.main.output.classesDirs)
+    }
+
+    reports {
+        xml.required = true
+        html.required = true
+        html.outputLocation = layout.buildDirectory.dir('reports/jacoco/testCoverage/html')
+        xml.outputLocation = layout.buildDirectory.file('reports/jacoco/testCoverage/report.xml')
     }
 }

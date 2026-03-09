@@ -5,6 +5,7 @@
 plugins {
     // Apply the java Plugin to add support for Java.
     id 'java'
+    id 'jacoco'
 }
 
 repositories {
@@ -34,4 +35,14 @@ java {
 tasks.named('test') {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+    // Génère le rapport de couverture automatiquement après chaque 'test'
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true   // utilisé par la CI et Codecov
+        html.required = true  // lisible en local
+    }
 }
