@@ -25,6 +25,12 @@ public class EntityHandle {
         tcpClient.send(packet);
     }
 
+    public static void deleteEntity(Entity entity) {
+        Packet packet = new PacketDeleteEntity(entity.id);
+        TCPClient tcpClient = Main.gameClient.getTCPClient();
+        tcpClient.send(packet);
+    }
+
     public static void updateEntity(Entity entity) {
         Packet packet = new PacketUpdateEntity(entity);
         TCPClient tcpClient = Main.gameClient.getTCPClient();
