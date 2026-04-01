@@ -52,6 +52,8 @@ public class Entity extends Collisionable {
      * @param blocksManager
      */
     public void updateLogic(EntitiesManager entitiesManager, BlocksManager blocksManager) {
+        if (hp <= 0) deleteSelf();
+
         updateMovement();
         {
             List<CollisionData> collisions = collisionsManager.findCollisionsWithData(entitiesManager, blocksManager);
@@ -97,6 +99,10 @@ public class Entity extends Collisionable {
         this.entitiesManager.addToBeDeleted(this);
     }
 
+    @Override
+    public void onCollision(Collisionable other) {
+    }
+
     //GETTERS ET SETTERS
     public void setEntitiesManager(EntitiesManager entitiesManager) {
         this.entitiesManager = entitiesManager;
@@ -105,10 +111,6 @@ public class Entity extends Collisionable {
     @Override
     public Vector2d getWorldPosition() {
         return pos;
-    }
-
-    @Override
-    public void onCollision(Collisionable other) {
     }
 
     @Override

@@ -86,4 +86,8 @@ public abstract class Collisionable {
     public Collisionable getCollisionException(int i) {
         return exceptionsCollisions.get(i);
     }
+
+    protected void fullHealth() {
+        this.hp = this.maxHP;
+    }
 }

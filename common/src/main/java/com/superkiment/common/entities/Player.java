@@ -9,6 +9,8 @@ import org.joml.Vector2d;
  */
 public class Player extends Entity {
 
+    Vector2d respawnPoint;
+
     public Player(Vector2d pos) {
         super(pos);
 
@@ -23,5 +25,17 @@ public class Player extends Entity {
                         this
                 )
         );
+
+        respawnPoint = new Vector2d(pos.x, pos.y);
+    }
+
+    @Override
+    public void deleteSelf() {
+        respawn();
+    }
+
+    public void respawn() {
+        pos.set(respawnPoint.x, respawnPoint.y);
+        this.fullHealth();
     }
 }
