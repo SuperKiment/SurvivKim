@@ -1,16 +1,18 @@
 package com.superkiment.common.packets;
 
-import org.joml.Vector2d;
+import com.superkiment.common.blocks.Block;
 
 public class PacketCreateBlock extends Packet {
 
-    public double posX;
-    public double posY;
+    public int posX = 0;
+    public int posY = 0;
+    public Block.BlockCollisionType blockCollisionType = Block.BlockCollisionType.GROUND;
 
-    public PacketCreateBlock(Vector2d position) {
+    public PacketCreateBlock(Block block) {
         super();
-        this.posX = position.x;
-        this.posY = position.y;
+        this.posX = (int) block.pos.x;
+        this.posY = (int) block.pos.y;
+        this.blockCollisionType = block.blockCollisionType;
     }
 
     @Override

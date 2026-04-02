@@ -3,6 +3,7 @@ package com.superkiment.client;
 import com.superkiment.client.graphics.ui.UIElement;
 import com.superkiment.client.network.handles.BlockHandle;
 import com.superkiment.client.network.handles.EntityHandle;
+import com.superkiment.common.blocks.Block;
 import com.superkiment.common.entities.Player;
 import com.superkiment.common.entities.Projectile;
 import org.joml.Vector2d;
@@ -106,10 +107,11 @@ public class InputManager {
             EntityHandle.createEntity(projectile);
         });
 
+        //TODO: ajouter un toggle "wall/ground"
         input.onActionPress("ajouter block", () -> {
             int posX = (int) round(player.pos.x / 50);
             int posY = (int) round(player.pos.y / 50);
-            BlockHandle.createBlock(new Vector2d(posX, posY));
+            BlockHandle.createBlock(new Block(posX, posY, Block.BlockCollisionType.WALL));
         });
 
         input.onActionRelease("avancer", () -> player.dirDepl.y = 0);

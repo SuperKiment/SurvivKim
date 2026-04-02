@@ -15,12 +15,20 @@ import static com.superkiment.common.utils.StringUtils.GetLastTerm;
  * Un block dans le monde, non-déplaçable.
  */
 public class Block extends Collisionable {
-    public static int blockSize = 50;
+    public static enum BlockCollisionType {
+        GROUND, WALL
+    }
 
-    public Block(int x, int y) {
+    public static int blockSize = 50;
+    public BlockCollisionType blockCollisionType = BlockCollisionType.WALL;
+
+    public Block(int x, int y, BlockCollisionType bct) {
         pos = new Vector2d(x, y);
+        blockCollisionType = bct;
         shapeModel = new ShapeModel();
         shapeModel.addShape(new Shape(new Vector2d(0, 0), new Vector2d(blockSize, blockSize), Shape.ShapeType.RECT));
+
+        if (blockCollisionType== BlockCollisionType.GROUND) this.doReactCollision = false;
 
         collisionsManager = new CollisionsManager(this);
         collisionsManager.addCollisionShape(

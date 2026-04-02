@@ -32,7 +32,7 @@ public class PlayerHandle {
         }
 
         for (Block block : GameServer.blocksManager.getBlocks()) {
-            PacketCreateBlock packetCreateBlock = new PacketCreateBlock(block.pos);
+            PacketCreateBlock packetCreateBlock = new PacketCreateBlock(block);
             client.sendTCP(packetCreateBlock);
         }
 

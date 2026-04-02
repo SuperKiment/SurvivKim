@@ -1,7 +1,6 @@
 package com.superkiment.common.blocks;
 
 import com.superkiment.common.Logger;
-import org.joml.Vector2d;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -20,16 +19,16 @@ public class BlocksManager {
         return blocks;
     }
 
-    public boolean addBlock(Vector2d pos) {
+    public boolean addBlock(Block newBlock) {
         for (Block block : blocks) {
-            if (block.isBlockOnPos(pos)) {
-                Logger.debug("Cannot place block " + (int) pos.x + " " + (int) pos.y);
+            if (block.isBlockOnPos(newBlock.pos)) {
+                Logger.debug("Cannot place block " + (int) newBlock.pos.x + " " + (int) newBlock.pos.y);
                 return false;
             }
         }
 
-        Logger.debug("Added block to BlockManager " + (int) pos.x + " " + (int) pos.y);
-        blocks.add(new Block((int) pos.x, (int) pos.y));
+        Logger.debug("Added block to BlockManager " + (int) newBlock.pos.x + " " + (int) newBlock.pos.y);
+        blocks.add(newBlock);
         return true;
     }
 }
