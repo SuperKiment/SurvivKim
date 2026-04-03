@@ -3,6 +3,7 @@ package com.superkiment.client;
 import com.superkiment.client.graphics.ui.UIElement;
 import com.superkiment.client.network.handles.BlockHandle;
 import com.superkiment.client.network.handles.EntityHandle;
+import com.superkiment.common.Logger;
 import com.superkiment.common.blocks.Block;
 import com.superkiment.common.entities.Player;
 import com.superkiment.common.entities.Projectile;
@@ -68,6 +69,7 @@ public class InputManager {
         input.bindAction("quitter", GLFW_KEY_ESCAPE);
         input.bindAction("sprint", GLFW_KEY_LEFT_SHIFT);
         input.bindAction("ajouter block", GLFW_KEY_B);
+        input.bindAction("toggle ground wall", GLFW_KEY_R);
         input.bindAction("tirer", GLFW_KEY_E);
         input.bindAction("tests", GLFW_KEY_L);
 
@@ -107,11 +109,20 @@ public class InputManager {
             EntityHandle.createEntity(projectile);
         });
 
-        //TODO: ajouter un toggle "wall/ground"
         input.onActionPress("ajouter block", () -> {
             int posX = (int) round(player.pos.x / 50);
             int posY = (int) round(player.pos.y / 50);
-            BlockHandle.createBlock(new Block(posX, posY, Block.BlockCollisionType.WALL));
+            BlockHandle.createBlock(new Block(posX, posY,
+                    PlayerActionsManager.getInstance().isBlockGround ?
+                            Block.BlockCollisionType.GROUND :
+                            Block.BlockCollisionType.WALL
+            ));
+        });
+
+        input.onActionRelease("toggle ground wall", () -> {
+            Logger.info("Toggled Block placing to "
+                    + (PlayerActionsManager.getInstance().toggleGroundWallBlock() ? "Ground" : "Wall")
+            );
         });
 
         input.onActionRelease("avancer", () -> player.dirDepl.y = 0);
