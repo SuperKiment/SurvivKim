@@ -6,6 +6,7 @@ import com.superkiment.common.shapes.ShapeModel;
 import com.superkiment.common.collisions.CollisionsManager;
 import com.superkiment.common.collisions.CollisionShape;
 import org.joml.Vector2d;
+import org.joml.Vector3d;
 
 import java.util.ArrayList;
 
@@ -25,20 +26,29 @@ public class Block extends Collisionable {
     public Block(int x, int y, BlockCollisionType bct) {
         pos = new Vector2d(x, y);
         blockCollisionType = bct;
+
         shapeModel = new ShapeModel();
-        shapeModel.addShape(new Shape(new Vector2d(0, 0), new Vector2d(blockSize, blockSize), Shape.ShapeType.RECT));
-
-        if (blockCollisionType== BlockCollisionType.GROUND) this.doReactCollision = false;
-
         collisionsManager = new CollisionsManager(this);
-        collisionsManager.addCollisionShape(
-                new CollisionShape(
-                        new Vector2d(0, 0),
-                        new Vector2d(blockSize, blockSize),
-                        Shape.ShapeType.RECT_OUTLINE,
-                        this
-                )
-        );
+
+        switch (blockCollisionType) {
+            case GROUND -> {
+                Shape shape = new Shape(new Vector2d(0, 0), new Vector2d(blockSize, blockSize), Shape.ShapeType.RECT);
+                shape.lineWidth = 0f;
+                shape.color = new Vector3d(0, 1, 0);
+                shapeModel.addShape(shape);
+            }
+            case WALL -> {
+                shapeModel.addShape(new Shape(new Vector2d(0, 0), new Vector2d(blockSize, blockSize), Shape.ShapeType.RECT));
+                collisionsManager.addCollisionShape(
+                        new CollisionShape(
+                                new Vector2d(0, 0),
+                                new Vector2d(blockSize, blockSize),
+                                Shape.ShapeType.RECT_OUTLINE,
+                                this
+                        )
+                );
+            }
+        }
 
         uiShapeModels = new ArrayList<>();
     }

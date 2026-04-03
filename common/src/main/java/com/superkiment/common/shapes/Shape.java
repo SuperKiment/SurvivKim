@@ -10,6 +10,7 @@ public class Shape {
     }
 
     public Vector3d color = new Vector3d(1f, 0f, 0f);
+    public Vector3d lineColor = new Vector3d(0f, 0f, 0f);
     public Vector2d position;
     public ShapeType shapeType = ShapeType.CIRCLE;
     public Vector2d textOffset = new Vector2d(0, 0);
@@ -17,7 +18,7 @@ public class Shape {
 
     public Vector2d dimensions = null;
     public final int segments = 10;
-    public final float lineWidth = 3f;
+    public float lineWidth = 3f;
 
     // Attributs pour le texte
     public String text = "";

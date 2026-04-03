@@ -111,15 +111,20 @@ public class Renderer {
         glTranslated(position.x, position.y, 0);
         glColor3d(shape.color.x, shape.color.y, shape.color.z);
 
+        float dimXDiv2 = (float) dimensions.x * .5f;
+        float dimYDiv2 = (float) dimensions.y * .5f;
+
         switch (shapeType) {
             case ShapeType.RECT -> {
                 glBegin(GL_QUADS);
-                glVertex2f(-(float) dimensions.x / 2, -(float) dimensions.y / 2);
-                glVertex2f((float) dimensions.x / 2, -(float) dimensions.y / 2);
-                glVertex2f((float) dimensions.x / 2, (float) dimensions.y / 2);
-                glVertex2f(-(float) dimensions.x / 2, (float) dimensions.y / 2);
+                glVertex2f(-dimXDiv2, -dimYDiv2);
+                glVertex2f(dimXDiv2, -dimYDiv2);
+                glVertex2f(dimXDiv2, dimYDiv2);
+                glVertex2f(-dimXDiv2, dimYDiv2);
                 glEnd();
+                break;
             }
+
             case ShapeType.CIRCLE -> {
                 glBegin(GL_TRIANGLE_FAN);
                 glVertex2f(0, 0);
@@ -132,22 +137,24 @@ public class Renderer {
                 }
                 glEnd();
             }
+
             case ShapeType.TRIANGLE -> {
             }
 
             case ShapeType.RECT_OUTLINE -> {
-                glLineWidth(lineWidth);
-                glColor3d(0, 0, 0);
+                glLineWidth(2f);
+                if (shape.color.y == 1) System.out.println("copuc");;
+                glColor3d(shape.lineColor.x, shape.lineColor.y, shape.lineColor.z);
 
                 glBegin(GL_LINE_LOOP);
-                glVertex2d(-dimensions.x / 2, -dimensions.y / 2);
-                glVertex2d(dimensions.x / 2, -dimensions.y / 2);
-                glVertex2d(dimensions.x / 2, dimensions.y / 2);
-                glVertex2d(-dimensions.x / 2, dimensions.y / 2);
+                glVertex2d(-dimXDiv2, -dimYDiv2);
+                glVertex2d(dimXDiv2, -dimYDiv2);
+                glVertex2d(dimXDiv2, dimYDiv2);
+                glVertex2d(-dimXDiv2, dimYDiv2);
                 glEnd();
             }
+
             case ShapeType.CIRCLE_OUTLINE -> {
-                glLineWidth(lineWidth);
                 glColor3d(0, 0, 0);
 
                 glBegin(GL_LINE_LOOP);
@@ -159,6 +166,7 @@ public class Renderer {
                 }
                 glEnd();
             }
+
             default -> throw new IllegalStateException("Unexpected value: " + shapeType);
         }
 

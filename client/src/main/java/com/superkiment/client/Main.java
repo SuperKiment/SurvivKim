@@ -98,8 +98,8 @@ public class Main {
         }
 
         renderer.renderFloor();
-        renderer.renderEntities(entitiesManager.getEntities(), localPlayer);
         renderer.renderBlocks(blocksManager.getBlocks());
+        renderer.renderEntities(entitiesManager.getEntities(), localPlayer);
     }
 
     public static void main(String[] args) {
