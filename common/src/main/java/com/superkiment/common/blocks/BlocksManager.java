@@ -22,6 +22,12 @@ public class BlocksManager {
     public boolean addBlock(Block newBlock) {
         for (Block block : blocks) {
             if (block.isBlockOnPos(newBlock.pos)) {
+                //On peut placer un mur sur un sol
+                if (block.blockCollisionType == Block.BlockCollisionType.GROUND
+                        && newBlock.blockCollisionType == Block.BlockCollisionType.WALL) {
+                    continue;
+                }
+
                 Logger.debug("Cannot place block " + (int) newBlock.pos.x + " " + (int) newBlock.pos.y);
                 return false;
             }
