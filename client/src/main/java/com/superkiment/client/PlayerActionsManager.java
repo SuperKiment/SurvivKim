@@ -1,7 +1,7 @@
 package com.superkiment.client;
 
 public class PlayerActionsManager {
-    public static PlayerActionsManager instance = null;
+    private static PlayerActionsManager instance = null;
 
     public boolean isBlockGround = false;
 

@@ -47,7 +47,7 @@ public class UIManager {
     }
 
     public void setup(long window) {
-        Vector2d winSize = Renderer.GetCurrentWindowSize(window);
+        Vector2d winSize = Renderer.GetCurrentWindowSize();
 
         //GROUPES
 

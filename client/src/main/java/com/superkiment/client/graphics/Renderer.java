@@ -24,6 +24,7 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Renderer {
     private FontManager fontManager;
+    private static long window;
 
     public Renderer() {
     }
@@ -208,8 +209,6 @@ public class Renderer {
     }
 
     public long SetupWindow() {
-        long window;
-
         GLFWErrorCallback.createPrint(System.err).set();
 
         if (!glfwInit())
@@ -283,7 +282,7 @@ public class Renderer {
         }
     }
 
-    public static Vector2d GetCurrentWindowSize(long window) {
+    public static Vector2d GetCurrentWindowSize() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer pWidth = stack.mallocInt(1);
             IntBuffer pHeight = stack.mallocInt(1);

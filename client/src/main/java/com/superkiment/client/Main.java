@@ -1,5 +1,6 @@
 package com.superkiment.client;
 
+import com.superkiment.client.graphics.Camera;
 import com.superkiment.client.graphics.Renderer;
 import com.superkiment.client.graphics.ui.UIManager;
 import com.superkiment.client.network.GameClient;
@@ -9,6 +10,7 @@ import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.entities.EntitiesManager;
 import com.superkiment.common.entities.Entity;
 import com.superkiment.common.entities.EntityFactory;
+import org.joml.Vector2d;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -97,9 +99,14 @@ public class Main {
             GameClient.positionSendTimer = 0;
         }
 
+        Vector2d cameraPos = Camera.getInstance().update().getPos();
+
+        glPushMatrix();
+        glTranslated(-cameraPos.x, -cameraPos.y, 0);
         renderer.renderFloor();
         renderer.renderBlocks(blocksManager.getBlocks());
         renderer.renderEntities(entitiesManager.getEntities(), localPlayer);
+        glPopMatrix();
     }
 
     public static void main(String[] args) {
