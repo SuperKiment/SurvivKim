@@ -2,6 +2,7 @@ package com.superkiment.common.entities;
 
 import com.superkiment.common.shapes.Shape;
 import com.superkiment.common.collisions.CollisionShape;
+import com.superkiment.common.net.Sync;
 import org.joml.Vector2d;
 
 /**
@@ -9,7 +10,12 @@ import org.joml.Vector2d;
  */
 public class Player extends Entity {
 
+    @Sync
     Vector2d respawnPoint;
+
+    public Player() {
+        this(new Vector2d());
+    }
 
     public Player(Vector2d pos) {
         super(pos);
@@ -36,6 +42,7 @@ public class Player extends Entity {
 
     public void respawn() {
         pos.set(respawnPoint.x, respawnPoint.y);
+        dirtyPosition = true;
         this.fullHealth();
     }
 }

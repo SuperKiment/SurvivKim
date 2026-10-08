@@ -1,8 +1,8 @@
 package com.superkiment.server.monitor;
 
-import com.superkiment.common.packets.Packet;
-import com.superkiment.common.packets.entity.PacketEntityPosition;
-import com.superkiment.common.packets.PacketSerializer;
+import com.superkiment.common.net.Packet;
+import com.superkiment.common.net.PacketEntityPosition;
+import com.superkiment.common.net.PacketSerializer;
 import com.superkiment.server.GameServer;
 
 import java.io.IOException;
@@ -64,10 +64,9 @@ public class ServerMonitor {
     /**
      * Logger un packet TCP reçu
      */
-    public void logTCPReceived(Packet packet) throws IOException {
-        byte[] data = PacketSerializer.serialize(packet);
-        int bytes = data.length;
-        String packetType = packet.getType().toString();
+    public void logTCPReceived(Packet packet) {
+        int bytes = sizeOf(packet);
+        String packetType = packet.getClass().getSimpleName();
 
         totalTCPPackets++;
         tcpPacketsPerSecond++;
@@ -79,16 +78,23 @@ public class ServerMonitor {
     /**
      * Logger un packet TCP envoyé
      */
-    public void logTCPSent(Packet packet) throws IOException {
-        byte[] data = PacketSerializer.serialize(packet);
-        int bytes = data.length;
-        String packetType = packet.getType().toString();
+    public void logTCPSent(Packet packet) {
+        int bytes = sizeOf(packet);
+        String packetType = packet.getClass().getSimpleName();
 
         totalTCPPackets++;
         tcpPacketsPerSecond++;
         totalBytesSent += bytes;
         bytesPerSecond += bytes;
         log("TCP_OUT", "→ " + packetType + " (" + bytes + " bytes)");
+    }
+
+    private static int sizeOf(Packet packet) {
+        try {
+            return PacketSerializer.serialize(packet).length;
+        } catch (IOException e) {
+            return -1;
+        }
     }
 
     /**

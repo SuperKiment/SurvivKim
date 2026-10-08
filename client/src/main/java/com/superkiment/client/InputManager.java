@@ -1,10 +1,9 @@
 package com.superkiment.client;
 
 import com.superkiment.client.graphics.ui.UIElement;
-import com.superkiment.client.network.handles.BlockHandle;
-import com.superkiment.client.network.handles.EntityHandle;
 import com.superkiment.common.entities.Player;
 import com.superkiment.common.entities.Projectile;
+import com.superkiment.common.net.Packets;
 import org.joml.Vector2d;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
@@ -102,14 +101,14 @@ public class InputManager {
             projDir.normalize();
 
             Projectile projectile = new Projectile(projPos, projDir);
-            projectile.addCollisionException(player);
-            EntityHandle.createEntity(projectile);
+            projectile.ownerId = player.id;
+            Main.gameClient.spawn(projectile);
         });
 
         input.onActionPress("ajouter block", () -> {
             int posX = (int) round(player.pos.x / 50);
             int posY = (int) round(player.pos.y / 50);
-            BlockHandle.createBlock(new Vector2d(posX, posY));
+            Main.gameClient.send(new Packets.CreateBlock(posX, posY));
         });
 
         input.onActionRelease("avancer", () -> player.dirDepl.y = 0);
@@ -118,8 +117,7 @@ public class InputManager {
         input.onActionRelease("droite", () -> player.dirDepl.x = 0);
 
         input.onActionRelease("tests", () -> {
-            player.shapeModel.shapes.get(0).text = "I said a thing !";
-            EntityHandle.updateEntity(player);
+            player.shapeModel.shapes.get(0).text = "I said a thing !"; // propagé automatiquement
         });
 
         input.onActionPress("quitter", () -> glfwSetWindowShouldClose(window, true));

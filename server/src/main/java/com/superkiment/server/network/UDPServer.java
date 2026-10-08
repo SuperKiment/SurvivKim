@@ -1,8 +1,8 @@
 package com.superkiment.server.network;
 
 import com.superkiment.common.Logger;
-import com.superkiment.common.packets.PacketSerializer;
-import com.superkiment.common.packets.entity.PacketEntityPosition;
+import com.superkiment.common.net.PacketSerializer;
+import com.superkiment.common.net.PacketEntityPosition;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

@@ -1,11 +1,11 @@
-package com.superkiment.common.packets;
+package com.superkiment.common.net;
 
 import com.superkiment.common.entities.Entity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PacketPositionsBulk extends Packet {
+public class PacketPositionsBulk {
 
     public List<String> ids;
     public List<Double> x;
@@ -21,11 +21,6 @@ public class PacketPositionsBulk extends Packet {
             x.add(entity.pos.x);
             y.add(entity.pos.y);
         }
-    }
-
-    @Override
-    public PacketType getType() {
-        return PacketType.BULK_POSITION;
     }
 
     @Override

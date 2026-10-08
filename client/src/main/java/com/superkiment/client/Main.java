@@ -3,12 +3,10 @@ package com.superkiment.client;
 import com.superkiment.client.graphics.Renderer;
 import com.superkiment.client.graphics.ui.UIManager;
 import com.superkiment.client.network.GameClient;
-import com.superkiment.client.network.handles.PlayerHandle;
 import com.superkiment.common.Time;
 import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.entities.EntitiesManager;
 import com.superkiment.common.entities.Entity;
-import com.superkiment.common.entities.EntityFactory;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -48,7 +46,6 @@ public class Main {
         //Setup et lancer les services
         uiManager.setup(window);
 
-        EntityFactory.CreateInstance(entitiesManager);
         input = InputManager.getInstance();
         input.init(window);
         InputManager.setupGeneralInputs(input);
@@ -88,14 +85,7 @@ public class Main {
 
         localPlayer.updateLogic(entitiesManager, blocksManager);
 
-        gameClient.update();
-
-        // Envoyer la position au serveur (UDP) régulièrement
-        GameClient.positionSendTimer += deltaTime;
-        if (GameClient.positionSendTimer >= GameClient.POSITION_SEND_RATE) {
-            PlayerHandle.sendPosition();
-            GameClient.positionSendTimer = 0;
-        }
+        gameClient.update(deltaTime);
 
         renderer.renderFloor();
         renderer.renderEntities(entitiesManager.getEntities(), localPlayer);
