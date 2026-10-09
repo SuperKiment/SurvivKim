@@ -1,6 +1,7 @@
 package com.superkiment.common.collisions;
 
 import com.superkiment.common.entities.Entity;
+import com.superkiment.common.net.Sync;
 import com.superkiment.common.shapes.ShapeModel;
 import org.joml.Vector2d;
 
@@ -19,6 +20,7 @@ public abstract class Collisionable {
     /**
      * Le nombre de points de vie du collisionable.
      */
+    @Sync
     public float hp = 100, maxHP = 100;
 
     /**
@@ -37,11 +39,6 @@ public abstract class Collisionable {
      * Est-ce que le Collisionable a bougé depuis le dernier tick ?
      */
     public boolean dirtyPosition = false;
-
-    /**
-     * Est-ce qu'un attribut comme les hp ou le nom ont changé depuis le dernier tick ?
-     */
-    public boolean dirtyOtherAttribute = false;
 
     /**
      * Est-ce que le Collisionable réagit aux collisions de manière physique ?

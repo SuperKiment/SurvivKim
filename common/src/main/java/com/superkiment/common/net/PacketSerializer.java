@@ -1,7 +1,6 @@
-package com.superkiment.common.packets;
+package com.superkiment.common.net;
 
 import com.superkiment.common.entities.Entity;
-import com.superkiment.common.packets.entity.PacketEntityPosition;
 
 import java.io.*;
 import java.nio.BufferUnderflowException;

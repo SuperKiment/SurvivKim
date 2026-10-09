@@ -4,7 +4,6 @@ import com.superkiment.common.Logger;
 import com.superkiment.common.Time;
 import com.superkiment.common.blocks.BlocksManager;
 import com.superkiment.common.entities.Entity;
-import com.superkiment.common.entities.EntityFactory;
 import com.superkiment.server.entities.ServerEntitiesManager;
 import com.superkiment.server.monitor.MonitorWebServer;
 import com.superkiment.server.monitor.ServerMonitor;
@@ -44,8 +43,6 @@ public class GameServer {
 
         entitiesManager = new ServerEntitiesManager();
         blocksManager = new BlocksManager();
-
-        EntityFactory.CreateInstance(entitiesManager);
 
         running = true;
 
@@ -96,19 +93,18 @@ public class GameServer {
     private void tick() {
         Time.UpdateFrameTime();
 
+        Network.ROUTER.drain();
+
         // Gérer les timeouts
         for (ClientConnection client : entitiesManager.getClients().values()) {
-            float timeSinceLastHeatbeat = client.timeSinceLastHeartbeat(System.currentTimeMillis());
-
             // Timeout : 12 secondes (3 * heartbeat de 4s)
-            if (timeSinceLastHeatbeat > 12_000f) {
+            if (client.timeSinceLastHeartbeat(System.currentTimeMillis()) > 12_000) {
                 Logger.info("Client " + client.playerName + " was timed out.");
                 client.disconnect();
             }
         }
 
         for (Entity entity : entitiesManager.getEntities().values()) {
-            entity.dirtyOtherAttribute = false;
             entity.dirtyPosition = false;
         }
 
@@ -119,7 +115,7 @@ public class GameServer {
         entitiesManager.deleteAllEntitiesToBeDeleted();
 
         Network.broadcastBulkPositionUDP(udpServer);
-        Network.broadcastChangesInCollisionablesTCP(tcpServer);
+        entitiesManager.broadcastChanges();
     }
 
     public void stop() {

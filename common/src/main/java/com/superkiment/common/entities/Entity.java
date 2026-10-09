@@ -6,6 +6,7 @@ import com.superkiment.common.collisions.CollisionData;
 import com.superkiment.common.collisions.Collisionable;
 import com.superkiment.common.shapes.ShapeModel;
 import com.superkiment.common.collisions.CollisionsManager;
+import com.superkiment.common.net.Sync;
 import org.joml.Vector2d;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ public class Entity extends Collisionable {
             dirLookTarget, dirLookLerp, dirDepl;
     public float speed = 200f;
     public String id;
+    @Sync
     public String name = "NoName";
 
     public boolean moveFromInput = false;

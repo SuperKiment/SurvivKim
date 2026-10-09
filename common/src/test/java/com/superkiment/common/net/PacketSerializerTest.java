@@ -1,7 +1,7 @@
-package com.superkiment.common.packets;
+package com.superkiment.common.net;
 
 import com.superkiment.common.entities.Entity;
-import com.superkiment.common.packets.entity.PacketEntityPosition;
+import com.superkiment.common.entities.Player;
 import org.joml.Vector2d;
 import org.junit.jupiter.api.Test;
 
@@ -21,37 +21,24 @@ public class PacketSerializerTest {
     // ─────────────────────── TCP (Java Serialization) ────────────────────
 
     @Test
-    void tcp_serialize_playerJoin_deserialize_isEqual() throws IOException, ClassNotFoundException {
-        PacketPlayerJoin original = new PacketPlayerJoin("uuid-42", "Alice");
+    void tcp_serialize_join_deserialize_isEqual() throws IOException, ClassNotFoundException {
+        Packets.Join original = new Packets.Join("uuid-42", "Alice");
 
         byte[] bytes = PacketSerializer.serialize(original);
-        assertNotNull(bytes, "Les bytes ne doivent pas être null");
         assertTrue(bytes.length > 0, "Les bytes ne doivent pas être vides");
 
-        Packet deserialized = PacketSerializer.deserialize(bytes);
-        assertInstanceOf(PacketPlayerJoin.class, deserialized);
-
-        PacketPlayerJoin result = (PacketPlayerJoin) deserialized;
-        assertEquals("uuid-42", result.playerId,   "playerId doit survivre au roundtrip");
-        assertEquals("Alice",   result.playerName, "playerName doit survivre au roundtrip");
-        assertEquals(Packet.PacketType.PLAYER_JOIN, result.getType());
+        assertEquals(original, PacketSerializer.deserialize(bytes), "Un record doit survivre au roundtrip");
     }
 
     @Test
-    void tcp_serialize_heartbeat_deserialize_isCorrect() throws IOException, ClassNotFoundException {
-        PacketHeartbeat original = new PacketHeartbeat("player-1", System.currentTimeMillis());
+    void tcp_serialize_spawnEntity_keepsState() throws IOException, ClassNotFoundException {
+        Packets.SpawnEntity original = EntitySync.spawnPacket(new Player(new Vector2d(5, 6)));
 
-        Packet result = PacketSerializer.deserialize(PacketSerializer.serialize(original));
-        assertInstanceOf(PacketHeartbeat.class, result);
-        assertEquals(Packet.PacketType.HEARTBEAT, result.getType());
-    }
+        Packets.SpawnEntity result = (Packets.SpawnEntity) PacketSerializer.deserialize(PacketSerializer.serialize(original));
 
-    @Test
-    void tcp_serialize_differentPackets_produceDifferentBytes() throws IOException {
-        byte[] joinBytes = PacketSerializer.serialize(new PacketPlayerJoin("a", "A"));
-        byte[] hbBytes   = PacketSerializer.serialize(new PacketHeartbeat("x", 0L));
-        assertNotEquals(joinBytes.length, hbBytes.length,
-                "Des types de packets différents doivent produire des bytes différents");
+        assertEquals(original.id(), result.id());
+        assertEquals(original.type(), result.type());
+        assertEquals(original.state().get("respawnPoint"), result.state().get("respawnPoint"), "Vector2d doit être sérialisable");
     }
 
     // ─────────────────────── UDP (format compact) ────────────────────────

@@ -105,3 +105,34 @@ Le projet adopte une architecture réseau classique :
 * code partagé mutualisé dans `common`
 * build multi-module Gradle
 * outils auxiliaires en JavaScript pour support graphique
+
+---
+
+## Réseau : ajouter du contenu
+
+Tout le réseau partagé vit dans `common/.../net`.
+
+### Ajouter une entité
+
+Une seule classe, dans `common/.../entities` :
+
+```java
+public class Zombie extends Entity {
+    @Sync public int rage = 1;            // synchronisé automatiquement
+    @Sync public Vector2d target = new Vector2d();
+    public int localOnly;                 // non annoté : reste local
+
+    public Zombie() { /* shapes, collisions... */ }  // constructeur sans argument requis
+}
+```
+
+- Faire apparaître : `Main.gameClient.spawn(new Zombie())` côté client, `GameServer.entitiesManager.addEntity(...)` côté serveur.
+- Modifier un champ `@Sync` suffit : le serveur diffe chaque tick et propage les changements ; le client fait de même pour son joueur local.
+- Position et direction passent par l'UDP, ne pas les annoter.
+
+### Ajouter un packet (hors entités)
+
+1. Un `record` dans `Packets.java` qui implémente `Packet`.
+2. Un `router.on(MonPacket.class, (p, ctx) -> ...)` côté récepteur (`Network.ROUTER` serveur, `GameClient.router` client).
+
+Les handlers s'exécutent sur le thread de jeu (file vidée à chaque tick / frame) : pas de concurrence sur l'état du monde.

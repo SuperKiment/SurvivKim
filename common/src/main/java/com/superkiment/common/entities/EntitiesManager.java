@@ -25,6 +25,10 @@ public class EntitiesManager {
         entities.put(entity.id, entity);
     }
 
+    public Entity removeEntity(String id) {
+        return entities.remove(id);
+    }
+
     public void addToBeDeleted(Entity entity) {
         toBeDeletedEntities.add(entity);
     }
@@ -32,6 +36,7 @@ public class EntitiesManager {
     public void deleteAllEntitiesToBeDeleted() {
         for (Entity entity : toBeDeletedEntities) {
             entity.onDeleted();
+            removeEntity(entity.id);
         }
 
         toBeDeletedEntities.clear();

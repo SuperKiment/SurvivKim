@@ -1,13 +1,6 @@
-package com.superkiment.common.packets.entity;
+package com.superkiment.common.net;
 
-import com.superkiment.common.packets.Packet;
-
-import java.io.Serial;
-
-public class PacketEntityPosition extends Packet {
-    @Serial
-    private static final long serialVersionUID = 1L;
-
+public class PacketEntityPosition {
     public String entityId;
     public double posX;
     public double posY;
@@ -24,11 +17,6 @@ public class PacketEntityPosition extends Packet {
         this.dirX = dirX;
         this.dirY = dirY;
         this.timestamp = System.currentTimeMillis();
-    }
-
-    @Override
-    public PacketType getType() {
-        return PacketType.ENTITY_POSITION;
     }
 
     @Override

@@ -1,18 +1,14 @@
 package com.superkiment.server.network;
 
 import com.superkiment.common.Logger;
+import com.superkiment.common.blocks.Block;
 import com.superkiment.common.entities.Entity;
-import com.superkiment.common.packets.*;
-import com.superkiment.common.packets.entity.PacketCreateEntity;
-import com.superkiment.common.packets.entity.PacketDeleteEntity;
-import com.superkiment.common.packets.entity.PacketEntityPosition;
-import com.superkiment.common.packets.entity.PacketUpdateEntity;
+import com.superkiment.common.net.*;
+import com.superkiment.common.net.Packets.*;
 import com.superkiment.server.GameServer;
 import com.superkiment.server.entities.ServerEntitiesManager;
 import com.superkiment.server.monitor.ServerMonitor;
-import com.superkiment.server.network.handles.BlockHandle;
-import com.superkiment.server.network.handles.EntityHandle;
-import com.superkiment.server.network.handles.PlayerHandle;
+import org.joml.Vector2d;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -21,46 +17,57 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Classe contenant uniquement des fonctions statiques sur le handling de paquets et l'envoi de paquets.
+ * Réception (routes TCP) et envoi de paquets côté serveur.
  */
 public class Network {
 
-    //Références pour la facilité.
-    private static final ServerMonitor monitor;
-    private static final ServerEntitiesManager entitiesManager;
+    private static final ServerMonitor monitor = ServerMonitor.getInstance();
 
-    //Récupération des références.
-    static {
-        monitor = ServerMonitor.getInstance();
-        entitiesManager = GameServer.entitiesManager;
+    /**
+     * Toutes les routes TCP du serveur. Exécutées sur le thread de jeu via {@link PacketRouter#drain()}.
+     */
+    public static final PacketRouter<ClientConnection> ROUTER = new PacketRouter<ClientConnection>()
+            .on(Join.class, Network::onJoin)
+            .on(Heartbeat.class, (p, client) -> client.onHeartbeat(p.timestamp()))
+            .on(SpawnEntity.class, (p, client) -> entities().addEntity(EntitySync.create(p)))
+            .on(UpdateEntity.class, (p, client) -> {
+                Entity entity = entities().getEntityFromID(p.id());
+                if (entity != null) EntitySync.apply(entity, p.changes());
+            })
+            .on(RemoveEntity.class, (p, client) -> entities().removeEntity(p.id()))
+            .on(CreateBlock.class, (p, client) -> {
+                if (GameServer.blocksManager.addBlock(new Vector2d(p.x(), p.y()))) broadcast(p);
+            });
+
+    private static ServerEntitiesManager entities() {
+        return GameServer.entitiesManager;
+    }
+
+    private static void onJoin(Join packet, ClientConnection client) {
+        client.playerId = packet.playerId();
+        client.playerName = packet.playerName();
+        entities().getClients().put(client.playerId, client);
+
+        // Rattrapage de l'état du monde pour le nouveau venu
+        for (Entity entity : entities().getEntities().values()) {
+            client.send(EntitySync.spawnPacket(entity));
+        }
+        for (Block block : GameServer.blocksManager.getBlocks()) {
+            client.send(new CreateBlock((int) block.pos.x, (int) block.pos.y));
+        }
+
+        broadcast(packet);
+        Logger.info("Joueur connecté: " + client.playerName + " (" + client.playerId + ")");
+        monitor.log("INFO", "Joueur a rejoint : " + client.playerId + " (" + client.playerName + ")");
     }
 
     /**
-     * Gérer les packets TCP reçus
+     * Envoyer un packet TCP à tous les clients connectés.
      */
-    public static void handleTCPPacket(Packet packet, ClientConnection originClient) {
-        Logger.trace("TCP reçu: " + packet);
-
-        try {
-            monitor.logTCPReceived(packet);
-        } catch (IOException ignored) {
-        }
-
-        switch (packet.getType()) {
-            case CREATE_ENTITY -> EntityHandle.handleCreateEntity((PacketCreateEntity) packet, originClient);
-
-            case DELETE_ENTITY -> EntityHandle.handleDeleteEntity((PacketDeleteEntity) packet);
-
-            case UPDATE_ENTITY -> EntityHandle.handleUpdateEntity((PacketUpdateEntity) packet, originClient);
-
-            case PLAYER_JOIN -> PlayerHandle.handlePlayerJoin((PacketPlayerJoin) packet, originClient);
-
-            case CREATE_BLOCK -> BlockHandle.handleCreateBlock((PacketCreateBlock) packet, originClient);
-
-            case HEARTBEAT -> EntityHandle.handlePlayerHeartbeat((PacketHeartbeat) packet, originClient);
-
-            default -> Logger.warn("Type de packet TCP non géré: " + packet.getType());
-
+    public static void broadcast(Packet packet) {
+        monitor.logTCPSent(packet);
+        for (ClientConnection client : entities().getClients().values()) {
+            client.send(packet);
         }
     }
 
@@ -70,14 +77,12 @@ public class Network {
     public static void handleUDPPacket(PacketEntityPosition packet, InetAddress address, int port, UDPServer udpServer) {
         monitor.logUDPReceived(packet);
 
-        ClientConnection client = entitiesManager.getClients().get(packet.entityId);
-        if (client != null) {
-            if (client.getUdpPort() == 0) {
-                client.setUdpPort(port);
-            }
+        ClientConnection client = entities().getClients().get(packet.entityId);
+        if (client != null && client.getUdpPort() == 0) {
+            client.setUdpPort(port);
         }
 
-        Entity entity = entitiesManager.getEntities().get(packet.entityId);
+        Entity entity = entities().getEntities().get(packet.entityId);
         if (entity != null) {
             entity.pos.set(packet.posX, packet.posY);
             entity.dirLookTarget.set(packet.dirX, packet.dirY);
@@ -87,31 +92,12 @@ public class Network {
     }
 
     /**
-     * Envoyer un packet TCP à tous les clients (sauf l'expéditeur en cas de création de player)
-     */
-    public static void broadcastTCP(Packet packet, ClientConnection except) {
-        try {
-            monitor.logTCPSent(packet);
-        } catch (IOException ignored) {
-        }
-
-        for (ClientConnection client : entitiesManager.getClients().values()) {
-            if (client == except
-                    && packet.getType() == Packet.PacketType.CREATE_ENTITY
-                    && ((PacketCreateEntity) packet).entityId.equals(client.playerId)
-            ) continue;
-
-            client.sendTCP(packet);
-        }
-    }
-
-    /**
      * Envoyer une position UDP à tous les clients sauf l'expéditeur (mise à jour d'une seule entité).
      */
     public static void broadcastPositionUDP(PacketEntityPosition packet, InetAddress exceptAddress, int exceptPort, UDPServer udpServer) {
         monitor.logUDPSent(packet);
 
-        for (ClientConnection client : entitiesManager.getClients().values()) {
+        for (ClientConnection client : entities().getClients().values()) {
             int udpPort = client.getUdpPort();
             if (udpPort == 0) continue;
 
@@ -123,10 +109,10 @@ public class Network {
     }
 
     /**
-     * Envoyer une position UDP à tous les clients sauf l'expéditeur (mise à jour de toutes les entités qui ont bougé).
+     * Envoyer en UDP les positions de toutes les entités qui ont bougé ce tick.
      */
     public static void broadcastBulkPositionUDP(UDPServer udpServer) {
-        List<Entity> moved = entitiesManager.getEntities()
+        List<Entity> moved = entities().getEntities()
                 .values()
                 .stream()
                 .filter(e -> e.dirtyPosition)
@@ -134,60 +120,23 @@ public class Network {
 
         if (moved.isEmpty()) return;
 
-        //On divise la liste en petites listes de 17 entités pour éviter de passer au-dessus de la limite du buffer
-        List<List<Entity>> dividedMoved = new ArrayList<>();
-        List<Entity> currentList = new ArrayList<>();
-
-        for (int i = 0; i < moved.size(); i++) {
-            if (i % 17 == 0) {
-                dividedMoved.add(new ArrayList<>());
-                currentList = dividedMoved.get(dividedMoved.size() - 1);
-            }
-
-            currentList.add(moved.get(i));
+        // Paquets de 17 entités pour rester sous la taille du buffer de réception (1024 octets)
+        List<byte[]> datas = new ArrayList<>();
+        for (int i = 0; i < moved.size(); i += 17) {
+            List<Entity> part = moved.subList(i, Math.min(i + 17, moved.size()));
+            datas.add(PacketSerializer.serializeBulk(new PacketPositionsBulk(part)));
         }
 
-        //On sérialise toutes les listes
-        List<byte[]> dividedDatas = new ArrayList<>();
-        for (List<Entity> part : dividedMoved) {
-            byte[] data = PacketSerializer.serializeBulk(new PacketPositionsBulk(part));
-            dividedDatas.add(data);
-        }
-
-        for (ClientConnection client : entitiesManager.getClients().values()) {
+        for (ClientConnection client : entities().getClients().values()) {
             int udpPort = client.getUdpPort();
             if (udpPort == 0) continue;
 
-            //Et on envoie tous les serials à chaque client
-            for (byte[] data : dividedDatas) {
+            for (byte[] data : datas) {
                 try {
-                    DatagramPacket datagramPacket = new DatagramPacket(
-                            data, data.length, client.getAddress(), udpPort
-                    );
-                    udpServer.socket.send(datagramPacket);
+                    udpServer.socket.send(new DatagramPacket(data, data.length, client.getAddress(), udpPort));
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Logger.error("Échec d'envoi UDP", e);
                 }
-            }
-        }
-    }
-
-    /**
-     * Envoyer une position UDP à tous les clients sauf l'expéditeur (mise à jour de toutes les entités qui ont bougé).
-     */
-    public static void broadcastChangesInCollisionablesTCP(TCPServer tcpServer) {
-        List<Entity> changed = entitiesManager.getEntities()
-                .values()
-                .stream()
-                .filter(e -> e.dirtyOtherAttribute)
-                .toList();
-
-        if (changed.isEmpty()) return;
-
-        for (ClientConnection client : entitiesManager.getClients().values()) {
-
-            for (Entity entity : changed) {
-                client.sendTCP(new PacketUpdateEntity(entity));
             }
         }
     }
